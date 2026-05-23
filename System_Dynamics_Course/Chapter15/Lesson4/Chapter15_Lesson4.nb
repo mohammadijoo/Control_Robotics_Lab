@@ -1,0 +1,46 @@
+Notebook[{
+  Cell["Chapter15_Lesson4.nb - Event Handling, Switching, and Hybrid Dynamics", "Section"],
+  Cell[BoxData[
+    ToBoxes[
+      Module[{g = 9.81, e = 0.82, tf = 8.0, x, v, impacts = {}, sol, tNow = 0., x0 = 1.5, v0 = 0.0, pieces = {}},
+        While[tNow < tf,
+          sol = NDSolveValue[
+            {
+              x'[t] == v[t],
+              v'[t] == -g,
+              x[tNow] == x0,
+              v[tNow] == v0,
+              WhenEvent[x[t] == 0 && v[t] < 0,
+                {
+                  AppendTo[impacts, t],
+                  x[t] -> 0,
+                  v[t] -> -e v[t]
+                },
+                "StopIntegration"
+              ]
+            },
+            {x, v},
+            {t, tNow, tf},
+            Method -> {"EventLocator", "EventAction" -> "StopIntegration"}
+          ];
+          AppendTo[pieces, sol];
+          If[impacts === {} || Last[impacts] <= tNow, Break[]];
+          tNow = Last[impacts];
+          x0 = 0.0;
+          v0 = (sol[[2]][tNow]);
+          If[Abs[v0] < 0.05, Break[]];
+          v0 = v0 + 10^-12;
+        ];
+        Print["Impact times: ", impacts];
+        Plot[
+          Evaluate@Table[pieces[[k, 1]][t], {k, Length[pieces]}],
+          {t, 0, tf},
+          PlotRange -> All,
+          GridLines -> {impacts, None},
+          AxesLabel -> {"t", "h(t)"},
+          PlotLabel -> "Hybrid Simulation with WhenEvent"
+        ]
+      ]
+    ]
+  ], "Input"]
+}]

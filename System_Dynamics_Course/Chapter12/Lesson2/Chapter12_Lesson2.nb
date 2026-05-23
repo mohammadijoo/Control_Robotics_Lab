@@ -1,0 +1,67 @@
+(* Chapter 12 - Lesson 2: Bode Plots (Wolfram Mathematica) *)
+Notebook[{
+  Cell["Chapter 12 - Lesson 2: Bode Plots: Magnitude, Phase, Asymptotes", "Section"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"(*", " Define transfer function: G(s)=10 (1+s)/(s (1+s/10)) ", "*)"}], "\n",
+      RowBox[{"G", "=", 
+        RowBox[{"TransferFunctionModel", "[", 
+          RowBox[{
+            RowBox[{"10", " ", 
+              RowBox[{"(", 
+                RowBox[{"1", "+", "s"}], ")"}], "/", 
+              RowBox[{"(", 
+                RowBox[{"s", " ", 
+                  RowBox[{"(", 
+                    RowBox[{"1", "+", 
+                      RowBox[{"s", "/", "10"}]}], ")"}]}], ")"}]}], ",", "s"}], "]"}]}], ";"}]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"w", "=", 
+        RowBox[{"10", "^", 
+          RowBox[{"Range", "[", 
+            RowBox[{"-2", ",", "3", ",", "0.0025"}], "]"}]}]}], ";"}]], "Input"],
+  Cell[BoxData[
+    RowBox[{"BodePlot", "[", 
+      RowBox[{"G", ",", 
+        RowBox[{"{", 
+          RowBox[{"w", "[", 
+            RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{"w", "[", 
+            RowBox[{"[", 
+              RowBox[{"-", "1"}], "]"}], "]"}]}], "}"}], ",", 
+        RowBox[{"ScalingFunctions", "->", "\"Log\""}], ",", 
+        RowBox[{"PlotLegends", "->", "None"}]}], "]"}]], "Input"],
+  Cell["Manual frequency response and asymptotes", "Subsection"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"jw", "=", 
+        RowBox[{"I", " ", "w"}]}], ";", "\n",
+      RowBox[{"Gj", "=", 
+        RowBox[{"10", " ", 
+          RowBox[{"(", 
+            RowBox[{"1", "+", "jw"}], ")"}], "/", 
+          RowBox[{"(", 
+            RowBox[{"jw", " ", 
+              RowBox[{"(", 
+                RowBox[{"1", "+", 
+                  RowBox[{"jw", "/", "10"}]}], ")"}]}], ")"}]}]}], ";", "\n",
+      RowBox[{"Mag", "=", 
+        RowBox[{"20", " ", 
+          RowBox[{"Log10", "[", 
+            RowBox[{"Abs", "[", "Gj", "]"}], "]"}]}]}], ";", "\n",
+      RowBox[{"Ph", "=", 
+        RowBox[{"Arg", "[", "Gj", "]"}]}], ";"}]], "Input"],
+  Cell[BoxData[
+    RowBox[{"ListLinePlot", "[", 
+      RowBox[{
+        RowBox[{"Transpose", "[", 
+          RowBox[{"{", 
+            RowBox[{"w", ",", "Mag"}], "}"}], "]"}], ",", 
+        RowBox[{"ScalingFunctions", "->", 
+          RowBox[{"{", 
+            RowBox[{"\"Log\"", ",", "None"}], "}"}]}], ",", 
+        RowBox[{"AxesLabel", "->", 
+          RowBox[{"{", 
+            RowBox[{"\"w\"", ",", "\"Mag (dB)\""}], "}"}]}]}], "]"}]], "Input"]
+}]

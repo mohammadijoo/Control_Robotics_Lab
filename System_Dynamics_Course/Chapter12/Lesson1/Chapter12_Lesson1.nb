@@ -1,0 +1,80 @@
+(* Chapter12_Lesson1.nb
+   System Dynamics (Control Engineering) — Chapter 12, Lesson 1
+   Sinusoidal Steady-State Response and Frequency Response Definition
+
+   This is a Mathematica notebook stored as a plain-text Notebook[] expression.
+*)
+
+Notebook[{
+  Cell["System Dynamics — Chapter 12, Lesson 1", "Title"],
+  Cell["Sinusoidal Steady-State Response and Frequency Response", "Section"],
+
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"wn", "=", "5.0"}], ";",
+      RowBox[{"zeta", "=", "0.2"}], ";",
+      RowBox[{"G", "=", 
+        RowBox[{"TransferFunctionModel", "[", 
+          RowBox[{
+            FractionBox[RowBox[{"wn", "^", "2"}], 
+              RowBox[{
+                RowBox[{"s", "^", "2"}], "+", RowBox[{"2", " ", "zeta", " ", "wn", " ", "s"}], "+", RowBox[{"wn", "^", "2"}]
+              }]
+            ], ",", "s"}], "]"}]}], ";"
+    }]], "Input"],
+
+  Cell["Frequency response and Bode plot:", "Text"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"Um", "=", "1.0"}], ";",
+      RowBox[{"omega", "=", "4.0"}], ";",
+      RowBox[{"Gjw", "=", 
+        RowBox[{"FrequencyResponse", "[", 
+          RowBox[{"G", ",", "omega"}], "]"}]}], ";",
+      RowBox[{"YmPred", "=", 
+        RowBox[{"Abs", "[", "Gjw", "]"}], ";",
+        }], ";",
+      RowBox[{"phiPred", "=", 
+        RowBox[{"Arg", "[", "Gjw", "]"}]}], ";",
+      RowBox[{"{Gjw, YmPred, phiPred}"}]
+    }]], "Input"],
+
+  Cell[BoxData[RowBox[{"BodePlot", "[", RowBox[{"G", ",", RowBox[{"{", RowBox[{"0.1", ",", "100"}], "}"}]}], "]"}]], "Input"],
+
+  Cell["Time-domain simulation of y'' + 2 zeta wn y' + wn^2 y = wn^2 u(t):", "Text"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"u", "[", "t_", "]"}], ":=", RowBox[{"Um", " ", RowBox[{"Sin", "[", RowBox[{"omega", " ", "t"}], "]"}]}], ";",
+      RowBox[{"sol", "=", RowBox[{"NDSolve", "[", 
+        RowBox[{
+          RowBox[{"{", 
+            RowBox[{
+              RowBox[{
+                RowBox[{
+                  RowBox[{"y", "''"}], "[", "t", "]"}], "+", 
+                RowBox[{"2", " ", "zeta", " ", "wn", " ", RowBox[{
+                  RowBox[{"y", "'"}], "[", "t", "]"}]}], "+", 
+                RowBox[{
+                  RowBox[{"wn", "^", "2"}], " ", RowBox[{"y", "[", "t", "]"}]}], "==", 
+                RowBox[{
+                  RowBox[{"wn", "^", "2"}], " ", RowBox[{"u", "[", "t", "]"}]}
+              }], ",",
+              RowBox[{"y", "[", "0", "]"}], "==", "0", ",",
+              RowBox[{
+                RowBox[{"y", "'"}], "[", "0", "]"}], "==", "0"
+            }], "}", ",", "y", ",", RowBox[{"{", RowBox[{"t", ",", "0", ",", "40"}], "}"}]}], "]"}]}], ";"
+    }]], "Input"],
+
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"Plot", "[", 
+        RowBox[{
+          RowBox[{"Evaluate", "[", RowBox[{"y", "[", "t", "]"}], "/.", "sol"}], ",",
+          RowBox[{"{", RowBox[{"t", ",", "35", ",", "40"}], "}"}], ",",
+          RowBox[{"GridLines", "->", "Automatic"}], ",",
+          RowBox[{"PlotRange", "->", "All"}]}], "]"}]
+    }]], "Input"]
+},
+WindowSize -> {1000, 700},
+StyleDefinitions -> "Default.nb"
+]

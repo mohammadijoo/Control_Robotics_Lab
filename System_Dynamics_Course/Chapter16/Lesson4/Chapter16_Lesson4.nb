@@ -1,0 +1,74 @@
+(* Chapter16_Lesson4.nb *)
+(* Continuous–Discrete Conversions: Zero-Order Hold, Exact Discretization *)
+(* Wolfram Mathematica / Wolfram Language implementation *)
+
+ClearAll["Global`*"];
+
+(* Mass-spring-damper example *)
+m = 1.0; c = 0.6; k = 4.0; b = 1.0;
+A = {{0., 1.}, {-k/m, -c/m}};
+B = {{0.}, {b/m}};
+C = {{1., 0.}};
+D = {{0.}};
+Ts = 0.1;
+
+n = Length[A];
+mIn = Dimensions[B][[2]];
+
+(* Exact ZOH discretization via augmented matrix exponential *)
+M = ArrayFlatten[{{A, B}, {ConstantArray[0., {mIn, n}], ConstantArray[0., {mIn, mIn}]}}];
+Md = MatrixExp[M Ts];
+
+AdExact = Md[[1 ;; n, 1 ;; n]];
+BdExact = Md[[1 ;; n, n + 1 ;; n + mIn]];
+
+Print["AdExact = ", MatrixForm[AdExact]];
+Print["BdExact = ", MatrixForm[BdExact]];
+
+(* If A is nonsingular, closed-form Bd *)
+If[Det[A] != 0,
+  BdClosed = LinearSolve[A, (AdExact - IdentityMatrix[n]).B];
+  Print["BdClosed = ", MatrixForm[BdClosed]];
+];
+
+(* Forward Euler (approximate) *)
+AdEuler = IdentityMatrix[n] + Ts A;
+BdEuler = Ts B;
+
+(* Discrete simulation with a step input *)
+Nsteps = 80;
+uSeq = Join[ConstantArray[0., 5], ConstantArray[1., Nsteps - 5]];
+
+xExact = {0., 0.};
+xEuler = {0., 0.};
+
+yExact = Table[0., {Nsteps}];
+yEuler = Table[0., {Nsteps}];
+
+Do[
+  yExact[[k]] = (C . xExact)[[1]];
+  yEuler[[k]] = (C . xEuler)[[1]];
+
+  xExact = Flatten[AdExact . xExact + Flatten[BdExact] uSeq[[k]]];
+  xEuler = Flatten[AdEuler . xEuler + Flatten[BdEuler] uSeq[[k]]];
+, {k, 1, Nsteps}];
+
+t = Range[0, Nsteps - 1] Ts;
+
+ListLinePlot[
+  {
+    Transpose[{t, yExact}],
+    Transpose[{t, yEuler}],
+    Transpose[{t, uSeq}]
+  },
+  PlotLegends -> {"Exact ZOH", "Forward Euler", "u[k]"},
+  AxesLabel -> {"t [s]", "value"},
+  PlotRange -> All,
+  GridLines -> Automatic,
+  ImageSize -> Large
+]
+
+(* Optional (newer versions):
+   sysc = StateSpaceModel[{A, B, C, D}];
+   sysd = ToDiscreteTimeModel[sysc, Ts, Method -> "ZeroOrderHold"];
+*)

@@ -1,0 +1,93 @@
+\
+Notebook[{
+  Cell["Chapter16_Lesson1.nb", "Title"],
+  Cell["Sampling, Aliasing, and Zero-Order Hold Demo", "Section"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"fs","=","80."}],";",
+      RowBox[{"Ts","=","1/fs"}],";",
+      RowBox[{"f1","=","12."}],";",
+      RowBox[{"f2","=","55."}],";",
+      RowBox[{"A1","=","1."}],";",
+      RowBox[{"A2","=","0.7"}],";",
+      RowBox[{"dur","=","0.25"}],";"
+    }]
+  ], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"x","[","t_","]"}],":=",
+      RowBox[{"A1"," ","Sin","[",RowBox[{"2"," ","Pi"," ","f1"," ","t"}],"]","+",
+             "A2"," ","Sin","[",RowBox[{"2"," ","Pi"," ","f2"," ","t"}],"]"}]
+    }]
+  ], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"aliasFreq","[",RowBox[{"f0_",",","fs_"}],"]"}],":=",
+      RowBox[{"Module","[",
+        RowBox[{
+          RowBox[{"{","m,fa","}"}],",",
+          RowBox[{
+            RowBox[{"m","=","Round","[",RowBox[{"f0/fs"}],"]"}],";",
+            RowBox[{"fa","=","Abs","[",RowBox[{"f0","-","m"," ","fs"}],"]"}],";",
+            RowBox[{"If","[",RowBox[{
+              RowBox[{"fa",">","fs/2"}],",",
+              RowBox[{"fa","=","fs-fa"}]
+            }],"]"}],";",
+            "fa"
+          }]
+        }],"]"}]
+    }]
+  ], "Input"],
+  Cell[BoxData[
+    RowBox[{"aliasFreq","[",RowBox[{"f2",",","fs"}],"]"}]
+  ], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"ts","=",
+        RowBox[{"Range","[",RowBox[{"0",",",RowBox[{"dur-Ts"}],",","Ts"}],"]"}]}],";",
+      RowBox[{"xs","=",RowBox[{"x","/@","ts"}]}],";",
+      RowBox[{"td","=",RowBox[{"Range","[",RowBox[{"0",",","dur",",","0.0002"}],"]"}]}],";"
+    }]
+  ], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"zoh","[","t_","]"}],":=",
+      RowBox[{"Module","[",
+        RowBox[{
+          RowBox[{"{","k","}"}],",",
+          RowBox[{
+            RowBox[{"k","=",
+              RowBox[{"Floor","[",RowBox[{"t/Ts"}],"]","+","1"}]}],";",
+            RowBox[{"k","=","Clip","[",RowBox[{"k",",",RowBox[{"{","1",",",RowBox[{"Length","[","xs","]"}],"}"}]}],"]"}],";",
+            RowBox[{"xs","[","[","k","]","]"}]
+          }]
+        }],"]"}]
+    }]
+  ], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"xz","=",RowBox[{"zoh","/@","td"}]}],";",
+      RowBox[{"xc","=",RowBox[{"x","/@","td"}]}],";"
+    }]
+  ], "Input"],
+  Cell[BoxData[
+    RowBox[{"Show","[",
+      RowBox[{
+        RowBox[{"ListLinePlot","[",RowBox[{
+          RowBox[{"Transpose","[",RowBox[{"{","td,xc","}"}],"]"}],",",
+          RowBox[{"PlotLegends","->",RowBox[{"{","\"Continuous\"","}"}]}],",",
+          RowBox[{"AxesLabel","->",RowBox[{"{","\"t [s]\""," , ","\"x\"","}"}]}]
+        }],"]"}],",",
+        RowBox[{"ListStepPlot","[",RowBox[{
+          RowBox[{"Transpose","[",RowBox[{"{","td,xz","}"}],"]"}],",",
+          RowBox[{"PlotLegends","->",RowBox[{"{","\"ZOH\"","}"}]}]
+        }],"]"}],",",
+        RowBox[{"ListPlot","[",RowBox[{
+          RowBox[{"Transpose","[",RowBox[{"{","ts,xs","}"}],"]"}],",",
+          RowBox[{"PlotStyle","->","Red"}],",",
+          RowBox[{"PlotLegends","->",RowBox[{"{","\"Samples\"","}"}]}]
+        }],"]"}]
+      }],"]"}]
+  ], "Input"],
+  Cell["Use Fourier[] or Periodogram[] on xs to inspect aliasing peaks near 12 Hz and 25 Hz.", "Text"]
+}]

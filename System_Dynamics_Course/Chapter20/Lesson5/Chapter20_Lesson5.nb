@@ -1,0 +1,86 @@
+(* Chapter20_Lesson5.nb (Mathematica package-style content) *)
+(* System Dynamics — Chapter 20, Lesson 5
+   Integrated Case Studies and Projects (Mechatronic / Vehicle / Thermal–Fluid)
+
+   This file is provided as plain text that you can paste into a Mathematica notebook.
+*)
+
+ClearAll["Global`*"];
+
+(* ---------- Utilities ---------- *)
+PoincareSamples[sol_, T_, nTransient_, nPoints_, vars_List] := Module[
+  {ts = Table[(nTransient + k) T, {k, 1, nPoints}]},
+  (vars /. sol /. t -> #) & /@ ts
+];
+
+(* ---------- Case 1: DC motor with saturation + Stribeck friction ---------- *)
+mp = <|
+  "J" -> 2.*^-3, "b" -> 1.*^-3, "Kt" -> 0.05, "Ke" -> 0.05, "R" -> 1.0, "L" -> 5.*^-3,
+  "tauC" -> 0.02, "tauS" -> 0.03, "wS" -> 2.0, "uMax" -> 12.0
+|>;
+
+sat[u_, umax_] := Max[-umax, Min[umax, u]];
+stribeck[w_] := Module[{s = Tanh[50. w]},
+  (mp["tauC"] + (mp["tauS"] - mp["tauC"]) Exp[-(Abs[w]/mp["wS"])^2]) s
+];
+
+uAmp = 8.0; uF = 0.8; T1 = 1.25;
+u[t_] := sat[uAmp Sin[2 Pi uF t], mp["uMax"]];
+
+eqMotor = {
+  th'[t] == w[t],
+  w'[t] == (mp["Kt"] i[t] - (mp["b"] w[t] + stribeck[w[t]]))/mp["J"],
+  i'[t] == (u[t] - mp["R"] i[t] - mp["Ke"] w[t])/mp["L"],
+  th[0] == 0, w[0] == 0, i[0] == 0
+};
+
+solMotor = NDSolve[eqMotor, {th, w, i}, {t, 0, (50 + 20) T1},
+  Method -> {"StiffnessSwitching"}, AccuracyGoal -> 12, PrecisionGoal -> 12][[1]];
+
+P1 = PoincareSamples[solMotor, T1, 50, 10, {th[t], w[t], i[t]}];
+Print["[Motor] last Poincare sample:", Last[P1]];
+
+(* ---------- Case 2: Bicycle model with saturated tires and periodic steering ---------- *)
+vp = <|"m" -> 1500., "Iz" -> 2500., "a" -> 1.2, "b" -> 1.6, "Ux" -> 20.,
+       "Cf" -> 80000., "Cr" -> 90000., "alphaSat" -> 0.15, "delta0" -> 0.06, "T" -> 1.0|>;
+
+tire[alpha_, C_] := C vp["alphaSat"] Tanh[alpha/vp["alphaSat"]];
+delta[t_] := vp["delta0"] Sin[2 Pi t/vp["T"]];
+
+eqVeh = {
+  vy'[t] == (-tire[(vy[t] + vp["a"] r[t])/vp["Ux"] - delta[t], vp["Cf"]] -
+             tire[(vy[t] - vp["b"] r[t])/vp["Ux"], vp["Cr"]])/vp["m"] - vp["Ux"] r[t],
+  r'[t]  == (vp["a"]*(-tire[(vy[t] + vp["a"] r[t])/vp["Ux"] - delta[t], vp["Cf"]]) -
+             vp["b"]*(-tire[(vy[t] - vp["b"] r[t])/vp["Ux"], vp["Cr"]]))/vp["Iz"],
+  vy[0] == 0, r[0] == 0
+};
+
+solVeh = NDSolve[eqVeh, {vy, r}, {t, 0, (200 + 50) vp["T"]},
+  Method -> {"StiffnessSwitching"}, AccuracyGoal -> 12, PrecisionGoal -> 12][[1]];
+
+P2 = PoincareSamples[solVeh, vp["T"], 200, 10, {vy[t], r[t]}];
+Print["[Vehicle] last Poincare sample:", Last[P2]];
+
+(* ---------- Case 3: Forced CSTR ---------- *)
+cp = <|"V" -> 1.0, "rho" -> 1000., "Cp" -> 4180., "q" -> 1.*^-3,
+       "CAf" -> 1.0, "Tf0" -> 300., "dTf" -> 5., "T" -> 2.0,
+       "k0" -> 7.2*^10, "E" -> 8.314*^4, "Rg" -> 8.314,
+       "dH" -> -5.*^7, "UA" -> 5.*^4, "Tc" -> 295.|>;
+
+Tf[t_] := cp["Tf0"] + cp["dTf"] Sin[2 Pi t/cp["T"]];
+kArr[T_] := cp["k0"] Exp[-cp["E"]/(cp["Rg"] T)];
+rA[CA_, T_] := kArr[T] CA;
+
+eqCSTR = {
+  CA'[t] == (cp["q"]/cp["V"])(cp["CAf"] - CA[t]) - rA[CA[t], Temp[t]],
+  Temp'[t] == (cp["q"]/cp["V"])(Tf[t] - Temp[t]) +
+              (-cp["dH"]/(cp["rho"] cp["Cp"])) rA[CA[t], Temp[t]] -
+              (cp["UA"]/(cp["rho"] cp["Cp"] cp["V"])) (Temp[t] - cp["Tc"]),
+  CA[0] == 0.9, Temp[0] == 305.
+};
+
+solCSTR = NDSolve[eqCSTR, {CA, Temp}, {t, 0, (400 + 60) cp["T"]},
+  Method -> {"StiffnessSwitching"}, AccuracyGoal -> 12, PrecisionGoal -> 12][[1]];
+
+P3 = PoincareSamples[solCSTR, cp["T"], 400, 10, {CA[t], Temp[t]}];
+Print["[CSTR] last Poincare sample:", Last[P3]];

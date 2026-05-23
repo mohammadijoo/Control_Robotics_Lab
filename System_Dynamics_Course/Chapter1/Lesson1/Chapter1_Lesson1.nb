@@ -1,0 +1,19 @@
+
+a = -1.0;
+b = 1.0;
+
+(* u[t] = 1 *)
+sol = NDSolve[
+  {
+    x'[t] == a x[t] + b*1,
+    x[0] == 0
+  },
+  x,
+  {t, 0, 5}
+];
+
+Plot[Evaluate[x[t] /. sol], {t, 0, 5},
+  AxesLabel -> {"t", "x(t)"},
+  PlotLegends -> {"x(t)"}
+]
+      

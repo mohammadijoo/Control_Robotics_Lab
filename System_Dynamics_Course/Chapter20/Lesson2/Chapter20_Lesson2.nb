@@ -1,0 +1,54 @@
+(* Chapter20_Lesson2.nb
+   System Dynamics — Chapter 20 (Chaos, Complex Dynamics, and Computational Tools)
+   Lesson 2: Bifurcation Diagrams, Period Doubling, and Strange Attractors *)
+
+Notebook[{
+
+Cell["Chapter 20 — Lesson 2: Bifurcation Diagrams, Period Doubling, and Strange Attractors", "Title"],
+
+Cell["A) Logistic map bifurcation diagram", "Section"],
+
+Cell[BoxData[
+ ToBoxes[
+  Module[{rmin=2.5, rmax=4.0, Nr=4000, nTrans=1200, nKeep=200, x0=0.123456,
+          rs, x, pts},
+   rs = Subdivide[rmin, rmax, Nr-1];
+   x = ConstantArray[x0, Nr];
+   Do[x = rs*x*(1 - x), {nTrans}];
+   pts = Reap[
+      Do[
+        x = rs*x*(1 - x);
+        Sow[Transpose[{rs, x}]];
+      , {nKeep}]
+   ][[2,1]];
+   ListPlot[Flatten[pts, 1], PlotStyle -> PointSize[0.001],
+            AxesLabel -> {"r","x"}, PlotRange -> All,
+            PlotLabel -> "Logistic map bifurcation diagram"]
+  ]
+ ]
+], "Input"],
+
+Cell["B) Lorenz strange attractor (continuous-time ODE)", "Section"],
+
+Cell[BoxData[
+ ToBoxes[
+  Module[{sigma=10, rho=28, beta=8/3, sol, tmax=40, y0={1,1,1}, traj},
+   sol = NDSolveValue[
+     {
+      x'[t] == sigma (y[t]-x[t]),
+      y'[t] == x[t] (rho - z[t]) - y[t],
+      z'[t] == x[t] y[t] - beta z[t],
+      x[0]==y0[[1]], y[0]==y0[[2]], z[0]==y0[[3]]
+     },
+     {x,y,z}, {t,0,tmax},
+     Method -> {"StiffnessSwitching"}, AccuracyGoal -> 12, PrecisionGoal -> 12
+   ];
+   traj = Table[{sol[[1]][t], sol[[2]][t], sol[[3]][t]}, {t,5,tmax,0.01}];
+   Graphics3D[{Thickness[0.001], Line[traj]},
+     Axes -> True, AxesLabel -> {"x","y","z"},
+     PlotLabel -> "Lorenz attractor trajectory (sampled)"]
+  ]
+ ]
+], "Input"]
+
+}]

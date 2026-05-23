@@ -1,0 +1,43 @@
+(* Chapter19_Lesson1.nb *)
+(* Wolfram Language code for a Mathematica notebook *)
+
+ClearAll["Global`*"];
+
+alpha = 0.2;
+heat = NDSolveValue[
+  {
+    D[u[x, t], t] == alpha D[u[x, t], {x, 2}],
+    u[0, t] == 0,
+    u[1, t] == 0,
+    u[x, 0] == Sin[Pi x] + 0.2 Sin[3 Pi x]
+  },
+  u,
+  {x, 0, 1}, {t, 0, 0.25}
+];
+
+Plot[
+  Evaluate@Table[heat[x, tt], {tt, {0.00, 0.05, 0.10, 0.20, 0.25}}],
+  {x, 0, 1},
+  PlotLegends -> {"0.00", "0.05", "0.10", "0.20", "0.25"},
+  PlotLabel -> "Heat / Diffusion Equation"
+];
+
+c = 1.0;
+wave = NDSolveValue[
+  {
+    D[w[x, t], {t, 2}] == c^2 D[w[x, t], {x, 2}],
+    w[0, t] == 0,
+    w[1, t] == 0,
+    w[x, 0] == Exp[-180 (x - 0.35)^2],
+    Derivative[0, 1][w][x, 0] == 0
+  },
+  w,
+  {x, 0, 1}, {t, 0, 1.0}
+];
+
+Plot[
+  Evaluate@Table[wave[x, tt], {tt, {0.00, 0.20, 0.40, 0.60, 0.80}}],
+  {x, 0, 1},
+  PlotLegends -> {"0.00", "0.20", "0.40", "0.60", "0.80"},
+  PlotLabel -> "Wave Equation"
+];

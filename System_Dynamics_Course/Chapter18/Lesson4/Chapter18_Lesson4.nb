@@ -1,0 +1,38 @@
+(* Chapter18_Lesson4.nb *)
+(* Wolfram Language code saved with .nb extension *)
+
+ClearAll["Global`*"];
+m = 1.5; b = 1.2; k = 12.0; C = 1/k;
+Se[t_] := 2 Sin[2 Pi 0.8 t] + If[t >= 1.0, 1.0, 0.0];
+
+eqns = {
+  q'[t] == p[t]/m,
+  p'[t] == Se[t] - b (p[t]/m) - q[t]/C,
+  q[0] == 0.10,
+  p[0] == 0.0
+};
+
+sol = NDSolveValue[eqns, {q, p}, {t, 0, 10}];
+qf[t_] := sol[[1]][t];
+pf[t_] := sol[[2]][t];
+vf[t_] := pf[t]/m;
+
+H[t_] := 0.5 pf[t]^2/m + 0.5 qf[t]^2/C;
+Pdiss[t_] := b vf[t]^2;
+Ediss[t_] := NIntegrate[Pdiss[s], {s, 0, t}];
+
+times = Range[0, 10, 0.01];
+data = Table[
+  Module[{dH = (H[tt + 10^-4] - H[tt - 10^-4])/(2*10^-4)},
+    {tt, qf[tt], vf[tt], H[tt], Ediss[tt], Se[tt] vf[tt] - Pdiss[tt] - dH}
+  ],
+  {tt, times}
+];
+
+Export["Chapter18_Lesson4_mathematica_output.csv",
+  Prepend[data, {"t","q","v","H","Ediss","residual"}]
+];
+
+Plot[{qf[t], vf[t]}, {t, 0, 10}, GridLines -> Automatic, PlotLegends -> {"q","v"}]
+Plot[{H[t], Ediss[t]}, {t, 0, 10}, GridLines -> Automatic, PlotLegends -> {"H","Ediss"}]
+Plot[Se[t] vf[t] - Pdiss[t] - D[H[s], s] /. s -> t, {t, 0.01, 9.99}, GridLines -> Automatic]

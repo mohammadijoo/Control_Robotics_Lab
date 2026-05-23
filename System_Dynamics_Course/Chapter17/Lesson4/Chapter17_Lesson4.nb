@@ -1,0 +1,90 @@
+(* Chapter17_Lesson4.nb *)
+(* Noise Modeling in Sensors and Actuators for Dynamic Systems *)
+(* Wolfram Language code: covariance propagation + stochastic simulation *)
+
+SeedRandom[17];
+
+(* Physical and sampling parameters *)
+m = 1.2; c = 0.35; k = 4.0;
+Ts = 0.01; nSteps = 6000;
+
+(* Continuous-time matrices *)
+Ac = {{0., 1.}, {-k/m, -c/m}};
+Bc = {{0.}, {1./m}};
+Gc = {{0.}, {1./m}};
+Cmat = {{1., 0.}};
+
+(* Euler discretization *)
+A = IdentityMatrix[2] + Ts Ac;
+B = Ts Bc;
+G = Ts Gc;
+
+(* Noise parameters *)
+sigmaW = 0.20;
+sigmaV = 0.01;
+sigmaBiasRW = 0.002;
+deltaQ = 0.001;
+rhoA = 0.97;
+sigmaASS = 0.08;
+
+Qw = {{sigmaW^2}};
+Qa = {{sigmaASS^2}};
+Rv = {{sigmaV^2}};
+Rq = {{deltaQ^2/12.0}};
+
+(* Symbolic covariance recursion (discrete Lyapunov step) *)
+P = ConstantArray[0., {2, 2}];
+
+x = {0., 0.};
+bias = 0.;
+aNoise = 0.;
+
+y = ConstantArray[0., nSteps];
+yTrue = ConstantArray[0., nSteps];
+syy = ConstantArray[0., nSteps];
+
+Do[
+  t = (kIdx - 1) Ts;
+  uCmd = 0.8 Sin[2 Pi 0.7 t];
+
+  aNoise = rhoA aNoise + Sqrt[1 - rhoA^2] sigmaASS RandomVariate[NormalDistribution[0, 1]];
+  w = sigmaW RandomVariate[NormalDistribution[0, 1]];
+
+  x = Flatten[A.x + B (uCmd + aNoise) + G w];
+
+  bias = bias + sigmaBiasRW Sqrt[Ts] RandomVariate[NormalDistribution[0, 1]];
+  v = sigmaV RandomVariate[NormalDistribution[0, 1]];
+
+  yAnalog = First[Cmat.x] + bias + v;
+  q = deltaQ Round[yAnalog/deltaQ] - yAnalog;
+  y[[kIdx + 1]] = yAnalog + q;
+  yTrue[[kIdx + 1]] = First[Cmat.x];
+
+  P = A.P.Transpose[A] + G.Qw.Transpose[G] + B.Qa.Transpose[B];
+  syy[[kIdx + 1]] = First[First[Cmat.P.Transpose[Cmat] + Rv + Rq]];
+  ,
+  {kIdx, 1, nSteps - 1}
+];
+
+burn = 1000;
+ySub = y[[burn ;;]];
+yTrueSub = yTrue[[burn ;;]];
+syySub = syy[[burn ;;]];
+
+empVarY = Variance[ySub];
+empVarYTrue = Variance[yTrueSub];
+predVarY = Mean[syySub];
+
+Print["=== Noise Modeling Demo (Mathematica) ==="];
+Print["Empirical var(y_true): ", NumberForm[empVarYTrue, {10, 6}]];
+Print["Empirical var(y)    : ", NumberForm[empVarY, {10, 6}]];
+Print["Predicted mean Syy  : ", NumberForm[predVarY, {10, 6}], " (bias RW excluded)"];
+Print["Quantization theory : ", NumberForm[deltaQ^2/12.0, {10, 6}]];
+
+(* Optional exact steady-state covariance for the linear plant (without bias RW) *)
+p11 =.; p12 =.; p22 =.;
+Psym = {{p11, p12}, {p12, p22}};
+Qeff = G.Qw.Transpose[G] + B.Qa.Transpose[B];
+sol = Solve[Flatten[Psym == A.Psym.Transpose[A] + Qeff], {p11, p12, p22}];
+Print["Steady-state plant covariance (linearized recursion): "];
+Print[Psym /. sol[[1]]];

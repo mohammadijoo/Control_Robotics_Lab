@@ -1,0 +1,99 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+Notebook[{
+ Cell["Chapter14_Lesson5.nb - Limit Cycles, Multiple Equilibria, and Basic Bifurcation Notions", "Title"],
+ Cell["Van der Pol oscillator, 1D bifurcation normal forms, and a basic Hopf normal form check.", "Text"],
+
+ Cell["Van der Pol simulation (NDSolveValue)", "Section"],
+ Cell[BoxData[
+  ToBoxes[
+   mu = 1;
+   sol = NDSolveValue[
+     {
+      x'[t] == y[t],
+      y'[t] == mu (1 - x[t]^2) y[t] - x[t],
+      x[0] == 2, y[0] == 0.1
+     },
+     {x, y},
+     {t, 0, 80},
+     MaxStepFraction -> 1/500
+   ];
+  ]
+ ], "Input"],
+
+ Cell[BoxData[
+  ToBoxes[
+   ParametricPlot[
+    Evaluate[{sol[[1]][t], sol[[2]][t]}],
+    {t, 40, 80},
+    AxesLabel -> {"x", "xdot"},
+    PlotLabel -> "Van der Pol Limit Cycle (phase plane)",
+    PlotRange -> All
+   ]
+  ]
+ ], "Input"],
+
+ Cell["Estimate period using upward crossings of y[t]==0 with x[t]>0", "Text"],
+ Cell[BoxData[
+  ToBoxes[
+   pts = Table[{tt, sol[[1]][tt], sol[[2]][tt]}, {tt, 40, 80, 0.01}];
+   crossTimes = Reap[
+      Do[
+       If[pts[[k, 3]] < 0 && pts[[k + 1, 3]] >= 0,
+        alpha = -pts[[k, 3]]/(pts[[k + 1, 3]] - pts[[k, 3]] + 10^-14);
+        tc = pts[[k, 1]] + alpha (pts[[k + 1, 1]] - pts[[k, 1]]);
+        xc = pts[[k, 2]] + alpha (pts[[k + 1, 2]] - pts[[k, 2]]);
+        If[xc > 0, Sow[tc]];
+       ],
+       {k, 1, Length[pts] - 1}
+      ]
+    ][[2, 1]];
+   periodEstimate = Mean[Differences[crossTimes[[-5 ;; -1]]]];
+   ampEstimate = Max[Abs[pts[[All, 2]]]];
+   {ampEstimate, periodEstimate}
+  ]
+ ], "Input"],
+
+ Cell["1D bifurcation normal forms", "Section"],
+ Cell[BoxData[
+  ToBoxes[
+   pitchforkStable = Join[
+     Table[{r, 0}, {r, -2, -10^-3, 0.01}],
+     Flatten[Table[{{r, Sqrt[r]}, {r, -Sqrt[r]}}, {r, 0, 2, 0.01}], 1]
+   ];
+   pitchforkUnstable = Table[{r, 0}, {r, 0, 2, 0.01}];
+   saddleStable = Table[{r, Sqrt[r]}, {r, 0, 2, 0.01}];
+   saddleUnstable = Table[{r, -Sqrt[r]}, {r, 0, 2, 0.01}];
+   Show[
+    ListLinePlot[{pitchforkStable, saddleStable}, PlotRange -> All],
+    ListLinePlot[{pitchforkUnstable, saddleUnstable}, PlotStyle -> Dashed],
+    AxesLabel -> {"r", "x*"},
+    PlotLabel -> "Pitchfork and Saddle-Node Branches"
+   ]
+  ]
+ ], "Input"],
+
+ Cell["Supercritical Hopf normal form in polar coordinates", "Section"],
+ Cell[BoxData[
+  ToBoxes[
+   Clear[rho, th, muH, om];
+   muH = 0.5; om = 1.0;
+   hopf = NDSolveValue[
+    {
+     rho'[t] == muH rho[t] - rho[t]^3,
+     th'[t] == om,
+     rho[0] == 0.2, th[0] == 0
+    },
+    {rho, th}, {t, 0, 40}
+   ];
+   ParametricPlot[
+    Evaluate[{hopf[[1]][t] Cos[hopf[[2]][t]], hopf[[1]][t] Sin[hopf[[2]][t]]}],
+    {t, 0, 40},
+    PlotLabel -> "Supercritical Hopf Normal Form Orbit",
+    AxesLabel -> {"x", "y"}
+   ]
+  ]
+ ], "Input"]
+},
+WindowSize -> {1000, 700},
+WindowTitle -> "Chapter14_Lesson5"
+]

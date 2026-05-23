@@ -1,0 +1,285 @@
+(* ::Package:: *)
+
+(* Chapter 13 - Vibrations and Multi-Degree-of-Freedom (MDOF) Systems
+   Lesson 5 - Intro to Experimental Modal Analysis and System Identification Concepts
+
+   File: Chapter13_Lesson5.nb
+
+   This notebook:
+   1) Defines a 2-DOF mass-spring-damper model in state-space.
+   2) Simulates broadband excitation and computes a simple H1 FRF estimate using Fourier transforms.
+   3) Computes coherence.
+*)
+
+Notebook[{
+
+Cell["Chapter 13 - Lesson 5: Experimental Modal Analysis (EMA) and System ID (concepts)", "Title"],
+
+Cell[CellGroupData[{
+Cell["1) Define a 2-DOF model", "Section"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"m1", "=", "1.0"}], ";",
+  RowBox[{"m2", "=", "0.8"}], ";",
+  RowBox[{"M", "=", "DiagonalMatrix", "[", 
+   RowBox[{"{", 
+    RowBox[{"m1", ",", "m2"}], "}"}], "]"}], ";", "\n",
+  RowBox[{"k1", "=", "600"}], ";",
+  RowBox[{"k2", "=", "500"}], ";",
+  RowBox[{"k3", "=", "700"}], ";",
+  RowBox[{"K", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"k1", "+", "k2", ",", 
+       RowBox[{"-", "k2"}]}], "}"}], ",",
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "k2"}], ",", "k2", "+", "k3"}], "}"}]}], "}"}]}], ";", "\n",
+  RowBox[{"c1", "=", "2.0"}], ";",
+  RowBox[{"c2", "=", "1.6"}], ";",
+  RowBox[{"c3", "=", "2.1"}], ";",
+  RowBox[{"C", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"c1", "+", "c2", ",", 
+       RowBox[{"-", "c2"}]}], "}"}], ",",
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "c2"}], ",", "c2", "+", "c3"}], "}"}]}], "}"}]}], ";", "\n",
+  RowBox[{"Minv", "=", 
+   RowBox[{"Inverse", "[", "M", "]"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"n", "=", "2"}], ";",
+  RowBox[{"Z", "=", "ConstantArray", "[", 
+   RowBox[{"0.0", ",", 
+    RowBox[{"{", 
+     RowBox[{"n", ",", "n"}], "}"}]}], "]"}], ";",
+  RowBox[{"I", "=", "IdentityMatrix", "[", "n", "]"}], ";", "\n",
+  RowBox[{"A", "=", 
+   RowBox[{"ArrayFlatten", "[", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"Z", ",", "I"}], "}"}], ",",
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "Minv", ".", "K"}], ",", 
+        RowBox[{"-", "Minv", ".", "C"}]}], "}"}]}], "}"}], "]"}]}], ";", "\n",
+  RowBox[{"B", "=", 
+   RowBox[{"ArrayFlatten", "[", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", "Z", "}"}], ",",
+      RowBox[{"{", "Minv", "}"}]}], "}"}], "]"}]}], ";"}]], "Input"],
+
+Cell["We excite DOF1 by force u(t) and measure acceleration at DOF1.", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Ca", "=", 
+   RowBox[{"ArrayFlatten", "[", 
+    RowBox[{"{", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "Minv", ".", "K"}], ",", 
+       RowBox[{"-", "Minv", ".", "C"}]}], "}"}], "}"}], "]"}]}], ";",
+  RowBox[{"Da", "=", "Minv"}], ";"}]], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell["2) Simulate broadband excitation", "Section"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"fs", "=", "500.0"}], ";",
+  RowBox[{"dt", "=", 
+   RowBox[{"1.0", "/", "fs"}]}], ";",
+  RowBox[{"T", "=", "20.0"}], ";",
+  RowBox[{"tgrid", "=", 
+   RowBox[{"Range", "[", 
+    RowBox[{"0.0", ",", 
+     RowBox[{"T", "-", "dt"}], ",", "dt"}], "]"}]}], ";",
+  RowBox[{"N", "=", 
+   RowBox[{"Length", "[", "tgrid", "]"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SeedRandom", "[", "7", "]"}], ";",
+  RowBox[{"u", "=", 
+   RowBox[{"RandomVariate", "[", 
+    RowBox[{
+     RowBox[{"NormalDistribution", "[", 
+      RowBox[{"0", ",", "1"}], "]"}], ",", "N"}], "]"}]}], ";",
+  RowBox[{"u", "=", 
+   RowBox[{"MovingAverage", "[", 
+    RowBox[{"u", ",", "9"}], "]"}]}], ";",
+  RowBox[{"u", "=", 
+   RowBox[{"u", "/", 
+    RowBox[{"StandardDeviation", "[", "u", "]"}]}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"x", "=", 
+   RowBox[{"ConstantArray", "[", 
+    RowBox[{"0.0", ",", "4"}], "]"}]}], ";",
+  RowBox[{"y", "=", 
+   RowBox[{"ConstantArray", "[", 
+    RowBox[{"0.0", ",", "N"}], "]"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rhs", "[", 
+   RowBox[{"x_", ",", "f_"}], "]"}], ":=", 
+  RowBox[{"A", ".", "x", "+", 
+   RowBox[{"B", ".", "f"}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Do", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"f", "=", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"u", "[", 
+         RowBox[{"[", "i", "]"}], "]"}], ",", "0.0"}], "}"}]}], ";",
+     RowBox[{"k1", "=", 
+      RowBox[{"rhs", "[", 
+       RowBox[{"x", ",", "f"}], "]"}]}], ";",
+     RowBox[{"k2", "=", 
+      RowBox[{"rhs", "[", 
+       RowBox[{
+        RowBox[{"x", "+", 
+         RowBox[{"0.5", " ", "dt", " ", "k1"}]}], ",", "f"}], "]"}]}], ";",
+     RowBox[{"k3", "=", 
+      RowBox[{"rhs", "[", 
+       RowBox[{
+        RowBox[{"x", "+", 
+         RowBox[{"0.5", " ", "dt", " ", "k2"}]}], ",", "f"}], "]"}]}], ";",
+     RowBox[{"k4", "=", 
+      RowBox[{"rhs", "[", 
+       RowBox[{
+        RowBox[{"x", "+", 
+         RowBox[{"dt", " ", "k3"}]}], ",", "f"}], "]"}]}], ";",
+     RowBox[{"x", "=", 
+      RowBox[{"x", "+", 
+       RowBox[{
+        RowBox[{"dt", "/", "6.0"}], 
+        RowBox[{"(", 
+         RowBox[{"k1", "+", 
+          RowBox[{"2", "k2"}], "+", 
+          RowBox[{"2", "k3"}], "+", "k4"}], ")"}]}]}]}], ";",
+     RowBox[{"acc", "=", 
+      RowBox[{
+       RowBox[{"Ca", ".", "x"}], "+", 
+       RowBox[{"Da", ".", "f"}]}]}], ";",
+     RowBox[{"y", "[", 
+      RowBox[{"[", "i", "]"}], "]"}], "=", 
+     RowBox[{"acc", "[", 
+      RowBox[{"[", "1", "]"}], "]"}]}], ",",
+    RowBox[{"{", 
+     RowBox[{"i", ",", "1", ",", "N"}], "}"}]}], "]"}], ";"}]], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell["3) Simple H1 FRF estimate via Fourier transforms", "Section"],
+Cell["We use: H1(w) = G_yu(w) / G_uu(w) and coherence gamma^2(w) = |G_yu|^2/(G_uu G_yy).", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"U", "=", 
+   RowBox[{"Fourier", "[", "u", "]"}]}], ";",
+  RowBox[{"Y", "=", 
+   RowBox[{"Fourier", "[", "y", "]"}]}], ";",
+  RowBox[{"Guu", "=", 
+   RowBox[{
+    RowBox[{"U", " ", 
+     RowBox[{"Conjugate", "[", "U", "]"}]}], "/", "N"}]}], ";",
+  RowBox[{"Gyy", "=", 
+   RowBox[{
+    RowBox[{"Y", " ", 
+     RowBox[{"Conjugate", "[", "Y", "]"}]}], "/", "N"}]}], ";",
+  RowBox[{"Gyu", "=", 
+   RowBox[{
+    RowBox[{"Y", " ", 
+     RowBox[{"Conjugate", "[", "U", "]"}]}], "/", "N"}]}], ";",
+  RowBox[{"H1", "=", 
+   RowBox[{"Gyu", "/", 
+    RowBox[{"(", 
+     RowBox[{"Guu", "+", 
+      RowBox[{"10", "^", 
+       RowBox[{"-", "30"}]}]}], ")"}]}]}], ";",
+  RowBox[{"coh", "=", 
+   RowBox[{
+    RowBox[{"Abs", "[", "Gyu", "]"}], "^", "2", "/", 
+    RowBox[{"(", 
+     RowBox[{"Guu", " ", "Gyy", "+", 
+      RowBox[{"10", "^", 
+       RowBox[{"-", "30"}]}]}], ")"}]}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"K", "=", 
+   RowBox[{"Floor", "[", 
+    RowBox[{"N", "/", "2"}], "]"}]}], ";",
+  RowBox[{"freq", "=", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"fs", " ", 
+      RowBox[{"(", 
+       RowBox[{"k", "-", "1"}], ")"}], "/", "N"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"k", ",", "1", ",", 
+       RowBox[{"K", "+", "1"}]}], "}"}]}], "]"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"ListLinePlot", "[", 
+  RowBox[{
+   RowBox[{"Transpose", "[", 
+    RowBox[{"{", 
+     RowBox[{"freq", ",", 
+      RowBox[{"Abs", "[", 
+       RowBox[{"H1", "[", 
+        RowBox[{"[", 
+         RowBox[{"1", ";;", 
+          RowBox[{"K", "+", "1"}]}], "]"}], "]"}], "]"}]}], "}"}], "]"}], ",",
+   RowBox[{"ScalingFunctions", "->", 
+    RowBox[{"{", 
+     RowBox[{"None", ",", "\"Log\""}], "}"}]}], ",",
+   RowBox[{"PlotRange", "->", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"0", ",", "120"}], "}"}], ",", "All"}], "}"}]}], ",",
+   RowBox[{"AxesLabel", "->", 
+    RowBox[{"{", 
+     RowBox[{"\"Hz\"", ",", "\"|H1|\""}], "}"}]}], ",",
+   RowBox[{"PlotLabel", "->", "\"FRF magnitude (H1)\""}]}], "]"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"ListLinePlot", "[", 
+  RowBox[{
+   RowBox[{"Transpose", "[", 
+    RowBox[{"{", 
+     RowBox[{"freq", ",", 
+      RowBox[{"coh", "[", 
+       RowBox[{"[", 
+        RowBox[{"1", ";;", 
+         RowBox[{"K", "+", "1"}]}], "]"}], "]"}]}], "}"}], "]"}], ",",
+   RowBox[{"PlotRange", "->", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"0", ",", "120"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "1.05"}], "}"}]}], "}"}]}], ",",
+   RowBox[{"AxesLabel", "->", 
+    RowBox[{"{", 
+     RowBox[{"\"Hz\"", ",", "\"coherence\""}], "}"}]}], ",",
+   RowBox[{"PlotLabel", "->", "\"Magnitude-squared coherence\""}]}], "]"}]], "Input"]
+}, Open  ]]
+
+}]

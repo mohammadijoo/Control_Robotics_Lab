@@ -1,0 +1,80 @@
+(* Chapter16_Lesson2.nb *)
+(* Difference Equations and Discrete-Time State-Space Models *)
+
+ClearAll["Global`*"];
+
+(* Example 1: Scalar recursion y[k+1] = a y[k] + b u[k] *)
+simulateScalarDifference[a_, b_, u_List, y0_] := Module[
+  {n = Length[u], y, k},
+  y = ConstantArray[0.0, n + 1];
+  y[[1]] = y0; (* y[0] stored at index 1 *)
+  For[k = 1, k <= n, k++,
+    y[[k + 1]] = a y[[k]] + b u[[k]];
+  ];
+  y
+];
+
+(* Example 2: Discrete state-space simulation
+   x[k+1] = A.x[k] + B u[k]
+   y[k]   = C.x[k] + D u[k]
+*)
+simulateDiscreteSS[A_, B_, C_, D_, u_List, x0_List] := Module[
+  {n = Length[u], nx = Length[x0], X, Y, x, k},
+  X = ConstantArray[0.0, {n + 1, nx}];
+  Y = ConstantArray[0.0, n];
+  x = N[x0];
+  X[[1]] = x;
+  For[k = 1, k <= n, k++,
+    Y[[k]] = C.x + D u[[k]];
+    x = A.x + B u[[k]];
+    X[[k + 1]] = x;
+  ];
+  <|"X" -> X, "Y" -> Y|>
+];
+
+Nsteps = 40;
+
+u1 = ConstantArray[1.0, Nsteps];
+y1 = simulateScalarDifference[0.85, 0.2, u1, 0.0];
+
+Print["Scalar recursion (first 10 samples)"];
+Do[
+  Print[Row[{"k=", k - 1, ", y=", NumberForm[y1[[k]], {8, 6}]}]],
+  {k, 1, 10}
+];
+
+A = {{1.5, -0.7}, {1.0, 0.0}};
+B = {1.0, 0.0};
+C = {0.0, 1.0};
+D = 0.0;
+
+u2 = Join[ConstantArray[1.0, 10], ConstantArray[0.0, Nsteps - 10]];
+res = simulateDiscreteSS[A, B, C, D, u2, {0.0, 0.0}];
+
+Print["State-space output (first 10 samples)"];
+Do[
+  Print[
+    Row[{
+      "k=", k - 1, 
+      ", y=", NumberForm[res["Y"][[k]], {8, 6}],
+      ", x=", res["X"][[k]]
+    }]
+  ],
+  {k, 1, 10}
+];
+
+ListLinePlot[
+  y1,
+  PlotMarkers -> Automatic,
+  GridLines -> Automatic,
+  AxesLabel -> {"k (index+1 in list)", "y"},
+  PlotLabel -> "Scalar Difference Equation Response"
+]
+
+ListLinePlot[
+  res["Y"],
+  PlotMarkers -> Automatic,
+  GridLines -> Automatic,
+  AxesLabel -> {"k", "y[k]"},
+  PlotLabel -> "Discrete-Time State-Space Output"
+]

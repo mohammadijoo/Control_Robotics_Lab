@@ -1,0 +1,86 @@
+(* Chapter17_Lesson5.nb *)
+(* Monte Carlo simulation of a stochastic mass-spring-damper system *)
+SeedRandom[17];
+
+T = 10.0;
+dt = 0.005;
+nSamples = 2000;
+m = 1.0;
+
+kMean = 25.0; kStd = 2.0;
+cMean = 1.5; cStd = 0.2;
+x0Mean = 0.0; x0Std = 0.05;
+v0Mean = 0.0; v0Std = 0.05;
+sigmaF = 2.0;
+xThreshold = 0.75;
+
+tGrid = N[Range[0, T, dt]];
+nt = Length[tGrid];
+
+rk4Step[{x_, v_}, force_, k_, c_, m_, h_] := Module[
+  {f, y, k1, k2, k3, k4, yNext},
+  f[{xs_, vs_}] := {vs, -(k/m) xs - (c/m) vs + force/m};
+  y = {x, v};
+  k1 = f[y];
+  k2 = f[y + 0.5 h k1];
+  k3 = f[y + 0.5 h k2];
+  k4 = f[y + h k3];
+  yNext = y + (h/6.0) (k1 + 2 k2 + 2 k3 + k4);
+  yNext
+];
+
+simulateOne[] := Module[
+  {k, c, x, v, xHist, force, n},
+  k = Max[10^-6, RandomVariate[NormalDistribution[kMean, kStd]]];
+  c = Max[10^-6, RandomVariate[NormalDistribution[cMean, cStd]]];
+  x = RandomVariate[NormalDistribution[x0Mean, x0Std]];
+  v = RandomVariate[NormalDistribution[v0Mean, v0Std]];
+  xHist = ConstantArray[0.0, nt];
+  xHist[[1]] = x;
+  Do[
+    force = RandomVariate[NormalDistribution[0, sigmaF]];
+    {x, v} = rk4Step[{x, v}, force, k, c, m, dt];
+    xHist[[n + 1]] = x;
+    ,
+    {n, 1, nt - 1}
+  ];
+  xHist
+];
+
+trajectories = Table[simulateOne[], {nSamples}];
+
+meanX = Mean[trajectories];
+varX = Variance /@ Transpose[trajectories];
+stdX = Sqrt[varX];
+
+z975 = 1.959963984540054;
+seFinal = stdX[[-1]]/Sqrt[nSamples];
+ciMean = {meanX[[-1]] - z975 seFinal, meanX[[-1]] + z975 seFinal};
+
+pHat = N[Count[trajectories, tr_ /; Max[Abs[tr]] > xThreshold]/nSamples];
+seP = Sqrt[Max[pHat (1 - pHat), 10^-12]/nSamples];
+ciP = {Max[0, pHat - z975 seP], Min[1, pHat + z975 seP]};
+
+Print["Monte Carlo trajectories: ", nSamples];
+Print["Final mean x(T): ", NumberForm[meanX[[-1]], {10, 6}]];
+Print["Final variance x(T): ", NumberForm[varX[[-1]], {10, 6}]];
+Print["95% CI for E[x(T)]: ", ciMean];
+Print["P(max |x| > ", xThreshold, "): ", NumberForm[pHat, {10, 6}]];
+Print["95% CI for probability: ", ciP];
+
+result = Transpose[{tGrid, meanX, varX, stdX}];
+Export["Chapter17_Lesson5_mathematica_results.csv",
+  Prepend[result, {"t", "mean_x", "var_x", "std_x"}]
+];
+
+ListLinePlot[
+  {
+    Transpose[{tGrid, meanX}],
+    Transpose[{tGrid, meanX + 2 stdX}],
+    Transpose[{tGrid, meanX - 2 stdX}]
+  },
+  PlotLegends -> {"Mean", "Mean + 2 std", "Mean - 2 std"},
+  GridLines -> Automatic,
+  AxesLabel -> {"Time (s)", "Displacement x(t)"},
+  PlotLabel -> "Monte Carlo response statistics"
+]

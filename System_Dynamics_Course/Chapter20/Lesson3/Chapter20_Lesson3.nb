@@ -1,0 +1,97 @@
+(* Chapter20_Lesson3.nb
+   System Dynamics (Control Engineering) - Chapter 20, Lesson 3
+   Sensitivity to Initial Conditions and Lyapunov Exponents (Intro)
+
+   This is a plain-text Mathematica notebook expression.
+   Open it in Mathematica; it should render as a notebook.
+*)
+
+Notebook[{
+  Cell["Chapter 20 - Lesson 3: Sensitivity to Initial Conditions and Lyapunov Exponents (Intro)", "Title"],
+
+  Cell["Part A) Logistic map: LLE via time-average of log|f'(x)|", "Section"],
+  Cell[
+"(* Logistic map: x_{n+1} = r x_n (1 - x_n)
+   LLE: lambda ~ (1/N) Sum_{n=0}^{N-1} Log[ Abs[ r (1 - 2 x_n ) ] ]
+*)
+
+ClearAll[logisticStep, lyapLogistic];
+logisticStep[x_, r_] := r x (1 - x);
+
+lyapLogistic[r_, x0_:0.234, N_:100000, discard_:5000] := Module[{x=x0, s=0.0, fp},
+  Do[x = logisticStep[x, r], {discard}];
+  Do[
+    fp = r (1 - 2 x);
+    s = s + Log[Abs[fp] + 10^-300];
+    x = logisticStep[x, r];
+  , {N}];
+  s/N
+];
+
+rList = {3.2, 3.5, 3.9, 4.0};
+TableForm[Table[{r, lyapLogistic[r]}, {r, rList}], TableHeadings -> {None, {\"r\", \"lambda\"}}]
+", "Input"],
+
+  Cell["Part B) Lorenz system: LLE via two-trajectory renormalization", "Section"],
+  Cell[
+"(* Lorenz ODE:
+   x' = sigma (y - x)
+   y' = x (rho - z) - y
+   z' = x y - beta z
+*)
+
+ClearAll[lorenz, rk4Step, lleLorenz];
+lorenz[{x_, y_, z_}, sigma_:10.0, rho_:28.0, beta_:8.0/3.0] := {
+  sigma (y - x),
+  x (rho - z) - y,
+  x y - beta z
+};
+
+rk4Step[f_, y_, dt_] := Module[{k1, k2, k3, k4},
+  k1 = f[y];
+  k2 = f[y + 0.5 dt k1];
+  k3 = f[y + 0.5 dt k2];
+  k4 = f[y + dt k3];
+  y + (dt/6) (k1 + 2 k2 + 2 k3 + k4)
+];
+
+lleLorenz[X0_:{1.0,1.0,1.0}, dt_:0.01, T_:120.0, transient_:20.0, renormEvery_:10, d0_:10^-8,
+          sigma_:10.0, rho_:28.0, beta_:8.0/3.0, seed_:0] := Module[
+  {X = N@X0, u, Xp, steps, nTrans, s=0.0, count=0, k, dvec, d, f},
+  SeedRandom[seed];
+  u = Normalize[RandomVariate[NormalDistribution[], 3]];
+  Xp = X + d0 u;
+
+  f[v_] := lorenz[v, sigma, rho, beta];
+
+  nTrans = Round[transient/dt];
+  Do[
+    X  = rk4Step[f, X, dt];
+    Xp = rk4Step[f, Xp, dt];
+    dvec = Xp - X;
+    d = Norm[dvec];
+    If[d == 0, Xp = X + d0 u, Xp = X + d0 dvec/d];
+  , {nTrans}];
+
+  steps = Round[T/dt];
+  Do[
+    X  = rk4Step[f, X, dt];
+    Xp = rk4Step[f, Xp, dt];
+
+    If[Mod[k, renormEvery] == 0,
+      dvec = Xp - X;
+      d = Norm[dvec];
+      If[d != 0,
+        s = s + Log[d/d0];
+        count = count + 1;
+        Xp = X + d0 dvec/d;
+      ];
+    ];
+  , {k, 1, steps}];
+
+  s/(count * renormEvery * dt)
+];
+
+lleLorenz[]
+", "Input"]
+}]

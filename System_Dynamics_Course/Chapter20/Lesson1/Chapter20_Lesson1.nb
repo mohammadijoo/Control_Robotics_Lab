@@ -1,0 +1,188 @@
+(* Chapter20_Lesson1.nb
+   System Dynamics — Chapter 20, Lesson 1
+   Nonlinear Maps and Continuous-Time Chaotic Systems (Logistic Map, Lorenz System)
+
+   This is a plain-text Wolfram Language notebook content.
+*)
+
+Notebook[{
+  Cell["System Dynamics — Chapter 20, Lesson 1: Logistic Map and Lorenz System", "Title"],
+  Cell["1) Logistic Map", "Section"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"logisticIter", "[", 
+        RowBox[{"r_", ",", "x0_", ",", "n_"}], "]"}], ":=", 
+      RowBox[{"NestList", "[", 
+        RowBox[{
+          RowBox[{
+            RowBox[{"r", " ", "#", " ", 
+              RowBox[{"(", 
+                RowBox[{"1", "-", "#"}], ")"}]}], "&"}], ",", "x0", ",", "n"}],
+        "]"}]}]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"r", "=", "3.8"}], ";", 
+      RowBox[{"x", "=", 
+        RowBox[{"logisticIter", "[", 
+          RowBox[{"r", ",", "0.2", ",", "200"}], "]"}]}], ";", 
+      RowBox[{"ListLinePlot", "[", "x", "]"}]}]], "Input"],
+  Cell["Cobweb plot", "Text"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"f", "[", "u_", "]"}], ":=", 
+      RowBox[{"r", " ", "u", " ", 
+        RowBox[{"(", 
+          RowBox[{"1", "-", "u"}], ")"}]}]}]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"Cobweb", "[", 
+        RowBox[{"f", ",", "0.2", ",", "40", ",", 
+          RowBox[{"{", 
+            RowBox[{"0", ",", "1"}], "}"}]}], "]"}], " ", "/.", " ", 
+      RowBox[{"Cobweb", "\[Rule]", "DiscretePlot"}]}]], "Input"],
+
+  Cell["2) Lorenz System", "Section"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"sigma", "=", "10"}], ";", 
+      RowBox[{"rho", "=", "28"}], ";", 
+      RowBox[{"beta", "=", 
+        FractionBox["8", "3"]}], ";"}]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"lorenz", "=", 
+        RowBox[{"{", 
+          RowBox[{
+            RowBox[{
+              RowBox[{"x", "'"}], "[", "t", "]"}], "\[Equal]", 
+            RowBox[{"sigma", 
+              RowBox[{"(", 
+                RowBox[{
+                  RowBox[{"y", "[", "t", "]"}], "-", 
+                  RowBox[{"x", "[", "t", "]"}]}], ")"}]}], ",", 
+            RowBox[{
+              RowBox[{"y", "'"}], "[", "t", "]"}], "\[Equal]", 
+            RowBox[{
+              RowBox[{
+                RowBox[{"x", "[", "t", "]"}], 
+                RowBox[{"(", 
+                  RowBox[{"rho", "-", 
+                    RowBox[{"z", "[", "t", "]"}]}], ")"}]}], "-", 
+              RowBox[{"y", "[", "t", "]"}]}], ",", 
+            RowBox[{
+              RowBox[{"z", "'"}], "[", "t", "]"}], "\[Equal]", 
+            RowBox[{
+              RowBox[{
+                RowBox[{"x", "[", "t", "]"}], 
+                RowBox[{"y", "[", "t", "]"}]}], "-", 
+              RowBox[{"beta", 
+                RowBox[{"z", "[", "t", "]"}]}]}], ",", 
+            RowBox[{
+              RowBox[{"x", "[", "0", "]"}], "\[Equal]", "1"}], ",", 
+            RowBox[{
+              RowBox[{"y", "[", "0", "]"}], "\[Equal]", "1"}], ",", 
+            RowBox[{
+              RowBox[{"z", "[", "0", "]"}], "\[Equal]", "1"}]}], "}"}]}], ";"}]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"sol", "=", 
+        RowBox[{"NDSolve", "[", 
+          RowBox[{"lorenz", ",", 
+            RowBox[{"{", 
+              RowBox[{"x", ",", "y", ",", "z"}], "}"}], ",", 
+            RowBox[{"{", 
+              RowBox[{"t", ",", "0", ",", "40"}], "}"}], ",", 
+            RowBox[{"MaxStepSize", "\[Rule]", "0.01"}]}], "]"}]}], ";"}]], "Input"],
+  Cell[BoxData[
+    RowBox[{"ParametricPlot3D", "[", 
+      RowBox[{
+        RowBox[{"Evaluate", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              RowBox[{
+                RowBox[{"x", "[", "t", "]"}], ",", 
+                RowBox[{"y", "[", "t", "]"}], ",", 
+                RowBox[{"z", "[", "t", "]"}]}], "}"}], "/.", "sol"}], "]"}], 
+        ",", 
+        RowBox[{"{", 
+          RowBox[{"t", ",", "0", ",", "40"}], "}"}]}], "]"}]], "Input"],
+
+  Cell["Sensitivity demo: two nearby initial conditions", "Text"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"lorenz2", "=", 
+        RowBox[{"{", 
+          RowBox[{
+            RowBox[{
+              RowBox[{"x", "'"}], "[", "t", "]"}], "\[Equal]", 
+            RowBox[{"sigma", 
+              RowBox[{"(", 
+                RowBox[{
+                  RowBox[{"y", "[", "t", "]"}], "-", 
+                  RowBox[{"x", "[", "t", "]"}]}], ")"}]}], ",", 
+            RowBox[{
+              RowBox[{"y", "'"}], "[", "t", "]"}], "\[Equal]", 
+            RowBox[{
+              RowBox[{
+                RowBox[{"x", "[", "t", "]"}], 
+                RowBox[{"(", 
+                  RowBox[{"rho", "-", 
+                    RowBox[{"z", "[", "t", "]"}]}], ")"}]}], "-", 
+              RowBox[{"y", "[", "t", "]"}]}], ",", 
+            RowBox[{
+              RowBox[{"z", "'"}], "[", "t", "]"}], "\[Equal]", 
+            RowBox[{
+              RowBox[{
+                RowBox[{"x", "[", "t", "]"}], 
+                RowBox[{"y", "[", "t", "]"}]}], "-", 
+              RowBox[{"beta", 
+                RowBox[{"z", "[", "t", "]"}]}]}], ",", 
+            RowBox[{
+              RowBox[{"x", "[", "0", "]"}], "\[Equal]", 
+              RowBox[{"1", "+", "10^-9"}]}], ",", 
+            RowBox[{
+              RowBox[{"y", "[", "0", "]"}], "\[Equal]", "1"}], ",", 
+            RowBox[{
+              RowBox[{"z", "[", "0", "]"}], "\[Equal]", "1"}]}], "}"}]}], ";"}]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"sol2", "=", 
+        RowBox[{"NDSolve", "[", 
+          RowBox[{"lorenz2", ",", 
+            RowBox[{"{", 
+              RowBox[{"x", ",", "y", ",", "z"}], "}"}], ",", 
+            RowBox[{"{", 
+              RowBox[{"t", ",", "0", ",", "40"}], "}"}], ",", 
+            RowBox[{"MaxStepSize", "\[Rule]", "0.01"}]}], "]"}]}], ";"}]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"d", "[", "t_", "]"}], ":=", 
+      RowBox[{"Sqrt", "[", 
+        RowBox[{"Total", "[", 
+          RowBox[{
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"Evaluate", "[", 
+                  RowBox[{
+                    RowBox[{"{", 
+                      RowBox[{
+                        RowBox[{"x", "[", "t", "]"}], ",", 
+                        RowBox[{"y", "[", "t", "]"}], ",", 
+                        RowBox[{"z", "[", "t", "]"}]}], "}"}], "/.", "sol"}], 
+                  "]"}], "-", 
+                RowBox[{"Evaluate", "[", 
+                  RowBox[{
+                    RowBox[{"{", 
+                      RowBox[{
+                        RowBox[{"x", "[", "t", "]"}], ",", 
+                        RowBox[{"y", "[", "t", "]"}], ",", 
+                        RowBox[{"z", "[", "t", "]"}]}], "}"}], "/.", "sol2"}], 
+                  "]"}]}], ")"}], "^", "2"}], "]"}], "]"}]}]], "Input"],
+  Cell[BoxData[
+    RowBox[{"LogPlot", "[", 
+      RowBox[{
+        RowBox[{"Evaluate", "[", 
+          RowBox[{"d", "[", "t", "]"}], "]"}], ",", 
+        RowBox[{"{", 
+          RowBox[{"t", ",", "0", ",", "40"}], "}"}]}], "]"}]], "Input"]
+}]

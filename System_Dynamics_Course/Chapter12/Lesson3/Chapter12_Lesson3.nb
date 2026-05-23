@@ -1,0 +1,67 @@
+(* Chapter12_Lesson3.nb
+   System Dynamics — Chapter 12, Lesson 3
+   Resonance, Bandwidth, and Quality Factor in Mechanical and Electrical Systems
+*)
+
+Notebook[{
+  Cell["Chapter 12, Lesson 3 — Resonance, Bandwidth, and Quality Factor", "Title"],
+  Cell["1) Canonical second-order system (normalized low-pass)", "Section"],
+  Cell[BoxData@ToBoxes[
+    HoldForm[
+      G[s_] := (wn^2)/(s^2 + 2 zeta wn s + wn^2)
+    ]
+  ], "Input"],
+  Cell["Magnitude squared and resonance condition", "Text"],
+  Cell[BoxData@ToBoxes[
+    HoldForm[
+      (* |G(j w)|^2 = 1 / ((1 - r^2)^2 + (2 zeta r)^2), r = w/wn *)
+      M2[r_] := 1/((1 - r^2)^2 + (2 zeta r)^2);
+      (* resonance when d/dr denominator = 0 => r^2 = 1 - 2 zeta^2, if zeta < 1/Sqrt[2] *)
+    ]
+  ], "Input"],
+
+  Cell["2) Example: mass–spring–damper parameters", "Section"],
+  Cell[BoxData@ToBoxes[
+    HoldForm[
+      m = 1.0; c = 0.4; k = 100.0;
+      wn = Sqrt[k/m];
+      zeta = c/(2 Sqrt[k m]);
+      Q = 1/(2 zeta);
+      wr = If[zeta < 1/Sqrt[2], wn Sqrt[1 - 2 zeta^2], Missing["NoPeak"]];
+      {wn, zeta, Q, wr}
+    ]
+  ], "Input"],
+
+  Cell["Half-power frequencies relative to peak (exact)", "Text"],
+  Cell[BoxData@ToBoxes[
+    HoldForm[
+      r1sq = 1 - 2 zeta^2 - 2 zeta Sqrt[1 - zeta^2];
+      r2sq = 1 - 2 zeta^2 + 2 zeta Sqrt[1 - zeta^2];
+      w1 = wn Sqrt[r1sq];
+      w2 = wn Sqrt[r2sq];
+      bw = w2 - w1;
+      Qhp = wr/bw;
+      {w1, w2, bw, Qhp}
+    ]
+  ], "Input"],
+
+  Cell["3) Plot normalized magnitude", "Section"],
+  Cell[BoxData@ToBoxes[
+    HoldForm[
+      Mag[w_] := 1/Sqrt[(1 - (w/wn)^2)^2 + (2 zeta (w/wn))^2];
+      LogLinearPlot[Mag[w], {w, 0.1, 1000}, PlotRange -> All,
+        AxesLabel -> {"w (rad/s)", "|G(j w)|"}]
+    ]
+  ], "Input"],
+
+  Cell["4) Series RLC: theoretical Q and bandwidth", "Section"],
+  Cell[BoxData@ToBoxes[
+    HoldForm[
+      R = 10.0; L = 50*10^-3; C = 10*10^-6;
+      w0 = 1/Sqrt[L C];
+      Qrlc = w0 L/R;
+      BWrlc = R/L;
+      {w0, Qrlc, BWrlc}
+    ]
+  ], "Input"]
+}]

@@ -1,0 +1,55 @@
+(* Chapter16_Lesson5.nb *)
+(* Wolfram Language code for discrete-time stability and time response *)
+
+ClearAll["Global`*"];
+
+(* Define discrete-time state-space model *)
+A = {{1.5770, -0.6724}, {1.0, 0.0}};
+B = {{1.0}, {0.0}};
+C = {{0.0676, 0.0604}};
+D = {{0.0}};
+
+eig = Eigenvalues[A];
+Print["Eigenvalues(A) = ", eig];
+Print["Magnitudes = ", Abs[eig]];
+Print["Schur stable? ", And @@ Thread[Abs[eig] < 1]];
+
+(* Discrete Lyapunov equation: A^T P A - P == -Q *)
+Q = IdentityMatrix[2];
+p11 =.; p12=.; p22=.;
+P = {{p11, p12}, {p12, p22}};
+eqs = Flatten[Transpose[A].P.A - P + Q == ConstantArray[0, {2, 2}]];
+solP = Solve[eqs, {p11, p12, p22}][[1]];
+Psol = P /. solP // N;
+Print["P = ", MatrixForm[Psol]];
+Print["Check A^T P A - P = ", MatrixForm[(Transpose[A].Psol.A - Psol) // N]];
+
+(* Simulate step response *)
+Nsteps = 80;
+u[k_] := 1.0;
+x[0] = {0.0, 0.0};
+y[k_] := (C.{x[k]}[[1]] + D[[1,1]]*u[k]) // First;
+
+Do[
+  x[k + 1] = (A.{x[k]}[[1]] + B[[All,1]]*u[k]) // N
+, {k, 0, Nsteps - 1}];
+
+yvals = Table[y[k], {k, 0, Nsteps - 1}] // N;
+Print["First 12 step samples = ", Take[yvals, 12]];
+
+ListLinePlot[yvals,
+  PlotRange -> All,
+  AxesLabel -> {"k", "y[k]"},
+  PlotLabel -> "Unit-Step Response (Discrete-Time)",
+  InterpolationOrder -> 0
+]
+
+(* Natural response *)
+Clear[xn, yn];
+xn[0] = {1.0, -0.4};
+yn[k_] := (C.{xn[k]}[[1]]) // First;
+Do[
+  xn[k + 1] = (A.{xn[k]}[[1]]) // N
+, {k, 0, Nsteps - 1}];
+ynvals = Table[yn[k], {k, 0, 20}] // N;
+Print["Natural response first 10 samples = ", Take[ynvals, 10]];

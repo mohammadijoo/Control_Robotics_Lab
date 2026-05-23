@@ -1,0 +1,73 @@
+(* Chapter18_Lesson2.nb *)
+(* Wolfram Language notebook-style script for Lagrangian modeling of a cart-pendulum *)
+(* Generalized coordinates: q = {x[t], th[t]} *)
+
+ClearAll["Global`*"];
+
+params = <|
+  "M" -> 1.0, "m" -> 0.25, "l" -> 0.5, "J" -> 0.02,
+  "g" -> 9.81, "k" -> 8.0, "c" -> 0.35, "b" -> 0.05
+|>;
+
+x = x[t];
+th = th[t];
+
+Texpr = 1/2 (M + m) D[x, t]^2 + m l Cos[th] D[x, t] D[th, t] + 1/2 (J + m l^2) D[th, t]^2;
+Vexpr = 1/2 k x^2 + m g l (1 - Cos[th]);
+Dexpr = 1/2 c D[x, t]^2 + 1/2 b D[th, t]^2;
+Lexpr = Texpr - Vexpr;
+
+qList = {x, th};
+qdList = D[qList, t];
+Qnc = {u[t], 0};
+
+eulerLagrange = Table[
+  FullSimplify[D[D[Lexpr, qdList[[i]]], t] - D[Lexpr, qList[[i]]] + D[Dexpr, qdList[[i]]] - Qnc[[i]]],
+  {i, 1, 2}
+];
+
+Print["Euler-Lagrange equations (left-hand side = 0):"];
+Print /@ eulerLagrange;
+
+u[t_] := Piecewise[{{2.0, 0.5 <= t <= 2.5}}, 0.0];
+
+eqns = {
+  (M + m) x''[t] + m l Cos[th[t]] th''[t] - m l Sin[th[t]] th'[t]^2 + c x'[t] + k x[t] == u[t],
+  m l Cos[th[t]] x''[t] + (J + m l^2) th''[t] + b th'[t] + m g l Sin[th[t]] == 0
+} /. {M -> params["M"], m -> params["m"], l -> params["l"], J -> params["J"],
+       g -> params["g"], k -> params["k"], c -> params["c"], b -> params["b"]};
+
+ics = {
+  x[0] == 0.05, th[0] == 0.35,
+  x'[0] == 0.0, th'[0] == 0.0
+};
+
+sol = NDSolve[Join[eqns, ics], {x, th}, {t, 0, 10}, MaxStepFraction -> 1/100][[1]];
+
+energy[t_] := Evaluate[
+  (Texpr + Vexpr) /. {M -> params["M"], m -> params["m"], l -> params["l"], J -> params["J"],
+                      g -> params["g"], k -> params["k"]} /. sol
+];
+
+p1 = Plot[Evaluate[{x[t], th[t]} /. sol], {t, 0, 10},
+  PlotLegends -> {"x(t)", "th(t)"},
+  GridLines -> Automatic,
+  PlotLabel -> "Generalized Coordinates"];
+
+p2 = Plot[energy[t], {t, 0, 10},
+  GridLines -> Automatic,
+  PlotLabel -> "Total Mechanical Energy"];
+
+Export["Chapter18_Lesson2_mathematica_states.png", p1];
+Export["Chapter18_Lesson2_mathematica_energy.png", p2];
+
+data = Table[
+  {tt, x[tt] /. sol, th[tt] /. sol, (x'[tt] /. sol), (th'[tt] /. sol), energy[tt]},
+  {tt, 0, 10, 0.01}
+];
+
+Export["Chapter18_Lesson2_mathematica_output.csv",
+  Prepend[data, {"t","x","theta","xdot","thetadot","energy"}]
+];
+
+Print["Saved Mathematica plots and CSV output."];

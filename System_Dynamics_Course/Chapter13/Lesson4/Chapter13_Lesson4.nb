@@ -1,0 +1,97 @@
+(* Chapter13_Lesson4.nb
+   Damping in MDOF Systems and Mode Shapes with Damping
+
+   This notebook is provided as a plain-text Notebook expression.
+   It demonstrates:
+   1) Undamped generalized eigenpairs using Eigensystem[{K,M}]
+   2) Rayleigh damping coefficient identification from two modal damping ratios
+   3) Non-proportional damping: state-space eigenvalues (complex poles)
+*)
+
+Notebook[{
+  Cell["Chapter 13 - Lesson 4: Damping in MDOF Systems and Mode Shapes with Damping", "Title"],
+
+  Cell["(1) Define M and K for a 3-DOF chain", "Section"],
+  Cell[BoxData@ToBoxes[
+    (
+      M = DiagonalMatrix[{1.2, 1.0, 0.8}];
+      K = {{2500. + 1800., -1800., 0.},
+           {-1800., 1800. + 1200., -1200.},
+           {0., -1200., 1200.}};
+      {M, K}
+    )
+  ], "Input"],
+
+  Cell["(2) Undamped modes: K.phi = (w^2) M.phi (mass-normalized)", "Section"],
+  Cell[BoxData@ToBoxes[
+    Module[{vals, vecs, omega, Phi, MM, KK},
+      {vals, vecs} = Eigensystem[{K, M}];  (* vals = omega^2 *)
+      omega = Sqrt[vals];
+
+      (* Mass-normalize each eigenvector: phi -> phi / Sqrt[phi^T M phi] *)
+      Phi = Transpose @ Map[
+        Function[phi, phi/Sqrt[phi.M.phi]],
+        vecs
+      ];
+
+      MM = Transpose[Phi].M.Phi;
+      KK = Transpose[Phi].K.Phi;
+
+      <|"omega" -> omega, "Phi" -> Phi, "PhiTMPhI" -> MM, "PhiTKPhi" -> KK|>
+    ]
+  ], "Input"],
+
+  Cell["(3) Rayleigh damping: C = alpha M + beta K; identify alpha,beta from two targets", "Section"],
+  Cell[BoxData@ToBoxes[
+    Module[{zeta1=0.02, zeta3=0.05, omega, A, b, alpha, beta, C, Cm},
+      omega = Sqrt[ Eigenvalues[{K, M}] ];
+
+      (* alpha + beta*w^2 = 2*zeta*w at modes 1 and 3 *)
+      A = {{1., omega[[1]]^2}, {1., omega[[3]]^2}};
+      b = {2 zeta1 omega[[1]], 2 zeta3 omega[[3]]};
+      {alpha, beta} = LinearSolve[A, b];
+
+      C = alpha M + beta K;
+      Cm = Transpose[Phi].C.Phi;
+
+      <|"alpha" -> alpha, "beta" -> beta, "Cm" -> Cm|>
+    ]
+  ], "Input"],
+
+  Cell["(4) Non-proportional damping and state-space poles", "Section"],
+  Cell[BoxData@ToBoxes[
+    Module[{Cnp, c13=45., c2g=35., n, Z, I, Astate, lam, lamPos, info},
+      Cnp = ConstantArray[0., {3, 3}];
+
+      (* Damper between DOF1 and DOF3 *)
+      Cnp[[1,1]] += c13; Cnp[[3,3]] += c13;
+      Cnp[[1,3]] -= c13; Cnp[[3,1]] -= c13;
+
+      (* DOF2 to ground *)
+      Cnp[[2,2]] += c2g;
+
+      n = Length[M];
+      Z = ConstantArray[0., {n, n}];
+      I = IdentityMatrix[n];
+
+      Astate = ArrayFlatten[{
+        {Z, I},
+        {-Inverse[M].K, -Inverse[M].Cnp}
+      }];
+
+      lam = Eigenvalues[Astate];
+      lamPos = SortBy[Select[lam, Im[#] > 10^-8 &], Im];
+
+      info = Table[
+        With[{sigma = Re[lamPos[[i]]], wd = Im[lamPos[[i]]]},
+          With[{wn = Sqrt[sigma^2 + wd^2], zeta = -sigma/Sqrt[sigma^2 + wd^2]},
+            <|"sigma" -> sigma, "wd" -> wd, "wn" -> wn, "zeta" -> zeta|>
+          ]
+        ],
+        {i, 1, Min[3, Length[lamPos]]}
+      ];
+
+      <|"Cnp" -> Cnp, "poles" -> info|>
+    ]
+  ], "Input"]
+}]

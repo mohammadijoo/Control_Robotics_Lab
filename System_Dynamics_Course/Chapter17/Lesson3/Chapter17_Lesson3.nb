@@ -1,0 +1,45 @@
+(* Chapter17_Lesson3.nb *)
+(* Response of Linear Systems to Random Inputs: Mean and Variance Propagation *)
+(* Wolfram Language code (can be pasted directly into a Mathematica notebook) *)
+
+ClearAll["Global`*"];
+
+(* Continuous-time Lyapunov example *)
+A = {{0, 1}, {-4, -0.6}};
+Gamma = {{0}, {1}};
+q = 0.8;
+
+(* Solve A.P + P.Transpose[A] + Gamma q Gamma^T == 0 *)
+Pss = LyapunovSolve[A, -Gamma.q.Transpose[Gamma]];
+Print["Steady-state covariance Pss = "];
+Print[MatrixForm[Pss]];
+
+(* Deterministic mean propagation for constant mean input *)
+B = {{0}, {1}};
+uMean = 1.0;
+mx0 = {0, 0};
+
+(* Closed-form mean: m(t) = exp(A t) m0 + integral_0^t exp(A (t-tau)) B uMean d tau *)
+m[t_] := MatrixExp[A t].mx0 + NIntegrate[MatrixExp[A (t - tau)].B[[All, 1]] uMean, {tau, 0, t}];
+Print["Mean state at t=10: ", N[m[10], 8]];
+
+(* Discrete-time scalar recursion and Monte Carlo check *)
+a = 0.94; b = 0.4; g = 1.0; mu = 1.0; qk = 0.3;
+K = 120; M = 20000;
+
+mth = 0.0; Pth = 0.0;
+Do[
+  mth = a mth + b mu;
+  Pth = a^2 Pth + g^2 qk;
+, {k, 1, K}];
+
+SeedRandom[1234];
+x = ConstantArray[0.0, M];
+Do[
+  w = Sqrt[qk] RandomVariate[NormalDistribution[0, 1], M];
+  x = a x + b mu + g w;
+, {kk, 1, K}];
+
+Print["Theory mean/variance after K steps: ", {mth, Pth}];
+Print["Monte Carlo mean/variance after K steps: ", N[{Mean[x], Variance[x]}, 8]];
+Print["Steady-state mean/variance: ", N[{(b mu)/(1 - a), (g^2 qk)/(1 - a^2)}, 8]];

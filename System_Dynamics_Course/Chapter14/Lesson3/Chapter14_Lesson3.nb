@@ -1,0 +1,51 @@
+(*
+Chapter 14 - Nonlinear System Dynamics
+Lesson 3 - Linearization vs. True Nonlinear Behavior: When Linear Models Fail
+
+File: Chapter14_Lesson3.nb
+
+This is a plain-text Wolfram Notebook expression. Open it in Mathematica.
+It compares nonlinear vs linearized dynamics for Example B and illustrates
+a nonhyperbolic case in Example A.
+*)
+
+Notebook[{
+  Cell["Chapter 14 - Nonlinear System Dynamics\nLesson 3 - Linearization vs. True Nonlinear Behavior: When Linear Models Fail", "Title"],
+
+  Cell["Example B: linear center vs nonlinear spiral-out", "Section"],
+
+  Cell[BoxData[
+    ToBoxes[
+      Module[{mu = 1, fNL, A, fLIN, solNL, solLIN, tmax = 25, z0 = {0.2, 0.0}},
+        fNL[{x_, y_}] := {-y + x (x^2 + y^2), x + y (x^2 + y^2)};
+        A = {{0, -1}, {1, 0}};
+        fLIN[z_] := A.z;
+
+        solNL = NDSolveValue[{z'[t] == fNL[z[t]], z[0] == z0}, z, {t, 0, tmax}];
+        solLIN = NDSolveValue[{w'[t] == fLIN[w[t]], w[0] == z0}, w, {t, 0, tmax}];
+
+        Print["r(T) nonlinear = ", Norm[solNL[tmax]]];
+        Print["r(T) linear    = ", Norm[solLIN[tmax]]];
+
+        Show[
+          ParametricPlot[{solLIN[t][[1]], solLIN[t][[2]]}, {t, 0, tmax},
+            PlotLegends -> {"Linearized"}, AxesLabel -> {"x", "y"}],
+          ParametricPlot[{solNL[t][[1]], solNL[t][[2]]}, {t, 0, tmax},
+            PlotLegends -> {"Nonlinear"}, AxesLabel -> {"x", "y"}]
+        ]
+      ]
+    ]
+  ], "Input"],
+
+  Cell["Example A: nonhyperbolic equilibrium (linearization inconclusive)", "Section"],
+
+  Cell[BoxData[
+    ToBoxes[
+      Module[{f, sol, x0 = 0.8, tmax = 10},
+        f[x_] := -x^3;
+        sol = NDSolveValue[{x'[t] == f[x[t]], x[0] == x0}, x, {t, 0, tmax}];
+        Plot[sol[t], {t, 0, tmax}, AxesLabel -> {"t", "x(t)"}]
+      ]
+    ]
+  ], "Input"]
+}]

@@ -1,0 +1,102 @@
+(* ::Package:: *)
+
+(* Chapter14_Lesson4.nb
+   System Dynamics (Control Engineering) — Chapter 14, Lesson 4
+   Piecewise-Linear Approximations, Saturation, Dead-Zone, and Backlash Models *)
+
+(* This notebook-style file is a plain-text Wolfram Notebook expression.
+   You can open it in Wolfram Mathematica. *)
+
+Notebook[{
+  Cell["Chapter 14 — Lesson 4: PWL, Saturation, Dead-Zone, Backlash", "Title"],
+  Cell["1) Nonlinearities (static + backlash/play operator)", "Section"],
+
+  Cell[BoxData @ ToBoxes @ HoldForm[
+    sat[u_, umax_] := Clip[u, {-umax, umax}]
+  ], "Input"],
+
+  Cell[BoxData @ ToBoxes @ HoldForm[
+    deadZone[u_, d_] := Piecewise[{
+      {0, Abs[u] <= d},
+      {u - d Sign[u], Abs[u] > d}
+    }]
+  ], "Input"],
+
+  Cell[TextData[{
+    "Backlash as a play operator: output y stays within [u - b/2, u + b/2] ",
+    "and only updates when u pushes the band boundary."
+  }], "Text"],
+
+  Cell[BoxData @ ToBoxes @ HoldForm[
+    backlashStep[u_, y_, b_] := Module[{half = b/2},
+      Which[
+        u > y + half, {u - half, u - half},
+        u < y - half, {u + half, u + half},
+        True,         {y, y}
+      ]
+    ]
+  ], "Input"],
+
+  Cell["2) Piecewise-linear (PWL) map via linear interpolation", "Section"],
+
+  Cell[BoxData @ ToBoxes @ HoldForm[
+    pwlEval[xs_List, ys_List, x_] := Module[{n = Length[xs], i, t},
+      If[x <= xs[[1]], Return[ys[[1]]]];
+      If[x >= xs[[n]], Return[ys[[n]]]];
+      i = First@FirstPosition[UnitStep[xs - x], 1] - 1; (* xs[[i]] <= x < xs[[i+1]] *)
+      t = (x - xs[[i]])/(xs[[i + 1]] - xs[[i]]);
+      (1 - t) ys[[i]] + t ys[[i + 1]]
+    ]
+  ], "Input"],
+
+  Cell["3) Closed-loop simulation (RK4, self-contained)", "Section"],
+
+  Cell[BoxData @ ToBoxes @ HoldForm[
+    plant[{x1_, x2_}, u_, wn_, zeta_, b_] := {x2, -2 zeta wn x2 - wn^2 x1 + b u}
+  ], "Input"],
+
+  Cell[BoxData @ ToBoxes @ HoldForm[
+    rk4Step[f_, x_, u_, dt_] := Module[{k1, k2, k3, k4},
+      k1 = f[x, u];
+      k2 = f[x + (dt/2) k1, u];
+      k3 = f[x + (dt/2) k2, u];
+      k4 = f[x + dt k3, u];
+      x + (dt/6) (k1 + 2 k2 + 2 k3 + k4)
+    ]
+  ], "Input"],
+
+  Cell[BoxData @ ToBoxes @ HoldForm[
+    Module[{
+      T = 6.0, dt = 0.001, steps, wn = 5.0, zeta = 0.25, b = 1.0,
+      Kp = 18.0, Kd = 4.5, umax = 2.0, d = 0.25, bgap = 0.20,
+      xs, ys, usePwl = False,
+      x = {0.0, 0.0}, ybl = 0.0,
+      data = {}
+    },
+      steps = Round[T/dt];
+      xs = {-3.0, -1.5, -0.5, 0.0, 0.5, 1.5, 3.0};
+      ys = Tanh /@ xs;
+
+      Do[
+        Module[{t = k dt, r = 1.0, e, ucmd, udz, usat, umap, ubl, tmp},
+          e = r - x[[1]];
+          ucmd = Kp e - Kd x[[2]];
+          udz = deadZone[ucmd, d];
+          usat = sat[udz, umax];
+          umap = If[usePwl, pwlEval[xs, ys, usat], usat];
+          tmp = backlashStep[umap, ybl, bgap];
+          ubl = tmp[[1]]; ybl = tmp[[2]];
+
+          x = rk4Step[(plant[#, #2, wn, zeta, b] &), x, ubl, dt];
+          AppendTo[data, {t, x[[1]], x[[2]], ucmd, udz, usat, ubl}];
+        ],
+        {k, 0, steps}
+      ];
+
+      Export["Chapter14_Lesson4_output.csv",
+        Prepend[data, {"t","x1","x2","u_cmd","u_deadzone","u_sat","u_backlash"}]
+      ];
+      "Wrote Chapter14_Lesson4_output.csv"
+    ]
+  ], "Input"]
+}]

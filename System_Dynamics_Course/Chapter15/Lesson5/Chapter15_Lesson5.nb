@@ -1,0 +1,101 @@
+(* Chapter15_Lesson5.nb *)
+(* Numerical Stability, Error Control, and Model Verification via Simulation *)
+(* Wolfram Mathematica implementation for Chapter 15, Lesson 5 (System Dynamics) *)
+
+ClearAll["Global`*"];
+
+(* 1) Explicit Euler absolute-stability demo for y' = lambda y *)
+eulerAmplification[lambda_, h_] := Abs[1 + h lambda];
+
+eulerMarch[lambda_, h_, n_] := NestList[# + h lambda # &, 1.0, n];
+
+Print["=== Explicit Euler stability demo ==="];
+lambda = -50.0;
+Do[
+  amp = eulerAmplification[lambda, h];
+  yN = Last[eulerMarch[lambda, h, 30]];
+  Print[
+    "h = ", NumberForm[h, {4, 3}],
+    ", |1 + h lambda| = ", NumberForm[amp, {8, 6}],
+    ", y_N = ", ScientificForm[yN]
+  ],
+  {h, {0.01, 0.03, 0.05, 0.06}}
+];
+
+(* 2) Damped oscillator exact solution and energy *)
+omegaN = 4.0;
+zeta = 0.05;
+q0 = 1.0; v0 = 0.0;
+
+wd = omegaN Sqrt[1 - zeta^2];
+qExact[t_] := Exp[-zeta omegaN t] (q0 Cos[wd t] + ((v0 + zeta omegaN q0)/wd) Sin[wd t]);
+
+energy[q_, v_] := 1/2 (v^2 + omegaN^2 q^2);
+
+(* 3) Adaptive NDSolve with error control *)
+sol = NDSolveValue[
+  {
+    q'[t] == v[t],
+    v'[t] == -2 zeta omegaN v[t] - omegaN^2 q[t],
+    q[0] == q0,
+    v[0] == v0
+  },
+  {q, v},
+  {t, 0, 12},
+  AccuracyGoal -> 9,
+  PrecisionGoal -> 6,
+  MaxStepSize -> 0.2
+];
+
+sample = Table[{tt, sol[[1]][tt], sol[[2]][tt]}, {tt, 0, 12, 0.02}];
+qErrInf = Max[Abs[(sample[[All, 2]]) - (qExact /@ sample[[All, 1]])]];
+energies = energy @@@ sample[[All, {2, 3}]];
+energyNonInc = And @@ Thread[Differences[energies] <= 10^-8];
+
+Print[" "];
+Print["=== Adaptive NDSolve verification ==="];
+Print["max|q - qExact| on sampled grid = ", ScientificForm[qErrInf]];
+Print["Energy nonincreasing (sampled) = ", energyNonInc];
+
+(* 4) Fixed-step RK4 verification and observed order *)
+rk4Step[f_, t_, y_, h_] := Module[{k1, k2, k3, k4},
+  k1 = f[t, y];
+  k2 = f[t + h/2, y + (h/2) k1];
+  k3 = f[t + h/2, y + (h/2) k2];
+  k4 = f[t + h, y + h k3];
+  y + (h/6) (k1 + 2 k2 + 2 k3 + k4)
+];
+
+fOsc[t_, y_] := {y[[2]], -2*0.1*4.0*y[[2]] - 4.0^2*y[[1]]};
+
+rk4Fixed[t0_, tf_, y0_, h_] := Module[{n, t = t0, y = y0, pts},
+  n = Round[(tf - t0)/h];
+  pts = {{t, y[[1]], y[[2]]}};
+  Do[
+    y = rk4Step[fOsc, t, y, h];
+    t = t + h;
+    AppendTo[pts, {t, y[[1]], y[[2]]}],
+    {n}
+  ];
+  pts
+];
+
+hs = {0.2, 0.1, 0.05, 0.025};
+errs = Table[
+   pts = rk4Fixed[0.0, 5.0, {1.0, 0.0}, h];
+   Max[Abs[pts[[All, 2]] - (qExact /@ pts[[All, 1]])]],
+   {h, hs}
+];
+
+Print[" "];
+Print["=== RK4 convergence verification ==="];
+Do[
+  Print["h = ", hs[[i]], ", max error = ", ScientificForm[errs[[i]]]],
+  {i, Length[hs]}
+];
+
+pObs = Table[Log[errs[[i]]/errs[[i + 1]]]/Log[2], {i, 1, Length[errs] - 1}];
+Do[
+  Print["p_obs(", hs[[i]], " -> ", hs[[i + 1]], ") = ", NumberForm[pObs[[i]], {5, 4}]],
+  {i, Length[pObs]}
+];

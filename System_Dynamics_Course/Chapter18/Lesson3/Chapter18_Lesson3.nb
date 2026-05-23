@@ -1,0 +1,37 @@
+(* Chapter18_Lesson3.nb *)
+m = 1.5; k = 12.0; d = 0.8; omega = 1.4;
+u[t_] := Sin[omega t];
+H[q_, p_] := 1/2 k q^2 + p^2/(2 m);
+y[q_, p_] := p/m;
+diss[q_, p_] := d (p/m)^2;
+
+eqns = {
+   q'[t] == p[t]/m,
+   p'[t] == -k q[t] - d (p[t]/m) + u[t],
+   q[0] == 0.15,
+   p[0] == 0.0
+};
+
+tmax = 20;
+sol = NDSolveValue[eqns, {q, p}, {t, 0, tmax}];
+qf[t_] := sol[[1]][t];
+pf[t_] := sol[[2]][t];
+
+energy[t_] := H[qf[t], pf[t]];
+rhs[t_] := -diss[qf[t], pf[t]] + y[qf[t], pf[t]] u[t];
+
+energyChange = energy[tmax] - energy[0];
+rhsIntegral = NIntegrate[rhs[t], {t, 0, tmax}];
+residual = N[energyChange - rhsIntegral];
+
+Print["Energy balance residual = ", residual];
+
+Plot[{qf[t], pf[t]}, {t, 0, tmax},
+ PlotLegends -> {"q(t)", "p(t)"},
+ AxesLabel -> {"t", "states"},
+ PlotLabel -> "Port-Hamiltonian states"];
+
+Plot[{energy[t], energy[0] + NIntegrate[rhs[s], {s, 0, t}]}, {t, 0, tmax},
+ PlotLegends -> {"H(t)", "H(0)+int(-diss+y*u)dt"},
+ AxesLabel -> {"t", "energy"},
+ PlotLabel -> "Energy balance verification"];

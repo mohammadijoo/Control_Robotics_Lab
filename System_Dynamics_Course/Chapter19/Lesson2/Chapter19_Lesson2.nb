@@ -1,0 +1,31 @@
+Notebook[{Cell[BoxData@ToBoxes[HoldForm[
+\
+    (* Chapter19_Lesson2.nb (Wolfram Mathematica Notebook content)
+       Separation of Variables & Modal Decomposition (1D Heat Equation, Dirichlet BC)
+
+       PDE: u_t = alpha u_xx, u(0,t)=u(L,t)=0
+       u(x,t) = Sum_{n=1..Infinity} a_n Exp[-alpha (n Pi/L)^2 t] Sin[n Pi x/L]
+    *)
+
+    L = 1;
+    alpha = 0.02;
+
+    u0[x_] := x (L - x);
+
+    a[n_] := (2/L) Integrate[u0[x] Sin[n Pi x/L], {x, 0, L},
+                            Assumptions -> n ∈ Integers && n >= 1];
+
+    uSeries[x_, t_, N_] := Sum[a[n] Exp[-alpha (n Pi/L)^2 t] Sin[n Pi x/L], {n, 1, N}];
+
+    Plot[Evaluate@Table[uSeries[x, t, 30], {t, {0, 1, 2.5, 5, 6}}], {x, 0, L},
+         PlotLegends -> {"t=0", "t=1", "t=2.5", "t=5", "t=6"},
+         PlotRange -> All, GridLines -> Automatic,
+         AxesLabel -> {"x", "u(x,t)"}]
+
+    (* Truncation error indicator (heuristic) *)
+    With[{t0 = 3},
+      Table[{N, NIntegrate[(uSeries[x, t0, 120] - uSeries[x, t0, N])^2, {x, 0, L}]},
+            {N, {3, 6, 12, 24, 48}}]
+    ]
+
+]], "Input"]}]

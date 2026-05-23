@@ -1,0 +1,61 @@
+Notebook[{
+      Cell["Chapter18_Lesson1.nb", "Title"],
+      Cell["Work, Energy, and Power in Mechanical, Electrical, Fluid, and Thermal Systems", "Subtitle"],
+      Cell["This notebook simulates four lumped dynamic models and checks the energy balance in each domain.", "Text"],
+      Cell["ClearAll[\"Global`*\"];\n\
+t0 = 0; tf = 12; dt = 0.0001;\n\
+tgrid = Range[t0, tf, dt];\n\
+trapz[y_List, tt_List] := Total[(Most[y] + Rest[y])*(Differences[tt])/2];", "Input"],
+      Cell["(* 1) Mechanical: m x'' + c x' + k x = F(t) *)\n\
+m = 1.5; c = 0.8; ks = 12.0;\n\
+Fin[t_] := 2.5 Sin[1.2 t] + 1.2 Cos[0.4 t];\n\
+xFun = NDSolveValue[{m x''[t] + c x'[t] + ks x[t] == Fin[t], x[0] == 0, x'[0] == 0}, x, {t, t0, tf}];\n\
+vFun[t_] := xFun'[t];\n\
+PmIn = (Fin[#] vFun[#]) & /@ tgrid;\n\
+PmDiss = (c vFun[#]^2) & /@ tgrid;\n\
+Em = (0.5 m vFun[#]^2 + 0.5 ks xFun[#]^2) & /@ tgrid;\n\
+mechResidual = Last[Em] - First[Em] - (trapz[PmIn, tgrid] - trapz[PmDiss, tgrid]);", "Input"],
+      Cell["(* 2) Electrical: series RLC *)\n\
+R = 2.0; L = 0.6; Cc = 0.25;\n\
+Vin[t_] := 5.0 Sin[2.0 t] + 2.0 Cos[0.5 t];\n\
+{qFun, iFun} = NDSolveValue[{\n\
+   q'[t] == i[t],\n\
+   L i'[t] + R i[t] + q[t]/Cc == Vin[t],\n\
+   q[0] == 0, i[0] == 0}, {q, i}, {t, t0, tf}];\n\
+PeIn = (Vin[#] iFun[#]) & /@ tgrid;\n\
+PeDiss = (R iFun[#]^2) & /@ tgrid;\n\
+Ee = (0.5 L iFun[#]^2 + 0.5 qFun[#]^2/Cc) & /@ tgrid;\n\
+elecResidual = Last[Ee] - First[Ee] - (trapz[PeIn, tgrid] - trapz[PeDiss, tgrid]);", "Input"],
+      Cell["(* 3) Fluid small-signal chamber + line *)\n\
+Ch = 0.08; Lh = 0.15; Rh = 1.7;\n\
+QinHyd[t_] := 0.8 Sin[0.9 t] + 0.2 Cos[0.3 t];\n\
+{pFun, qfFun} = NDSolveValue[{\n\
+   Ch p'[t] == QinHyd[t] - qf[t],\n\
+   Lh qf'[t] == p[t] - Rh qf[t],\n\
+   p[0] == 0, qf[0] == 0}, {p, qf}, {t, t0, tf}];\n\
+PfIn = (pFun[#] QinHyd[#]) & /@ tgrid;\n\
+PfDiss = (Rh qfFun[#]^2) & /@ tgrid;\n\
+Ef = (0.5 Ch pFun[#]^2 + 0.5 Lh qfFun[#]^2) & /@ tgrid;\n\
+fluidResidual = Last[Ef] - First[Ef] - (trapz[PfIn, tgrid] - trapz[PfDiss, tgrid]);", "Input"],
+      Cell["(* 4) Thermal lumped capacitance *)\n\
+Cth = 600.0; Rth = 0.4; Tenv = 293.15;\n\
+QdotTherm[t_] := 120.0 + 40.0 Sin[0.15 t];\n\
+TFun = NDSolveValue[{Cth T'[t] == QdotTherm[t] - (T[t] - Tenv)/Rth, T[0] == Tenv}, T, {t, t0, tf}];\n\
+PtIn = (QdotTherm[#]) & /@ tgrid;\n\
+PtOut = ((TFun[#] - Tenv)/Rth) & /@ tgrid;\n\
+Et = (Cth (TFun[#] - Tenv)) & /@ tgrid;\n\
+thermResidual = Last[Et] - First[Et] - (trapz[PtIn, tgrid] - trapz[PtOut, tgrid]);", "Input"],
+      Cell["Print[\"=== Energy Balance Audit (Mathematica) ===\"];\n\
+Print[\"Mechanical residual: \", NumberForm[mechResidual, {10, 6}]];\n\
+Print[\"Electrical residual: \", NumberForm[elecResidual, {10, 6}]];\n\
+Print[\"Fluid residual: \", NumberForm[fluidResidual, {10, 6}]];\n\
+Print[\"Thermal residual: \", NumberForm[thermResidual, {10, 6}]];\n\
+Print[\"Final stored energies:\"];\n\
+Print[\"E_mech(tf) = \", NumberForm[Last[Em], {10, 6}]];\n\
+Print[\"E_elec(tf) = \", NumberForm[Last[Ee], {10, 6}]];\n\
+Print[\"E_fluid(tf)= \", NumberForm[Last[Ef], {10, 6}]];\n\
+Print[\"E_therm(tf)= \", NumberForm[Last[Et], {10, 6}]];", "Input"]
+    },
+    WindowSize->{1000, 800},
+    WindowTitle->"Chapter18_Lesson1"
+    ]

@@ -1,0 +1,111 @@
+(* Chapter19_Lesson3.nb
+   Finite Difference (FD) and Finite Element (FE) Approximations (Conceptual Level)
+
+   This file is written as a Mathematica script with notebook-style section markers.
+   You can open it in Wolfram Mathematica; the FrontEnd recognizes these markers.
+
+   Contents:
+     1) Heat equation by FD (method of lines) + theta method.
+     2) Poisson equation by linear FEM (Galerkin) assembly.
+*)
+
+(* ::Section:: *)
+(*1. Heat equation: FD in space, theta method in time*)
+
+ClearAll["Global`*"];
+
+L = 1.0;
+N = 101;
+x = Subdivide[0, L, N - 1];
+dx = x[[2]] - x[[1]];
+alpha = 0.05;
+
+u0 = Sin[Pi x];
+u0[[1]] = 0.0; u0[[-1]] = 0.0;
+
+n = N - 2; (* interior size *)
+
+(* Laplacian on interior nodes with Dirichlet boundaries *)
+main = ConstantArray[-2/(dx^2), n];
+off  = ConstantArray[ 1/(dx^2), n - 1];
+A = SparseArray[
+   {Band[{1, 1}] -> main, Band[{1, 2}] -> off, Band[{2, 1}] -> off},
+   {n, n}
+];
+
+theta = 1/2;  (* Crank–Nicolson *)
+dt = 0.4*(dx^2)/alpha;
+steps = 200;
+
+I = IdentityMatrix[n, SparseArray];
+LHS = I - theta*dt*alpha*A;
+RHS = I + (1 - theta)*dt*alpha*A;
+
+uL = u0[[1]];
+uR = u0[[-1]];
+
+bc = ConstantArray[0.0, n];
+bc[[1]] = bc[[1]] + uL/(dx^2);
+bc[[-1]] = bc[[-1]] + uR/(dx^2);
+bc = SparseArray[bc];
+
+v = u0[[2 ;; -2]];
+
+Do[
+  rhs = RHS.v + dt*alpha*bc;
+  v = LinearSolve[LHS, rhs];
+, {k, 1, steps}];
+
+uHeatFinal = Join[{uL}, v, {uR}];
+
+Print["Heat FD done. Final time = ", steps*dt];
+
+(* Optional: plot *)
+ListLinePlot[Transpose[{x, uHeatFinal}], PlotRange -> All, AxesLabel -> {"x", "u"},
+ PlotLabel -> "Heat equation (FD space + theta time)"];
+
+(* ::Section:: *)
+(*2. Poisson equation: linear FEM (P1) on uniform mesh*)
+
+Nel = 40;
+xf = Subdivide[0, 1, Nel];
+h = xf[[2]] - xf[[1]];
+Nn = Nel + 1;
+
+f[x_] := Pi^2 Sin[Pi x]; (* exact u = Sin[Pi x] *)
+
+K = ConstantArray[0.0, {Nn, Nn}];
+F = ConstantArray[0.0, Nn];
+
+Do[
+  i = e; j = e + 1;
+  Ke = (1/h) {{1, -1}, {-1, 1}};
+  xm = (xf[[i]] + xf[[j]])/2;
+  Fe = f[xm]*(h/2)*{1, 1};
+
+  K[[{i, j}, {i, j}]] += Ke;
+  F[[{i, j}]] += Fe;
+, {e, 1, Nel}];
+
+(* Dirichlet BC u(0)=u(1)=0, eliminate first and last nodes *)
+free = Range[2, Nn - 1];
+
+u0bc = 0.0; uLbc = 0.0;
+Fmod = F - K[[All, 1]]*u0bc - K[[All, -1]]*uLbc;
+
+Kff = K[[free, free]];
+Ff  = Fmod[[free]];
+
+uf = LinearSolve[Kff, Ff];
+
+uFEM = ConstantArray[0.0, Nn];
+uFEM[[1]] = u0bc; uFEM[[-1]] = uLbc;
+uFEM[[free]] = uf;
+
+uExact = Sin[Pi xf];
+errInf = Max[Abs[uFEM - uExact]];
+Print["FEM Poisson max error = ", errInf];
+
+ListLinePlot[{Transpose[{xf, uFEM}], Transpose[{xf, uExact}]},
+ PlotLegends -> {"FEM", "Exact"}, PlotRange -> All, AxesLabel -> {"x", "u"},
+ PlotLabel -> "Poisson equation (linear FEM)"];

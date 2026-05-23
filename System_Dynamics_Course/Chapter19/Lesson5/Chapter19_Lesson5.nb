@@ -1,0 +1,52 @@
+(* Chapter19_Lesson5.nb *)
+(* Spatio-Temporal Dynamics: 1D heat equation discretization + discrete Riccati feedback *)
+
+ClearAll[alpha, L, N, dx, D2, A, xgrid, b, B, dt, Ad, Bd, Q, R, P, K];
+
+alpha = 0.12;
+L = 1.0;
+N = 60;
+dx = L/(N + 1);
+
+(* Laplacian with Dirichlet boundaries on interior nodes *)
+D2 = SparseArray[
+   {Band[{1, 1}] -> (-2), Band[{1, 2}] -> 1, Band[{2, 1}] -> 1},
+   {N, N}
+] / dx^2;
+
+A = alpha Normal[D2];
+xgrid = dx Range[N];
+
+(* Actuator shape *)
+b = Exp[-1/2 ((xgrid - 0.25)/0.07)^2];
+b = b/Norm[b];
+B = Transpose[{b}]; (* N x 1 *)
+
+(* Discretize *)
+dt = 2.*10^-3;
+Ad = IdentityMatrix[N] + dt A;
+Bd = dt B;
+
+Q = IdentityMatrix[N];
+R = {{2.*10^-3}};
+
+(* Discrete algebraic Riccati equation solver *)
+P = DiscreteRiccatiSolve[{Ad, Bd}, Q, R];
+K = Inverse[R + Transpose[Bd].P.Bd].Transpose[Bd].P.Ad; (* 1 x N *)
+
+(* Initial condition *)
+x = Exp[-80 (xgrid - 0.75)^2];
+
+E0 = 0.5 x.x;
+
+steps = Floor[4.0/dt];
+Do[
+  u = - (K.x)[[1]];
+  x = Ad.x + Flatten[Bd]*u;
+, {k, 1, steps}];
+
+E1 = 0.5 x.x;
+
+Print["Energy E(0)=", E0];
+Print["Energy E(end)=", E1];
+Print["Decay factor=", E1/(E0 + 10^-18)];

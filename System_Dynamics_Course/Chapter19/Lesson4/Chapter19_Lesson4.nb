@@ -1,0 +1,49 @@
+(* Chapter19_Lesson4.nb
+   System Dynamics — Chapter 19, Lesson 4
+   Transport delay models and pseudo-distributed approximations.
+*)
+
+ClearAll["Global`*"];
+
+T = 1.0;
+n = 2;
+Nchain = 8;
+
+(* Padé approximation of Exp[-s T] about s=0 *)
+pade = PadeApproximant[Exp[-s T], {s, 0, n}];
+
+(* Stable chain approximation: (1/(1+sT/N))^N *)
+chain = (1/(1 + s T/Nchain))^Nchain;
+
+(* Build transfer function models (delay approximations only) *)
+Gp = TransferFunctionModel[1/(s + 1), s];
+GdPade = TransferFunctionModel[pade, s];
+GdChain = TransferFunctionModel[chain, s];
+
+G_pade = SystemsModelSeriesConnect[Gp, GdPade];
+G_chain = SystemsModelSeriesConnect[Gp, GdChain];
+
+(* Step responses *)
+tmax = 12;
+p1 = OutputResponse[G_pade, UnitStep[t], {t, 0, tmax}];
+p2 = OutputResponse[G_chain, UnitStep[t], {t, 0, tmax}];
+
+Plot[{p1, p2}, {t, 0, tmax},
+ PlotLegends -> {"Padé [2/2]", "Chain N=8"},
+ GridLines -> Automatic,
+ PlotRange -> All,
+ AxesLabel -> {"t", "y(t)"}]
+
+(* Frequency-domain phase comparison (delay only) *)
+wmin = 10^-2; wmax = 10^2;
+phIdeal[w_] := Arg[Exp[-I w T]];
+phPade[w_] := Arg[Evaluate[pade /. s -> I w]];
+phChain[w_] := Arg[Evaluate[chain /. s -> I w]];
+
+LogLinearPlot[
+ {phIdeal[w], phPade[w], phChain[w]},
+ {w, wmin, wmax},
+ PlotLegends -> {"Ideal", "Padé [2/2]", "Chain N=8"},
+ GridLines -> Automatic,
+ AxesLabel -> {"ω", "phase (rad)"}
+]

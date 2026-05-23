@@ -1,0 +1,64 @@
+(* Chapter 12 - Lesson 5: Time–Frequency Domain Relationships and Trade-offs *)
+(* File: Chapter12_Lesson5.nb *)
+
+Notebook[{
+  Cell["Chapter 12 - Lesson 5: Time–Frequency Domain Relationships and Trade-offs", "Title"],
+  Cell["This notebook links step-response metrics and frequency-response metrics for a canonical 2nd-order low-pass system.", "Text"],
+  Cell[BoxData[ToBoxes[
+    Module[{zeta=0.35, wn=12, s, G, resp, t, y, wz, mag, Mr, wr, bw, zetas},
+      Needs["ControlSystems`"];
+      s = Unique["s"];
+      G = TransferFunctionModel[{wn^2},{1,2 zeta wn, wn^2}, s];
+
+      (* Step response and overshoot (numeric) *)
+      resp = StepResponse[G, {0, 3}][[1]];
+      t = resp[[1]]; y = resp[[2]];
+      Print["Overshoot Mp (%) = ", 100 Max[0, (Max[y] - y[[-1]])/y[[-1]]]];
+
+      (* Frequency response metrics *)
+      wz = LogSpace[-2, 3, 2000]*wn;
+      mag = Abs[FrequencyResponse[G, I*#]]& /@ wz;
+      Mr = Max[mag]; wr = wz[[First@Ordering[mag, -1]]];
+
+      bw = Module[{dc = mag[[1]], idx},
+        idx = FirstPosition[mag, _?(# <= dc/Sqrt[2] &)];
+        If[idx === Missing["NotFound"], Indeterminate, wz[[idx[[1]]]]]
+      ];
+
+      Print["Resonant peak Mr = ", Mr];
+      Print["Resonant frequency wr (rad/s) = ", wr];
+      Print["-3 dB bandwidth wb (rad/s) = ", bw];
+
+      (* Sweep zeta *)
+      zetas = {0.15,0.25,0.35,0.50,0.70};
+      Print["zeta, Mp(%), Mr, wb(rad/s)"];
+      Do[
+        Module[{z = zz, Gz, respz, yz, magz, Mrz, bwz, Mpz},
+          Gz = TransferFunctionModel[{wn^2},{1,2 z wn, wn^2}, s];
+          respz = StepResponse[Gz, {0, 3}][[1]];
+          yz = respz[[2]];
+          Mpz = 100 Max[0, (Max[yz] - yz[[-1]])/yz[[-1]]];
+
+          magz = Abs[FrequencyResponse[Gz, I*#]]& /@ wz;
+          Mrz = Max[magz];
+          bwz = Module[{dc = magz[[1]], idx},
+            idx = FirstPosition[magz, _?(# <= dc/Sqrt[2] &)];
+            If[idx === Missing["NotFound"], Indeterminate, wz[[idx[[1]]]]]
+          ];
+
+          Print[z, ", ", NumberForm[Mpz, {6,2}], ", ", NumberForm[Mrz, {6,4}], ", ", NumberForm[bwz, {8,4}]];
+        ],
+      {zz, zetas}]
+    ], StandardForm]]],
+  Cell["Optional plot:", "Section"],
+  Cell[BoxData[ToBoxes[
+    Module[{zeta=0.35, wn=12, s, G},
+      Needs["ControlSystems`"];
+      s = Unique["s"];
+      G = TransferFunctionModel[{wn^2},{1,2 zeta wn, wn^2}, s];
+      BodePlot[G, PlotLegends -> {"G(jw)"}]
+    ], StandardForm]]]
+},
+WindowSize->{1000, 700},
+WindowTitle->"Chapter12_Lesson5.nb"
+]

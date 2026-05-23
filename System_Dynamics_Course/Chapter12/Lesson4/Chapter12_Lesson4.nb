@@ -1,0 +1,53 @@
+(* Chapter12_Lesson4.nb
+   Nyquist and Nichols Plots (Introductory Level) — Frequency Response and Resonance
+
+   This is Wolfram Language code saved with .nb extension for convenience.
+   You can paste it into a Mathematica notebook and evaluate.
+
+   Example open-loop plant:
+     G(s) = K * wn^2 / (s^2 + 2*zeta*wn*s + wn^2) * 1/(tau*s + 1)
+*)
+
+Needs["ControlSystems`"]
+
+K = 5.0;
+wn = 10.0;
+zeta = 0.20;
+tau = 0.05;
+
+s = LaplaceTransform`Private`s;
+
+G = K * (wn^2)/(s^2 + 2*zeta*wn*s + wn^2) * 1/(tau*s + 1);
+
+sys = TransferFunctionModel[G, s];
+
+wmin = 10^-1; wmax = 10^2.5;
+
+nyq = NyquistPlot[sys, {wmin, wmax},
+  PlotLabel -> "Nyquist Curve",
+  GridLines -> Automatic
+];
+
+nich = NicholsPlot[sys, {wmin, wmax},
+  PlotLabel -> "Nichols Curve",
+  GridLines -> Automatic
+];
+
+nyq
+nich
+
+(* Gain/phase margin for unity feedback *)
+Margin[sys]
+
+(* Export sampled frequency response *)
+w = Table[10^(Log10[wmin] + (Log10[wmax] - Log10[wmin]) * k/1499), {k, 0, 1499}];
+Gjw = (TransferFunctionExpand[sys] /. s -> I #) & /@ w;
+
+magDb = 20 Log10[Abs[Gjw]];
+phDeg = Arg[Gjw] * 180/Pi;
+
+Export["Chapter12_Lesson4_freqresp_mathematica.csv",
+  Prepend[Transpose[{w, Re[Gjw], Im[Gjw], magDb, phDeg}],
+    {"omega_rad_s", "ReG", "ImG", "Mag_dB", "Phase_deg"}
+  ]
+];

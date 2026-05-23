@@ -1,0 +1,20 @@
+Notebook[{
+  Cell["Chapter16_Lesson3.nb - z-Transform and Discrete-Time Transfer Functions", "Title"],
+  Cell[BoxData@ToBoxes[
+    eq = y[n] - 1.5 y[n - 1] + 0.56 y[n - 2] == 0.2 KroneckerDelta[n] + 0.1 KroneckerDelta[n - 1];
+  ], "Input"],
+  Cell[BoxData@ToBoxes[
+    sol = RSolveValue[{eq, y[-1] == 0, y[-2] == 0}, y[n], n];
+  ], "Input"],
+  Cell[BoxData@ToBoxes[
+    h = Table[N[sol /. n -> k], {k, 0, 19}]
+  ], "Input"],
+  Cell[BoxData@ToBoxes[
+    Hz = FullSimplify[ZTransform[sol, n, z]]
+  ], "Input"],
+  Cell[BoxData@ToBoxes[
+    w = Table[k Pi/4, {k, 0, 4}];
+    vals = N[(Hz /. z -> Exp[I #]) & /@ w];
+    Transpose[{w, Abs[vals], Arg[vals]}]
+  ], "Input"]
+}]

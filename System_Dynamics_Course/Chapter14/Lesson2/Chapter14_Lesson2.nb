@@ -1,0 +1,87 @@
+(* Chapter14_Lesson2.nb
+   Wolfram Mathematica notebook (plain-text Notebook expression) implementing
+   equilibria, classification, and phase portrait for a planar system.
+*)
+
+Notebook[{
+  Cell["Chapter 14 - Lesson 2: Equilibria, Phase Portraits, Trajectories (2D Systems)", "Title"],
+
+  Cell["System definition", "Section"],
+  Cell[BoxData[
+    ToBoxes[
+      Row[{
+        "a = 1.0; ",
+        "f[x_, y_] := x - x^3 - y; ",
+        "g[x_, y_] := x + a y;"
+      }]
+    ]
+  ], "Input"],
+
+  Cell["Equilibria (analytic for this example)", "Section"],
+  Cell[BoxData[
+    ToBoxes[
+      Row[{
+        "xp = Sqrt[(a + 1)/a]; ",
+        "eqs = {{0, 0}, {xp, -xp}, {-xp, xp}};"
+      }]
+    ]
+  ], "Input"],
+
+  Cell["Local classification using trace/determinant", "Section"],
+  Cell[BoxData[
+    ToBoxes[
+      Row[{
+        "J[x_, y_] := {{1 - 3 x^2, -1}, {1, a}}; ",
+        "classify2x2[tr_, det_, disc_] := Which[",
+        "det < 0, \"saddle\", ",
+        "det == 0, \"degenerate\", ",
+        "disc > 0 && tr < 0, \"stable node\", ",
+        "disc > 0 && tr > 0, \"unstable node\", ",
+        "disc < 0 && tr < 0, \"stable spiral\", ",
+        "disc < 0 && tr > 0, \"unstable spiral\", ",
+        "disc < 0 && tr == 0, \"center (linear)\", ",
+        "True, \"other/degenerate\"",
+        "];"
+      }]
+    ]
+  ], "Input"],
+
+  Cell[BoxData[
+    ToBoxes[
+      "Table[{p, tr = Tr[J @@ p], det = Det[J @@ p], disc = tr^2 - 4 det, classify2x2[tr, det, disc]}, {p, eqs}]"
+    ]
+  ], "Input"],
+
+  Cell["Phase portrait (vector field + equilibria)", "Section"],
+  Cell[BoxData[
+    ToBoxes[
+      Row[{
+        "vf = VectorPlot[{f[x, y], g[x, y]}, {x, -2.5, 2.5}, {y, -2.5, 2.5}, ",
+        "VectorPoints -> 25, StreamPoints -> Fine, PlotRange -> All]; ",
+        "pts = Graphics[{PointSize[0.02], Point[eqs]}]; ",
+        "Show[vf, pts]"
+      }]
+    ]
+  ], "Input"],
+
+  Cell["Sample trajectories via NDSolve", "Section"],
+  Cell[BoxData[
+    ToBoxes[
+      Row[{
+        "sol[z0_] := NDSolveValue[{x'[t] == f[x[t], y[t]], y'[t] == g[x[t], y[t]], ",
+        "x[0] == z0[[1]], y[0] == z0[[2]]}, {x, y}, {t, 0, 12}];"
+      }]
+    ]
+  ], "Input"],
+
+  Cell[BoxData[
+    ToBoxes[
+      Row[{
+        "inits = {{-2, -2}, {-2, 0}, {-2, 2}, {0.5, -2}, {0.5, 2}, {2, -2}, {2, 0}, {2, 2}}; ",
+        "traj = ParametricPlot[Evaluate[Table[{x[t], y[t]} /. sol[z0], {z0, inits}]], {t, 0, 12}, ",
+        "PlotRange -> {{-2.5, 2.5}, {-2.5, 2.5}}]; ",
+        "Show[vf, pts, traj]"
+      }]
+    ]
+  ], "Input"]
+}]

@@ -1,0 +1,39 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+Notebook[{
+ Cell["Chapter 13 - Lesson 1: Natural Frequencies and Normal Modes", "Title"],
+ Cell["This notebook solves K . phi = (w^2) M . phi for a 3-DOF chain, mass-normalizes modes, and checks orthogonality.", "Text"],
+ Cell["(* Define M and K for a 3-DOF chain: wall-k1-m1-k2-m2-k3-m3 *)\n\
+m = {2.0, 1.5, 1.0};\n\
+k = {200.0, 300.0, 250.0};\n\
+M = DiagonalMatrix[m];\n\
+K = ConstantArray[0.0, {3, 3}];\n\
+Do[\n\
+  K[[i, i]] += k[[i]];\n\
+  If[i > 1,\n\
+    K[[i, i]] += k[[i - 1]];\n\
+    K[[i, i - 1]] -= k[[i - 1]];\n\
+    K[[i - 1, i]] -= k[[i - 1]];\n\
+  ];\n\
+, {i, 1, 3}];\n\
+\n\
+(* Generalized symmetric eigenproblem *)\n\
+{vals, vecs} = Eigensystem[{K, M}];\n\
+vals = Map[Max[#, 0.0] &, vals];\n\
+omega = Sqrt[vals];\n\
+\n\
+(* Sort by eigenvalue *)\n\
+perm = Ordering[vals];\n\
+vals = vals[[perm]];\n\
+omega = omega[[perm]];\n\
+vecs = vecs[[perm]];\n\
+\n\
+(* Mass-normalize modes *)\n\
+Phi = Map[#/Sqrt[#.M.#] &, vecs];\n\
+PhiMat = Transpose[Phi];\n\
+\n\
+Morth = Chop[PhiMat.M.Transpose[PhiMat]];  (* Phi^T M Phi *)\n\
+Korth = Chop[PhiMat.K.Transpose[PhiMat]];  (* Phi^T K Phi *)\n\
+\n\
+{omega, Morth, Korth}\n", "Input"]
+}]

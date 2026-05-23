@@ -1,0 +1,33 @@
+Notebook[{
+ Cell["Chapter18_Lesson5.nb","Title"],
+ Cell["Port-Hamiltonian electromechanical model (electrical + rotational + elastic)","Text"],
+ Cell[BoxData@ToBoxes@TraditionalForm[
+   H[\[Phi]_,p_,q_] == \[Phi]^2/(2 L) + p^2/(2 J) + (k q^2)/2
+ ],"Input"],
+ Cell["Symbolic passivity identity","Section"],
+ Cell[BoxData@ToBoxes[
+   Module[{g,Jm,Rm,G,xdot,Hdot},
+    g={phi/L,p/J,k q}; Jm={{0,Kt,0},{-Kt,0,-1},{0,1,0}}; Rm=DiagonalMatrix[{Ra,b,0}]; G={1,0,0};
+    xdot=(Jm-Rm).g + G u;
+    Hdot = Expand[g.xdot] // Simplify;
+    {"dHdt" -> Hdot, "Target" -> (u (phi/L) - Ra (phi/L)^2 - b (p/J)^2)}
+   ]
+ ],"Input"],
+ Cell["Numerical simulation","Section"],
+ Cell[BoxData@ToBoxes[
+   Module[{L=0.35,Ra=1.8,J=0.02,b=0.08,k=4.0,Kt=0.22,u,sol,i,w,Hf,pin,pd,lhs,rhs},
+    u[t_] := Piecewise[{{8.0,t<0.8},{3.0,t<1.6}},0.0];
+    sol = NDSolveValue[
+      {phi'[t]==Kt (p[t]/J)-Ra (phi[t]/L)+u[t],
+       p'[t]==-Kt (phi[t]/L)-k q[t]-b (p[t]/J),
+       q'[t]==p[t]/J,
+       phi[0]==0,p[0]==0,q[0]==0},
+      {phi,p,q},{t,0,4}];
+    i[t_] := sol[[1]][t]/L; w[t_] := sol[[2]][t]/J;
+    Hf[t_] := sol[[1]][t]^2/(2 L) + sol[[2]][t]^2/(2 J) + k sol[[3]][t]^2/2;
+    pin[t_] := u[t] i[t]; pd[t_] := Ra i[t]^2 + b w[t]^2;
+    lhs = N[Hf[4]-Hf[0]]; rhs = NIntegrate[pin[t]-pd[t],{t,0,4}];
+    {"EnergyResidual" -> (lhs-rhs), Plot[{i[t],w[t],sol[[3]][t]},{t,0,4}]}
+   ]
+ ],"Input"]
+}]

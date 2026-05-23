@@ -1,0 +1,61 @@
+(* Chapter13_Lesson1.nb
+   System Dynamics — Chapter 13, Lesson 1
+   Modeling Two- and Multi-Degree-of-Freedom Mechanical Systems.
+
+   This notebook:
+     1) Defines M, C, K for a 2-DOF mass–spring–damper system,
+     2) Builds the first-order state-space,
+     3) Uses NDSolve to simulate free response.
+*)
+
+Notebook[{
+  Cell["Chapter 13 — Lesson 1: MDOF Modeling (2-DOF Example)", "Section"],
+
+  Cell["1. Define parameters and build M, C, K", "Subsection"],
+  Cell[BoxData @ ToBoxes @
+    HoldForm[
+      m1 = 1.0; m2 = 0.8;
+      k1 = 200.0; k2 = 150.0; k3 = 100.0;
+      c1 = 1.5; c2 = 1.0; c3 = 0.8;
+
+      M = DiagonalMatrix[{m1, m2}];
+      C = {{c1 + c2, -c2}, {-c2, c2 + c3}};
+      K = {{k1 + k2, -k2}, {-k2, k2 + k3}};
+    ],
+  "Input"],
+
+  Cell["2. Convert to state-space: x = [q; qdot]", "Subsection"],
+  Cell[BoxData @ ToBoxes @
+    HoldForm[
+      n = 2;
+      Z = ConstantArray[0, {n, n}];
+      I = IdentityMatrix[n];
+      Minv = Inverse[M];
+
+      A = ArrayFlatten[{{Z, I}, {-Minv.K, -Minv.C}}];
+      B = ArrayFlatten[{{Z}, {Minv}}];
+      (* Force input f(t) in R^2 *)
+    ],
+  "Input"],
+
+  Cell["3. Free response simulation with NDSolve", "Subsection"],
+  Cell[BoxData @ ToBoxes @
+    HoldForm[
+      f[t_] := {0, 0};
+
+      (* State x(t) = {q1, q2, q1dot, q2dot} *)
+      x0 = {0.02, -0.01, 0.0, 0.0};
+
+      eq = x'[t] == A.x[t] + B.f[t];
+      ic = x[0] == x0;
+
+      sol = NDSolve[{eq, ic}, x, {t, 0, 8}][[1]];
+      q1[t_] := (x[t] /. sol)[[1]];
+      q2[t_] := (x[t] /. sol)[[2]];
+
+      Plot[{q1[t], q2[t]}, {t, 0, 8},
+           PlotLegends -> {"q1(t)", "q2(t)"},
+           AxesLabel -> {"t [s]", "displacement [m]"}]
+    ],
+  "Input"]
+}]

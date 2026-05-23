@@ -1,0 +1,44 @@
+(* ::Package:: *)
+
+(* System Dynamics — Chapter 14 (Nonlinear System Dynamics)
+   Lesson 1: Sources and Types of Nonlinearities in Engineering Systems
+
+   Mathematica notebook content (plain Wolfram Language).
+   Simulates the same nonlinear mass–spring–damper model using NDSolve.
+*)
+
+ClearAll["Global`*"];
+
+params = <|
+  "m" -> 1.0,
+  "c" -> 0.4,
+  "k" -> 4.0,
+  "k3" -> 8.0,
+  "Fc" -> 0.8,
+  "vs" -> 0.02,
+  "b" -> 1.0,
+  "umax" -> 1.5
+|>;
+
+sat[u_, umax_] := Clip[u, {-umax, umax}];
+uIn[t_] := 1.2 Sin[t] + 0.3 Sin[3 t];
+fric[v_, Fc_, vs_] := Fc Tanh[v/vs];
+
+m = params["m"]; c = params["c"]; k = params["k"]; k3 = params["k3"];
+Fc = params["Fc"]; vs = params["vs"]; b = params["b"]; umax = params["umax"];
+
+eqn = m x''[t] + c x'[t] + k x[t] + k3 x[t]^3 + fric[x'[t], Fc, vs] == b sat[uIn[t], umax];
+
+ic = {x[0] == 0.4, x'[0] == 0.0};
+
+sol = NDSolve[{eqn, ic}, x, {t, 0, 20}, MaxStepFraction -> 1/2000][[1]];
+
+p1 = Plot[Evaluate[x[t] /. sol], {t, 0, 20}, GridLines -> Automatic, PlotLabel -> "x(t)"];
+p2 = Plot[Evaluate[x'[t] /. sol], {t, 0, 20}, GridLines -> Automatic, PlotLabel -> "x'(t)"];
+
+Print[p1];
+Print[p2];
+
+data = Table[{tt, (x[tt] /. sol), (x'[tt] /. sol)}, {tt, 0, 20, 0.005}];
+Export["Chapter14_Lesson1_trace_mathematica.csv", Prepend[data, {"t", "x", "xdot"}]];
+Print["Wrote: Chapter14_Lesson1_trace_mathematica.csv"];

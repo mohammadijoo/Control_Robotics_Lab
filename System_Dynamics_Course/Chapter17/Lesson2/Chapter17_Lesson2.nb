@@ -1,0 +1,27 @@
+(* Chapter17_Lesson2.nb *)
+(* Wolfram Language script for autocorrelation and PSD *)
+
+SeedRandom[17];
+n = 2048; sigma = 2.0; b = 0.6;
+w = RandomVariate[NormalDistribution[0, sigma], n];
+x = Join[{w[[1]]}, Rest[w] + b Most[w]];
+
+autocorrBiased[data_, mmax_] := Module[{z = N[data - Mean[data]], Nn = Length[data]},
+  Table[Total[Take[z, Nn - m] Take[z, {1 + m, Nn}]]/Nn, {m, 0, mmax}]
+];
+
+rw = autocorrBiased[w, 80];
+rx = autocorrBiased[x, 80];
+
+re = Join[rx, Reverse[rx[[2 ;; -2]]]];
+sx = Re[Fourier[re, FourierParameters -> {1, -1}]];
+omega = Table[2 Pi (k - 1)/Length[sx], {k, Length[sx]}];
+sxTheory = sigma^2 (1 + b^2 + 2 b Cos[omega]);
+
+Print["R_w(0) = ", rw[[1]]];
+Print["R_x(0) = ", rx[[1]]];
+Print["Theo R_x(0) = ", sigma^2 (1 + b^2)];
+
+ListLinePlot[{rw, rx}, PlotLegends -> {"White", "Colored"}, AxesLabel -> {"m", "R"}]
+ListLinePlot[{Take[sx, Length[sx]/2], Take[sxTheory, Length[sxTheory]/2]},
+  PlotLegends -> {"Estimated", "Theory"}, AxesLabel -> {"bin", "PSD"}]

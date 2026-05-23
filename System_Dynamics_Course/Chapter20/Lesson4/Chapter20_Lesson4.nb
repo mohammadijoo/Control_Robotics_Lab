@@ -1,0 +1,18 @@
+(* Chapter20_Lesson4.nb *)
+
+Notebook[{
+  Cell["Chapter 20 — Chaos, Complex Dynamics, and Computational Tools", "Title"],
+  Cell["Lesson 4 — Computational Tools (Wolfram Language)", "Subtitle"],
+
+  Cell["1) Lorenz system via NDSolve and CSV export", "Section"],
+  Cell["lorenz = {x'[t] == 10 (y[t] - x[t]), y'[t] == x[t] (28 - z[t]) - y[t], z'[t] == x[t] y[t] - (8/3) z[t], x[0] == 1, y[0] == 1, z[0] == 1};\nsol = NDSolveValue[lorenz, {x, y, z}, {t, 0, 40}, MaxStepFraction -> 1/2000];\n(* Sample the solution *)\nts = Range[0, 40, 0.01];\ntraj = Transpose[{ts, sol[[1]] /@ ts, sol[[2]] /@ ts, sol[[3]] /@ ts}];\nExport[\"lorenz_traj.csv\", traj];", "Input"],
+
+  Cell["2) Poincaré section: x(t)=0 crossings (simple sign-change detection)", "Section"],
+  Cell["xs = sol[[1]] /@ ts; ys = sol[[2]] /@ ts; zs = sol[[3]] /@ ts;\nidx = Flatten@Position[Partition[Sign[xs], 2, 1], {-1, 1}];\npoinc = Transpose[{xs[[idx + 1]], ys[[idx + 1]], zs[[idx + 1]]}];\nExport[\"lorenz_poincare_x0.csv\", poinc];", "Input"],
+
+  Cell["3) Logistic map: bifurcation tail data and Lyapunov exponent curve", "Section"],
+  Cell["logistic[r_?NumericQ, x_?NumericQ] := r x (1 - x);\nlogisticIter[r_?NumericQ, x0_?NumericQ, n_Integer] := NestList[logistic[r, #] &, x0, n];\n\nrVals = N@Subdivide[2.5, 4.0, 399];\ntrans = 800; keep = 120;\nbif = Flatten[Table[\n  xs = logisticIter[r, 0.2, trans + keep];\n  Transpose[{ConstantArray[r, keep], Take[xs, -keep]}]\n, {r, rVals}], 1];\nExport[\"logistic_bifurcation.csv\", bif];\n\nlyap[r_?NumericQ] := Module[{xs, d},\n  xs = Take[logisticIter[r, 0.2, 1000 + 4000], -4000];\n  d = Abs[r (1 - 2 xs)];\n  Mean[Log[Max[d, 10^-300]]]\n];\n\nrVals2 = N@Subdivide[2.8, 4.0, 199];\nly = Table[{r, lyap[r]}, {r, rVals2}];\nExport[\"logistic_lyapunov.csv\", ly];", "Input"]
+},
+WindowTitle -> "Chapter20_Lesson4",
+WindowSize -> {900, 700}
+]

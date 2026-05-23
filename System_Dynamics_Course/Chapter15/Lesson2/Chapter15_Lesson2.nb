@@ -1,0 +1,94 @@
+(* Chapter15_Lesson2.nb *)
+(* Runge-Kutta Methods and Step Size Selection *)
+(* Wolfram Language code (saved with .nb filename for course packaging) *)
+
+ClearAll["Global`*"];
+
+f[t_, y_] := -2 y + Sin[t];
+yExact[t_] := (6/5) Exp[-2 t] + (2 Sin[t] - Cos[t])/5;
+
+rk2MidpointStep[fun_, t_, y_, h_] := Module[{k1, k2},
+  k1 = fun[t, y];
+  k2 = fun[t + h/2, y + (h/2) k1];
+  y + h k2
+];
+
+rk4Step[fun_, t_, y_, h_] := Module[{k1, k2, k3, k4},
+  k1 = fun[t, y];
+  k2 = fun[t + h/2, y + (h/2) k1];
+  k3 = fun[t + h/2, y + (h/2) k2];
+  k4 = fun[t + h, y + h k3];
+  y + (h/6) (k1 + 2 k2 + 2 k3 + k4)
+];
+
+integrateFixed[stepFun_, fun_, {t0_, tf_}, y0_, h_] := Module[
+  {t = t0, y = y0, ts = {t0}, ys = {y0}, hs},
+  While[t < tf,
+    hs = Min[h, tf - t];
+    y = stepFun[fun, t, y, hs];
+    t = t + hs;
+    AppendTo[ts, t];
+    AppendTo[ys, y];
+  ];
+  <|"t" -> ts, "y" -> ys|>
+];
+
+integrateAdaptiveRK4StepDoubling[fun_, {t0_, tf_}, y0_, h0_: 0.2, atol_: 1.*^-8, rtol_: 1.*^-6] := Module[
+  {t = t0, y = y0, h = h0, hMin = 1.*^-8, hMax = 0.5, safety = 0.9,
+   ts = {t0}, ys = {y0}, hHistory = {}, accepted = 0, rejected = 0,
+   yFull, yHalf, yHalf2, errEst, scale, errNorm, factor},
+  While[t < tf,
+    h = Min[h, tf - t];
+    If[h < hMin, Throw["Step size below hMin"]];
+    yFull = rk4Step[fun, t, y, h];
+    yHalf = rk4Step[fun, t, y, h/2];
+    yHalf2 = rk4Step[fun, t + h/2, yHalf, h/2];
+
+    errEst = Abs[yHalf2 - yFull]/15;
+    scale = atol + rtol Max[Abs[y], Abs[yHalf2]];
+    errNorm = errEst/scale;
+
+    If[errNorm <= 1,
+      y = yHalf2 + (yHalf2 - yFull)/15;
+      t = t + h;
+      AppendTo[ts, t];
+      AppendTo[ys, y];
+      AppendTo[hHistory, h];
+      accepted++;
+      factor = If[errNorm == 0, 2, safety (1/errNorm)^(1/5)];
+      factor = Min[2, Max[0.2, factor]];
+      h = Min[hMax, factor h];,
+      rejected++;
+      factor = safety (1/Max[errNorm, 10^-16])^(1/5);
+      factor = Min[1, Max[0.1, factor]];
+      h = Max[hMin, factor h];
+    ];
+  ];
+  <|"t" -> ts, "y" -> ys, "hHistory" -> hHistory, "accepted" -> accepted, "rejected" -> rejected|>
+];
+
+t0 = 0; tf = 10; y0 = 1; h = 0.1;
+solRK2 = integrateFixed[rk2MidpointStep, f, {t0, tf}, y0, h];
+solRK4 = integrateFixed[rk4Step, f, {t0, tf}, y0, h];
+solAdaptive = integrateAdaptiveRK4StepDoubling[f, {t0, tf}, y0];
+
+maxErr[data_] := Max[Abs[data["y"] - (yExact /@ data["t"])]];
+Print["Chapter15_Lesson2.nb"];
+Print["RK2 midpoint max error = ", ScientificForm[maxErr[solRK2], 6]];
+Print["RK4 max error = ", ScientificForm[maxErr[solRK4], 6]];
+Print["Adaptive RK4 max error = ", ScientificForm[maxErr[solAdaptive], 6]];
+Print["Accepted steps = ", solAdaptive["accepted"], ", Rejected steps = ", solAdaptive["rejected"]];
+
+(* Library-style comparison in Mathematica *)
+nd = NDSolveValue[{y'[t] == f[t, y[t]], y[0] == 1}, y, {t, 0, 10},
+  Method -> {"ExplicitRungeKutta"}];
+
+ListLinePlot[
+ {
+  Transpose[{solRK4["t"], solRK4["y"]}],
+  Table[{tt, yExact[tt]}, {tt, 0, 10, 0.01}],
+  Table[{tt, nd[tt]}, {tt, 0, 10, 0.01}]
+ },
+ PlotLegends -> {"RK4", "Exact", "NDSolve ExplicitRungeKutta"},
+ GridLines -> Automatic
+]

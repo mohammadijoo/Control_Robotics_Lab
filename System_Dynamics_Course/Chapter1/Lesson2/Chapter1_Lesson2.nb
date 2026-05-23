@@ -1,0 +1,21 @@
+
+ClearAll[TstaticLinear, TstaticNonlinear]
+
+(* Static linear system: y(t) = k * u(t) *)
+k = Symbol["k"];
+TstaticLinear[u_] := k * u;
+
+(* Static nonlinear system: y(t) = u(t)^2 *)
+TstaticNonlinear[u_] := u^2;
+
+(* Symbolic test of linearity for TstaticLinear *)
+ClearAll[u1, u2, a1, a2];
+lhsLinear = TstaticLinear[a1*u1 + a2*u2];
+rhsLinear = a1*TstaticLinear[u1] + a2*TstaticLinear[u2];
+Simplify[lhsLinear - rhsLinear]
+
+(* For TstaticNonlinear *)
+lhsNonlinear = TstaticNonlinear[a1*u1 + a2*u2];
+rhsNonlinear = a1*TstaticNonlinear[u1] + a2*TstaticNonlinear[u2];
+Expand[lhsNonlinear - rhsNonlinear]
+      

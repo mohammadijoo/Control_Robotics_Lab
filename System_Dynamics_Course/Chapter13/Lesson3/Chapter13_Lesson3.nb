@@ -1,0 +1,65 @@
+(* Chapter13_Lesson3.nb
+   Wolfram Mathematica Notebook expression (plain-text).
+   Save as Chapter13_Lesson3.nb and open in Mathematica. *)
+
+Notebook[{
+  Cell["Chapter 13, Lesson 3 — Modal Coordinates and Decoupling of MDOF Systems", "Title"],
+
+  Cell["1) Build a 3-DOF mass-spring system", "Section"],
+  Cell[BoxData@ToBoxes@
+    HoldForm[
+      m = {1.0, 1.2, 0.9};
+      k = {1200., 900., 700., 1100.};
+      M = DiagonalMatrix[m];
+      {k1,k2,k3,k4} = k;
+      K = {{k1+k2, -k2, 0.},
+           {-k2, k2+k3, -k3},
+           {0., -k3, k3+k4}};
+    ], "Input"],
+
+  Cell["2) Generalized eigenproblem: K.phi == lambda M.phi", "Section"],
+  Cell[BoxData@ToBoxes@
+    HoldForm[
+      {vals, vecs} = Eigensystem[{K, M}];
+      (* Sort by ascending eigenvalue *)
+      ord = Ordering[vals];
+      vals = vals[[ord]]; vecs = vecs[[ord]];
+      omega = Sqrt[Max[vals, 0]];
+    ], "Input"],
+
+  Cell["3) Mass-normalize modes: Phi^T M Phi = I", "Section"],
+  Cell[BoxData@ToBoxes@
+    HoldForm[
+      Phi = Transpose[vecs]; (* columns are eigenvectors *)
+      Phi = MapIndexed[
+        Function[{v, idx},
+          v/Sqrt[v.M.v]
+        ],
+        Transpose[Phi]
+      ] // Transpose;
+      Simplify[Transpose[Phi].M.Phi]
+    ], "Input"],
+
+  Cell["4) Decoupled modal ODE and reconstruction x = Phi q", "Section"],
+  Cell[BoxData@ToBoxes@
+    HoldForm[
+      F0 = 10.; Ω = 0.9*omega[[1]];
+      f[t_] := {F0*Sin[Ω t], 0., 0.};
+      p[t_] := Transpose[Phi].f[t]; (* modal force *)
+      q = Array[q, 3]; qd = Array[qd, 3];
+      eqs = Table[
+        q[i]''[t] + omega[[i]]^2 q[i][t] == p[t][[i]],
+        {i, 1, 3}
+      ];
+      ics = Join[
+        Table[q[i][0] == 0, {i,1,3}],
+        Table[q[i]'[0] == 0, {i,1,3}]
+      ];
+      sol = NDSolve[Join[eqs, ics], Table[q[i], {i,1,3}], {t,0,8},
+                    Method -> {"StiffnessSwitching"}][[1]];
+      qvec[t_] := Table[q[i][t], {i,1,3}] /. sol;
+      xvec[t_] := Phi.qvec[t];
+      Plot[Evaluate[xvec[t][[1]]], {t,0,8}, PlotRange->All,
+           AxesLabel->{"t","x1"}, PlotLabel->"x1(t) via modal coordinates"]
+    ], "Input"]
+}]

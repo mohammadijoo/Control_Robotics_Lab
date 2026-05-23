@@ -1,0 +1,52 @@
+(* Chapter15_Lesson3.nb
+   Wolfram Mathematica code (plain text notebook-ready content) *)
+
+ClearAll["Global`*"];
+
+robertson = {
+  y1'[t] == -0.04 y1[t] + 10^4 y2[t] y3[t],
+  y2'[t] == 0.04 y1[t] - 10^4 y2[t] y3[t] - 3*10^7 y2[t]^2,
+  y3'[t] == 3*10^7 y2[t]^2,
+  y1[0] == 1, y2[0] == 0, y3[0] == 0
+};
+
+solStiff = NDSolve[
+  robertson,
+  {y1, y2, y3},
+  {t, 0, 100},
+  Method -> {"StiffnessSwitching"},
+  AccuracyGoal -> 10,
+  PrecisionGoal -> 10
+];
+
+Print["Final state at t=100 (StiffnessSwitching):"];
+Print[{y1[100], y2[100], y3[100]} /. solStiff // N];
+
+solBDF = NDSolve[
+  robertson,
+  {y1, y2, y3},
+  {t, 0, 100},
+  Method -> {"BDF"},
+  MaxStepFraction -> 1/50
+];
+
+Plot[
+  Evaluate[{y1[t], y2[t], y3[t]} /. solBDF],
+  {t, 0, 100},
+  PlotRange -> All,
+  PlotLegends -> {"y1", "y2", "y3"},
+  GridLines -> Automatic,
+  AxesLabel -> {"t", "state"},
+  PlotLabel -> "Robertson Problem (BDF)"
+];
+
+(* Scalar stiff test equation with Backward Euler *)
+lambda = -1000.0;
+h = 0.05;
+nSteps = 10;
+y = 1.0;
+Table[
+  y = y/(1 - h*lambda);
+  {n, n*h, y},
+  {n, 1, nSteps}
+] // TableForm
