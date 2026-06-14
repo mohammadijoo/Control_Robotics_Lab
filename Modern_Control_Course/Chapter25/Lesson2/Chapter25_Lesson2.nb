@@ -1,0 +1,76 @@
+Notebook[{
+Cell["Chapter25_Lesson2.nb", "Title"],
+Cell["Role of Transmission Zeros in State-Feedback Design Limits", "Subtitle"],
+Cell["This notebook uses G(s) = (1 - s)/(s^2 + 3 s + 2). It verifies symbolically that state feedback changes the closed-loop denominator while preserving the transmission zero.", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ClearAll", "[", "s", "]"}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"G", "=", 
+   FractionBox[
+    RowBox[{"1", "-", "s"}], 
+    RowBox[{
+     SuperscriptBox["s", "2"], "+", 
+     RowBox[{"3", " ", "s"}], "+", "2"}]]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"Numerator", "[", "G", "]"}], ",", 
+   RowBox[{"Denominator", "[", "G", "]"}], ",", 
+   RowBox[{"Solve", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Numerator", "[", "G", "]"}], "==", "0"}], ",", "s"}], 
+    "]"}]}], "}"}]], "Input"],
+
+Cell["For A = {{0,1},{-2,-3}}, B = {{0},{1}}, C = {{1,-1}}, D = 0, the transfer function is C (sI - A)^(-1) B.", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", 
+   RowBox[{"(", GridBox[{{"0", "1"}, {"-2", "-3"}}], ")"}]}], ";", 
+  RowBox[{"B", "=", 
+   RowBox[{"(", GridBox[{{"0"}, {"1"}}], ")"}]}], ";", 
+  RowBox[{"Cmat", "=", 
+   RowBox[{"(", GridBox[{{"1", "-1"}}], ")"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"FullSimplify", "[", 
+  RowBox[{"Cmat", ".", 
+   RowBox[{"Inverse", "[", 
+    RowBox[{
+     RowBox[{"s", " ", 
+      RowBox[{"IdentityMatrix", "[", "2", "]"}]}], "-", "A"}], "]"}], ".", "B"}],
+  "]"}]], "Input"],
+
+Cell["Choose K = {28, 8}, which gives closed-loop poles -5 and -6.", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"K", "=", 
+   RowBox[{"(", GridBox[{{"28", "8"}}], ")"}]}], ";", 
+  RowBox[{"Acl", "=", 
+   RowBox[{"A", "-", 
+    RowBox[{"B", ".", "K"}]}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"FullSimplify", "[", 
+  RowBox[{"Cmat", ".", 
+   RowBox[{"Inverse", "[", 
+    RowBox[{
+     RowBox[{"s", " ", 
+      RowBox[{"IdentityMatrix", "[", "2", "]"}]}], "-", "Acl"}], "]"}], ".", "B"}],
+  "]"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"Eigenvalues", "[", "A", "]"}], ",", 
+   RowBox[{"Eigenvalues", "[", "Acl", "]"}]}], "}"}]], "Input"],
+
+Cell["The numerator remains 1 - s; therefore the transmission zero remains s = +1. This is the algebraic reason why state feedback cannot remove the non-minimum-phase limitation.", "Text"]
+}]

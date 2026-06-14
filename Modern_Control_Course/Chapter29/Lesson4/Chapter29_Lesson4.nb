@@ -1,0 +1,62 @@
+(* Chapter29_Lesson4.nb *)
+(* Numerical controllability and observability Gramians for a 2-state LTV system. *)
+
+ClearAll["Global`*"];
+
+t0 = 0.0;
+tf = 6.0;
+
+A[t_] := {{0.0, 1.0},
+  {-(2.0 + 0.4 Sin[t]), -(0.25 + 0.10 Cos[2.0 t])}};
+
+Bmat[t_] := {{0.0}, {1.0 + 0.25 Sin[0.5 t]}};
+
+Cmat[t_] := {{1.0, 0.30 Cos[t]}};
+
+phiSol = NDSolveValue[
+   {
+    Phi'[t] == A[t].Phi[t],
+    Phi[t0] == IdentityMatrix[2]
+    },
+   Phi,
+   {t, t0, tf}
+   ];
+
+PhiFromT0[s_] := phiSol[s];
+PhiFromSToTf[s_] := phiSol[tf].Inverse[phiSol[s]];
+
+Wc = NIntegrate[
+   Evaluate[
+    PhiFromSToTf[s].Bmat[s].Transpose[Bmat[s]].Transpose[PhiFromSToTf[s]]
+    ],
+   {s, t0, tf}
+   ];
+
+Wo = NIntegrate[
+   Evaluate[
+    Transpose[PhiFromT0[s]].Transpose[Cmat[s]].Cmat[s].PhiFromT0[s]
+    ],
+   {s, t0, tf}
+   ];
+
+Print["Controllability Gramian Wc = "];
+Print[MatrixForm[Wc]];
+Print["Eigenvalues of Wc = ", Eigenvalues[(Wc + Transpose[Wc])/2]];
+Print["Determinant of Wc = ", Det[Wc]];
+Print["Rank of Wc = ", MatrixRank[Wc]];
+
+Print["Observability Gramian Wo = "];
+Print[MatrixForm[Wo]];
+Print["Eigenvalues of Wo = ", Eigenvalues[(Wo + Transpose[Wo])/2]];
+Print["Determinant of Wo = ", Det[Wo]];
+Print["Rank of Wo = ", MatrixRank[Wo]];
+
+If[MatrixRank[Wc] == 2,
+  Print["The tested interval is numerically controllable/reachable."],
+  Print["The tested interval has at least one weak or unreachable direction."]
+  ];
+
+If[MatrixRank[Wo] == 2,
+  Print["The tested interval is numerically observable."],
+  Print["The tested interval has at least one weak or unobservable direction."]
+  ];

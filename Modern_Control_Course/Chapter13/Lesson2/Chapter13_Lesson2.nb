@@ -1,0 +1,5 @@
+Notebook[{
+Cell["Chapter 13 - Lesson 2: Observable States and Observable Subspace", "Title"],
+Cell["The following input cell computes the observable and unobservable subspaces.", "Text"],
+Cell['(* Chapter13_Lesson2.nb *)\n(* Observable states and observable subspace for a continuous-time LTI system. *)\n\nClearAll[ObservabilitySignatureMatrix, A, Cmat, Omat, unobservableBasis, observableBasis];\n\nA = {{0, 1, 0}, {-2, -3, 0}, {0, 0, -4}};\nCmat = {{1, 0, 0}};\n\nObservabilitySignatureMatrix[A_, C_] := Module[{n = Length[A]},\n  Join @@ Table[C . MatrixPower[A, k], {k, 0, n - 1}]\n];\n\nOmat = ObservabilitySignatureMatrix[A, Cmat];\nMatrixForm[Omat]\n\nMatrixRank[Omat]\nunobservableBasis = NullSpace[Omat]\nobservableBasis = Orthogonalize[Transpose[RowReduce[Omat]] /. {0, 0, 0} -> Sequence[]]\n\nx0 = {2, -1, 5};\nOmat . x0\nOmat . {0, 0, 5}\n\n(* The vector {0,0,5} produces zero output derivative signature and belongs to the unobservable subspace. *)\n', "Input"]
+}]

@@ -1,0 +1,12 @@
+Notebook[{
+Cell["Chapter27_Lesson1.nb", "Title"],
+Cell["Formulating Tracking Problems in State-Space Form", "Subtitle"],
+Cell["This notebook formulates xdot = A x + B u + E d, y = C x + D u + F d, e = y - r; computes the constant tracking equilibrium; and simulates a deviation-feedback tracking formulation.", "Text"],
+Cell[BoxData["ClearAll[\"Global`*\"];"], "Input"],
+Cell[BoxData["A = {{0, 1}, {-2, -0.8}};\nB = {{0}, {1}};\nCmat = {{1, 0}};\nDmat = {{0}};\nEcon = {{0}, {1}};\nFmat = {{0}};\nr = {{1.0}};\nd = {{0.2}};"], "Input"],
+Cell[BoxData["M = ArrayFlatten[{{A, B}, {Cmat, Dmat}}];\nrhs = Join[-Econ.d, r - Fmat.d];\ntheta = LeastSquares[M, rhs];\nxbar = theta[[1 ;; 2]];\nubar = theta[[3 ;; 3]];\nresidual = M.theta - rhs;\n{MatrixForm[M], MatrixForm[xbar], MatrixForm[ubar], Norm[residual]}"], "Input"],
+Cell[BoxData["K = {{4.0, 2.2}};\nx1bar = xbar[[1, 1]];\nx2bar = xbar[[2, 1]];\nubarScalar = ubar[[1, 1]];\ndScalar = d[[1, 1]];"], "Input"],
+Cell[BoxData["sol = NDSolve[\n  {\n    x1'[t] == x2[t],\n    x2'[t] == -2*x1[t] - 0.8*x2[t] + ubarScalar - K[[1, 1]]*(x1[t] - x1bar) - K[[1, 2]]*(x2[t] - x2bar) + dScalar,\n    x1[0] == 0,\n    x2[0] == 0\n  },\n  {x1, x2}, {t, 0, 8}\n];"], "Input"],
+Cell[BoxData["Plot[\n  Evaluate[{x1[t] /. sol[[1]], 1, (x1[t] /. sol[[1]]) - 1}],\n  {t, 0, 8},\n  PlotLegends -> {\"y(t)\", \"r\", \"e(t)=y(t)-r\"},\n  AxesLabel -> {\"time [s]\", \"signals\"},\n  PlotLabel -> \"Chapter 27 Lesson 1: Tracking formulation simulation\"\n]"], "Input"],
+Cell[BoxData["finalY = x1[8] /. sol[[1]];\nfinalError = finalY - 1;\n{finalY, finalError}"], "Input"]
+}]

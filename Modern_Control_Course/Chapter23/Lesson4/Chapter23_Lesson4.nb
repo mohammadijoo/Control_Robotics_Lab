@@ -1,0 +1,46 @@
+Notebook[{
+Cell["Chapter23_Lesson4.nb", "Title"],
+Cell["Mapping time-domain specifications to desired poles for SISO pole placement.", "Text"],
+Cell[BoxData["
+ClearAll[dampingRatioFromOvershoot, desiredPolesFromSpecs, controllabilityMatrix, ackermannGain];
+
+dampingRatioFromOvershoot[percentOvershoot_] := Module[{m, L},
+  If[percentOvershoot <= 0 || percentOvershoot >= 100,
+    Print[\"percentOvershoot must be between 0 and 100\"]; Abort[]
+  ];
+  m = percentOvershoot/100;
+  L = Log[m];
+  -L/Sqrt[Pi^2 + L^2]
+];
+
+desiredPolesFromSpecs[percentOvershoot_, settlingTime_] := Module[{zeta, wn, sigma, wd},
+  zeta = dampingRatioFromOvershoot[percentOvershoot];
+  wn = 4/(zeta settlingTime);
+  sigma = zeta wn;
+  wd = wn Sqrt[Max[0, 1 - zeta^2]];
+  {zeta, wn, {-sigma + I wd, -sigma - I wd}}
+];
+
+controllabilityMatrix[A_, b_] := Module[{n = Length[A]},
+  Transpose[Table[MatrixPower[A, k].b, {k, 0, n - 1}]]
+];
+
+ackermannGain[A_, b_, poles_] := Module[{n, Wc, coeff, phiA, eT},
+  n = Length[A];
+  Wc = controllabilityMatrix[A, b];
+  If[MatrixRank[Wc] < n, Print[\"(A,b) is not controllable\"]; Abort[]];
+  coeff = CoefficientList[Expand[Times @@ (s - # & /@ poles)], s] // Reverse;
+  phiA = MatrixPower[A, n] + Sum[coeff[[i + 1]] MatrixPower[A, n - i], {i, 1, n}];
+  eT = UnitVector[n, n];
+  Chop[eT.Inverse[Wc].phiA]
+];
+
+A = {{0, 1, 0}, {0, 0, 1}, {-2, -3, -1}};
+b = {0, 0, 1};
+{zeta, wn, pair} = desiredPolesFromSpecs[10, 2.0];
+sigma = -Re[pair[[1]]];
+poles = Join[pair, {-6 sigma}];
+K = ackermannGain[A, b, poles];
+{zeta, wn, poles, K, Eigenvalues[A - Outer[Times, b, K]]}
+"], "Input"]
+}]

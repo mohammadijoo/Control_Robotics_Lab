@@ -1,0 +1,5 @@
+Notebook[{
+Cell["A = { {0, 1}, {-2, -3} };\nB = { {0, 1}, {1, 0} };\nC = IdentityMatrix[2];\nD = ConstantArray[0, {2, 2}];\n\nsys = StateSpaceModel[{A, B, C, D}];\n\nEigenvalues[A]\nsys\n      ", "Input"]
+},
+WindowTitle -> "Chapter1/Lesson5.html"
+]

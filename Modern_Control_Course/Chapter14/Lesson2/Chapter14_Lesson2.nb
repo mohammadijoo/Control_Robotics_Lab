@@ -1,0 +1,35 @@
+Notebook[{
+Cell["Chapter14_Lesson2.nb", "Title"],
+Cell["PBH Test for Observability", "Section"],
+Cell[BoxData[
+ RowBox[{"ClearAll", "[", RowBox[{"pbhObservable", ",", "observabilityMatrix"}], "]"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"observabilityMatrix", "[", RowBox[{"A_", ",", "C_"}], "]"}], ":=",
+  RowBox[{"Join", "@@", RowBox[{"Table", "[",
+    RowBox[{RowBox[{"C", ".", RowBox[{"MatrixPower", "[", RowBox[{"A", ",", "k"}], "]"}]}], ",",
+    RowBox[{"{", RowBox[{"k", ",", "0", ",", RowBox[{RowBox[{"Length", "[", "A", "]"}], "-", "1"}]}], "}"}]}], "]"}]}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"pbhObservable", "[", RowBox[{"A_", ",", "C_"}], "]"}], ":=", RowBox[{"Module", "[",
+   RowBox[{RowBox[{"{", RowBox[{"n", ",", "lambdas", ",", "tests"}], "}"}], ",",
+    RowBox[{
+     RowBox[{"n", "=", RowBox[{"Length", "[", "A", "]"}]}], ";",
+     RowBox[{"lambdas", "=", RowBox[{"Eigenvalues", "[", "A", "]"}]}], ";",
+     RowBox[{"tests", "=", RowBox[{"Table", "[",
+       RowBox[{RowBox[{"{", RowBox[{"lambda", ",",
+          RowBox[{"MatrixRank", "[", RowBox[{"Join", "[",
+            RowBox[{RowBox[{"lambda", " ", RowBox[{"IdentityMatrix", "[", "n", "]"}], "-", "A"}], ",", "C"}], "]"}], "]"}]}], "}"}], ",",
+        RowBox[{"{", RowBox[{"lambda", ",", "lambdas"}], "}"}]}], "]"}]}], ";",
+     RowBox[{"{", RowBox[{RowBox[{"\"ObservableByPBH\"", "->", RowBox[{"AllTrue", "[", RowBox[{"tests", ",", RowBox[{RowBox[{RowBox[{"#[[2]]", "==", "n"}], "&"}]}], "]"}]}], ",",
+       RowBox[{"\"ModeRanks\"", "->", "tests"}], ",",
+       RowBox[{"\"ObservabilityMatrixRank\"", "->", RowBox[{"MatrixRank", "[", RowBox[{"observabilityMatrix", "[", RowBox[{"A", ",", "C"}], "]"}], "]"}]}]}], "}"}]}]}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{RowBox[{"A1", "=", RowBox[{"{{", RowBox[{RowBox[{"0", ",", "1"}], "},", RowBox[{"{", RowBox[{RowBox[{"-", "2"}], ",", RowBox[{"-", "3"}]}], "}"}]}], "}"}]}], ";",
+  RowBox[{"C1", "=", RowBox[{"{{", RowBox[{"1", ",", "0"}], "}}"}]}], ";",
+  RowBox[{"pbhObservable", "[", RowBox[{"A1", ",", "C1"}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{RowBox[{"A2", "=", RowBox[{"{{", RowBox[{RowBox[{"-", "1"}], ",", "0"}], "},", RowBox[{"{", RowBox[{"0", ",", RowBox[{"-", "2"}]}], "}"}], "}"}]}], ";",
+  RowBox[{"C2", "=", RowBox[{"{{", RowBox[{"1", ",", "0"}], "}}"}]}], ";",
+  RowBox[{"pbhObservable", "[", RowBox[{"A2", ",", "C2"}], "]"}]}]], "Input"]
+}]

@@ -1,0 +1,5 @@
+Notebook[{
+Cell["A = { {0, 1}, {-2, -3} };\nt0 = 0;\nx0 = {1, 0};\n\nx[t_] := MatrixExp[A (t - t0)].x0\n\n(* Evaluate at a few times *)\nTable[{tt, x[tt]}, {tt, 0, 5, 1}]\n\n(* Verify ODE: x'(t) == A x(t) *)\nSimplify[D[x[t], t] == A.x[t]]\n\n(* Symbolic exp(A t) *)\nSimplify[MatrixExp[A t]]\n      ", "Input"]
+},
+WindowTitle -> "Chapter7/Lesson1.html"
+]

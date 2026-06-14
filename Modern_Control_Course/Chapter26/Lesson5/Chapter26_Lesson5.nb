@@ -1,0 +1,33 @@
+Notebook[{
+Cell["Chapter26_Lesson5.nb", "Title"],
+Cell["Servo design by state augmentation for a mass-spring-damper plant.", "Text"],
+Cell[BoxData["
+ClearAll[\"Global`*\"]
+A = {{0, 1}, {-2, -0.8}};
+B = {{0}, {1}};
+Cmat = {{1, 0}};
+n = Length[A]; p = Length[Cmat];
+Aa = ArrayFlatten[{{A, ConstantArray[0, {n, p}]}, {-Cmat, ConstantArray[0, {p, p}]}}];
+Ba = Join[B, ConstantArray[0, {p, 1}]];
+Ea = Join[ConstantArray[0, {n, p}], IdentityMatrix[p]];
+controllabilityMatrix[aa_, bb_] := ArrayFlatten[{Table[MatrixPower[aa, k].bb, {k, 0, Length[aa] - 1}]}];
+Wc = controllabilityMatrix[Aa, Ba];
+MatrixRank[Wc]
+"], "Input"],
+Cell[BoxData["
+poles = {-2, -2.5, -3};
+poly = CoefficientList[Expand[Times @@ (s - # & /@ poles)], s];
+phiA = Sum[poly[[k + 1]] MatrixPower[Aa, k], {k, 0, Length[Aa]}];
+Kaug = UnitVector[Length[Aa], Length[Aa]].Inverse[Wc].phiA;
+Kx = Kaug[[1 ;; n]];
+Ki = -Kaug[[n + 1 ;;]];
+{Kaug, Kx, Ki, Eigenvalues[Aa - Ba.{Kaug}]}
+"], "Input"],
+Cell[BoxData["
+Acl = Aa - Ba.{Kaug};
+Cr = ArrayFlatten[{{Cmat, ConstantArray[0, {p, p}]}}];
+sys = StateSpaceModel[{Acl, Ea, Cr, ConstantArray[0, {p, p}]}];
+y = OutputResponse[sys, UnitStep[t], {t, 0, 8}];
+Plot[Evaluate[y], {t, 0, 8}, PlotRange -> All, AxesLabel -> {\"t\", \"y(t)\"}]
+"], "Input"]
+}]

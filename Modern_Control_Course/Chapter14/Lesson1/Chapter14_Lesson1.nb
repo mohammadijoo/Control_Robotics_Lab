@@ -1,0 +1,46 @@
+(* Chapter14_Lesson1.nb *)
+
+ClearAll[ObservabilityMatrix, NumericalRank, AnalyzeObservability];
+
+ObservabilityMatrix[A_, C_] := Module[
+  {n = Length[A]},
+  Join @@ Table[C . MatrixPower[A, k], {k, 0, n - 1}]
+];
+
+NumericalRank[M_, tol_: Automatic] := Module[
+  {s = SingularValueList[N[M]], threshold},
+  threshold = If[
+    tol === Automatic,
+    Max[Dimensions[M]] * $MachineEpsilon * Max[SingularValueList[N[M]]],
+    tol
+  ];
+  Count[s, _?(# > threshold &)]
+];
+
+AnalyzeObservability[A_, C_, name_] := Module[
+  {O, r, n, ns},
+  O = ObservabilityMatrix[A, C];
+  r = NumericalRank[O];
+  n = Length[A];
+  ns = NullSpace[O];
+
+  Print["\n", name];
+  Print["A = ", MatrixForm[A]];
+  Print["C = ", MatrixForm[C]];
+  Print["Observability matrix O_n = ", MatrixForm[O]];
+  Print["Singular values = ", SingularValueList[N[O]]];
+  Print["rank(O_n) = ", r, " of n = ", n];
+  Print["Observable? ", r == n];
+
+  If[r < n,
+    Print["Basis for unobservable initial-state directions = ", ns]
+  ];
+];
+
+A1 = {{0, 1}, {0, 0}};
+C1 = {{1, 0}};
+AnalyzeObservability[A1, C1, "Example 1: observable double integrator"];
+
+A2 = {{0, 0}, {0, -2}};
+C2 = {{1, 0}};
+AnalyzeObservability[A2, C2, "Example 2: unobservable second mode"];

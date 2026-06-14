@@ -1,0 +1,89 @@
+(* Chapter27_Lesson5.nb
+
+Reference tracking and disturbance rejection in state space.
+This is plain Wolfram Language content that can be pasted into a notebook
+or opened as a package-style notebook text file.
+
+Plant:
+  q'' m + b q' + k q = u + d
+  y = q
+*)
+
+ClearAll["Global`*"];
+
+m = 1.0;
+b = 0.6;
+k = 2.0;
+r = 1.0;
+d = 0.4;
+
+A = {{0, 1}, {-k/m, -b/m}};
+B = {{0}, {1/m}};
+Echan = B;
+Cmat = {{1, 0}};
+
+(* Direct gain formulas for the second-order plant. *)
+a1 = 5.0;  (* desired s^2 + a1 s + a0 *)
+a0 = 6.0;
+K1 = m*a0 - k;
+K2 = m*a1 - b;
+Nbar = k + K1;
+
+alpha2 = 10.0; (* desired s^3 + alpha2 s^2 + alpha1 s + alpha0 *)
+alpha1 = 31.0;
+alpha0 = 30.0;
+K1i = m*alpha1 - k;
+K2i = m*alpha2 - b;
+Ki = m*alpha0;
+
+Print["Feedforward gains: ", {K1, K2, Nbar}];
+Print["Integral gains: ", {K1i, K2i, Ki}];
+
+feedforwardSolution[dist_] := NDSolveValue[
+  {
+    q'[t] == v[t],
+    v'[t] == (-k*q[t] - b*v[t] - K1*q[t] - K2*v[t] + Nbar*r + dist)/m,
+    q[0] == 0,
+    v[0] == 0
+  },
+  {q, v},
+  {t, 0, 8}
+];
+
+integralSolution[dist_] := NDSolveValue[
+  {
+    q'[t] == v[t],
+    v'[t] == (-k*q[t] - b*v[t] - K1i*q[t] - K2i*v[t] + Ki*z[t] + dist)/m,
+    z'[t] == r - q[t],
+    q[0] == 0,
+    v[0] == 0,
+    z[0] == 0
+  },
+  {q, v, z},
+  {t, 0, 8}
+];
+
+{qff0, vff0} = feedforwardSolution[0.0];
+{qffd, vffd} = feedforwardSolution[d];
+{qint, vint, zint} = integralSolution[d];
+
+Print["Final y, feedforward no disturbance: ", qff0[8]];
+Print["Final y, feedforward with disturbance: ", qffd[8]];
+Print["Final y, integral with disturbance: ", qint[8]];
+
+Plot[
+  {qff0[t], qffd[t], qint[t], r},
+  {t, 0, 8},
+  PlotLegends -> {"FF, d=0", "FF, d=0.4", "Integral, d=0.4", "reference"},
+  AxesLabel -> {"time [s]", "output y"},
+  PlotLabel -> "Reference Tracking and Disturbance Rejection",
+  GridLines -> Automatic
+]
+
+Plot[
+  -K1i*qint[t] - K2i*vint[t] + Ki*zint[t],
+  {t, 0, 8},
+  AxesLabel -> {"time [s]", "control input u"},
+  PlotLabel -> "Integral Controller Effort",
+  GridLines -> Automatic
+]

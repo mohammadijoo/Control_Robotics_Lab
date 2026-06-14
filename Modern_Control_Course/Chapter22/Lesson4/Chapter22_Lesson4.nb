@@ -1,0 +1,70 @@
+(* Chapter22_Lesson4.nb *)
+(* Requirements for Implementing State Feedback *)
+
+ClearAll["Global`*"];
+
+A = {{0, 1}, {-2, -3}};
+B = {{0}, {1}};
+CPositionOnly = {{1, 0}};
+CFull = IdentityMatrix[2];
+
+(* K is assumed to be supplied by a design step. *)
+K = {{4, 2}};
+
+ControllabilityMatrix[A_, B_] := Module[
+  {n = Length[A]},
+  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]
+];
+
+ObservabilityMatrix[A_, C_] := Module[
+  {n = Length[A]},
+  Join @@ Table[C.MatrixPower[A, k], {k, 0, n - 1}]
+];
+
+PBHStabilizableQ[A_, B_] := Module[
+  {n = Length[A], evals = Eigenvalues[A], bad},
+  bad = Select[
+    evals,
+    Re[#] >= 0 && MatrixRank[ArrayFlatten[{{#.IdentityMatrix[n] - A, B}}]] < n &
+  ];
+  {Length[bad] == 0, bad}
+];
+
+Wc = ControllabilityMatrix[A, B];
+WoPosition = ObservabilityMatrix[A, CPositionOnly];
+WoFull = ObservabilityMatrix[A, CFull];
+
+Print["=== Requirement checks for u = -K x + r ==="];
+Print["Wc = ", MatrixForm[Wc]];
+Print["rank(Wc) = ", MatrixRank[Wc], ", required = ", Length[A]];
+
+Print["rank(CPositionOnly) = ", MatrixRank[CPositionOnly],
+  ", required for direct full-state measurement = ", Length[A]];
+Print["rank(CFull) = ", MatrixRank[CFull],
+  ", required for direct full-state measurement = ", Length[A]];
+
+Print["rank(WoPosition) = ", MatrixRank[WoPosition],
+  ", required for observer-based reconstruction = ", Length[A]];
+Print["rank(WoFull) = ", MatrixRank[WoFull],
+  ", required for observer-based reconstruction = ", Length[A]];
+
+Print["PBH stabilizable? ", PBHStabilizableQ[A, B]];
+
+Acl = A - B.K;
+Print["Acl = ", MatrixForm[Acl]];
+Print["Closed-loop eigenvalues = ", Eigenvalues[Acl]];
+
+x0 = {1, 0};
+sol = NDSolveValue[
+  {x'[t] == Acl.x[t], x[0] == x0},
+  x,
+  {t, 0, 5}
+];
+
+Print["Final simulated state = ", sol[5]];
+
+Plot[Evaluate[sol[t]], {t, 0, 5},
+  PlotLegends -> {"x1(t)", "x2(t)"},
+  AxesLabel -> {"t", "states"},
+  PlotLabel -> "Closed-loop state response"
+]

@@ -1,0 +1,35 @@
+(* Chapter21_Lesson3.nb *)
+(* Wolfram Mathematica / Wolfram Language source for zero dynamics. *)
+(* You can paste this into a notebook, or open as plain text and evaluate cells manually. *)
+
+ClearAll["Global`*"];
+
+A = {{0, 1, 0}, {0, 0, 1}, {-6, -11, -6}};
+B = {{0}, {0}, {1}};
+Cmat = {{-1, 1, 0}};
+Dmat = {{0}};
+
+sys = StateSpaceModel[{A, B, Cmat, Dmat}];
+tf = TransferFunctionModel[sys, s] // FullSimplify
+
+zeros = s /. Solve[Numerator[tf[[1, 1, 1]]] == 0, s]
+poles = s /. Solve[Denominator[tf[[1, 1, 1]]] == 0, s]
+
+(* Output-nulling manifold:
+   x2 == x1, x3 == x1.
+   Enforcing invariance gives u == 18*x1.
+   Therefore eta[t] == x1[t] satisfies eta'[t] == eta[t]. *)
+
+eta0 = 0.02;
+solEta = DSolveValue[{eta'[t] == eta[t], eta[0] == eta0}, eta[t], t]
+etaAt5 = solEta /. t -> 5
+
+u[t_] := 18 solEta;
+x[t_] := {solEta, solEta, solEta};
+y[t_] := Cmat.x[t] // Simplify
+
+Plot[Evaluate[solEta], {t, 0, 5}, PlotLabel -> "Zero Dynamics eta_dot = eta",
+     AxesLabel -> {"t", "eta"}]
+
+Plot[Evaluate[y[t][[1]]], {t, 0, 5}, PlotLabel -> "Output y(t) held at zero",
+     AxesLabel -> {"t", "y"}]

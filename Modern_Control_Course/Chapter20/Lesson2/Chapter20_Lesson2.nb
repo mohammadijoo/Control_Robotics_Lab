@@ -1,0 +1,50 @@
+(* Chapter20_Lesson2.nb *)
+
+(* Wolfram Mathematica code for Chapter 20, Lesson 2:
+   From Nonminimal to Minimal Realizations. *)
+
+ClearAll["Global`*"];
+
+A = DiagonalMatrix[{-1, -2, -3}];
+B = {{1}, {0}, {1}};
+Cmat = {{1, 1, 0}};
+Dmat = {{0}};
+n = Length[A];
+
+ControllabilityMatrix[A_, B_] :=
+  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, Length[A] - 1}]}];
+
+ObservabilityMatrix[A_, C_] :=
+  Join @@ Table[C.MatrixPower[A, k], {k, 0, Length[A] - 1}];
+
+Wc = ControllabilityMatrix[A, B];
+Wo = ObservabilityMatrix[A, Cmat];
+
+Print["rank(Wc) = ", MatrixRank[Wc], " out of n = ", n];
+Print["rank(Wo) = ", MatrixRank[Wo], " out of n = ", n];
+
+G[s_] := Cmat.Inverse[s IdentityMatrix[n] - A].B + Dmat;
+Print["Original transfer G(s) = ", FullSimplify[G[s][[1, 1]]]];
+
+(* Exact minimal realization for this example. *)
+Am = {{-1}};
+Bm = {{1}};
+Cm = {{1}};
+Dm = {{0}};
+
+Gmin[s_] := Cm.Inverse[s IdentityMatrix[1] - Am].Bm + Dm;
+Print["Minimal transfer Gmin(s) = ", FullSimplify[Gmin[s][[1, 1]]]];
+Print["Difference = ", FullSimplify[G[s][[1, 1]] - Gmin[s][[1, 1]]]];
+
+(* Kalman-style tests on the minimal realization. *)
+WcMin = ControllabilityMatrix[Am, Bm];
+WoMin = ObservabilityMatrix[Am, Cm];
+
+Print["rank(WcMin) = ", MatrixRank[WcMin]];
+Print["rank(WoMin) = ", MatrixRank[WoMin]];
+
+(* Sample values. *)
+Table[
+  {sigma, N[G[sigma][[1, 1]]], N[Gmin[sigma][[1, 1]]]},
+  {sigma, {0, 1, 2 + I}}
+] // TableForm

@@ -1,0 +1,6 @@
+Notebook[{
+Cell["(* ===== Code block 1 extracted from Chapter1/Lesson2.html ===== *)\nzeta = 0.3;\nwn   = 2.0;\n\nG = TransferFunctionModel[\n      wn^2 / (s^2 + 2 zeta wn s + wn^2),\n      s\n    ];\n\n(* Step response of the LTI transfer function *)\nltis = OutputResponse[G, UnitStep[t], {t, 0, 10}];\nPlot[ltis, {t, 0, 10}, AxesLabel -> {\"t\", \"y(t)\"}, PlotRange -> All]\n      ", "Input"],
+Cell["(* ===== Code block 2 extracted from Chapter1/Lesson2.html ===== *)\nzeta = 0.3;\nwn   = 2.0;\numin = -1.0;\numax = 1.0;\n\nuCmd[t_] := 2.0;\n\nsat[v_] := Min[umax, Max[umin, v]];\n\ntvSystem = NDSolve[\n  {\n    y'[t] == v[t],\n    v'[t] == -2 zeta wn (1 + 0.5 Sin[0.5 t]) v[t]\n             - wn^2 (1 + 0.3 Cos[0.2 t]) y[t]\n             + wn^2 sat[uCmd[t]],\n    y[0] == 0,\n    v[0] == 0\n  },\n  {y, v},\n  {t, 0, 10}\n];\n\nPlot[\n  Evaluate[y[t] /. tvSystem],\n  {t, 0, 10},\n  AxesLabel -> {\"t\", \"y(t)\"},\n  PlotRange -> All\n]\n      ", "Input"]
+},
+WindowTitle -> "Chapter1/Lesson2.html"
+]

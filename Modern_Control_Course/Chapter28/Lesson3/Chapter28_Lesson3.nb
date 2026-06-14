@@ -1,0 +1,14 @@
+Notebook[{Cell["Chapter28_Lesson3.nb", "Title"],
+Cell["Modern Control — Chapter 28, Lesson 3: State and control weighting matrices Q and R as performance descriptors.", "Text"],
+Cell[BoxData[RowBox[{"ClearAll", "[", "\"Global`*\"", "]"}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"A", "=", RowBox[{"{{", RowBox[{RowBox[{"0", ",", "1"}], ",", RowBox[{RowBox[{"-", "2"}], ",", RowBox[{"-", "0.4"}]}]}], "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"B", "=", RowBox[{"{{", RowBox[{"0"}], "},{", RowBox[{"1"}], "}}"}]}], ";", RowBox[{"K", "=", RowBox[{"{{", RowBox[{"3.0", ",", "2.2"}], "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"xMax", "=", RowBox[{"{", RowBox[{"1", ",", "2"}], "}"}]}], ";", RowBox[{"uMax", "=", "0.5"}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"Q", "=", RowBox[{"DiagonalMatrix", "[", RowBox[{"1", "/", RowBox[{"xMax", "^", "2"}]}], "]"}]}], ";", RowBox[{"R", "=", RowBox[{"{{", RowBox[{"1", "/", RowBox[{"uMax", "^", "2"}]}], "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"Eigenvalues", "[", "Q", "]"}], ",", RowBox[{"Eigenvalues", "[", "R", "]"}]}], "}"}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"Acl", "=", RowBox[{"A", "-", RowBox[{"B", ".", "K"}]}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{"sol", "=", RowBox[{"NDSolveValue", "[", RowBox[{RowBox[{"{", RowBox[{RowBox[{RowBox[{"x", "'"}], "[", "t", "]"}], "==", RowBox[{"Acl", ".", RowBox[{"x", "[", "t", "]"}]}]}], ",", RowBox[{RowBox[{"x", "[", "0", "]"}], "==", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}]}], "}"}], ",", "x", ",", RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}]}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"J", "=", RowBox[{"NIntegrate", "[", RowBox[{RowBox[{RowBox[{RowBox[{"sol", "[", "t", "]"}], ".", "Q", ".", RowBox[{"sol", "[", "t", "]"}]}], "+", RowBox[{RowBox[{"(", RowBox[{RowBox[{"-", "K"}], ".", RowBox[{"sol", "[", "t", "]"}]}], ")"}], ".", "R", ".", RowBox[{"(", RowBox[{RowBox[{"-", "K"}], ".", RowBox[{"sol", "[", "t", "]"}]}], ")"}]}]}], ",", RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}]}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"Tmat", "=", RowBox[{"{{", RowBox[{RowBox[{"2", ",", "0.5"}], ",", RowBox[{"0", ",", "1.5"}]}], "}}"}]}], ";", RowBox[{"Qz", "=", RowBox[{RowBox[{"Transpose", "[", "Tmat", "]"}], ".", "Q", ".", "Tmat"}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{"Simplify", "[", RowBox[{RowBox[{RowBox[{"x", ".", "Q", ".", "x"}], "/.", RowBox[{"x", "->", RowBox[{"Tmat", ".", "z"}]}]}], "==", RowBox[{"z", ".", "Qz", ".", "z"}]}], "]"}]], "Input"]
+}]

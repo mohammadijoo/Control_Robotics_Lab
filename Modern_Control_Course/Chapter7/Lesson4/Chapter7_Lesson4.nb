@@ -1,0 +1,46 @@
+(* Chapter7_Lesson4.nb
+   Modern Control — Chapter 7, Lesson 4
+   Output Response Using x(t) and y(t) = C x(t) + D u(t)
+
+   This is a plain-text Mathematica Notebook expression. Open it in Mathematica.
+*)
+
+Notebook[{
+  Cell["Modern Control — Chapter 7, Lesson 4: Output Response", "Title"],
+  Cell["Define a continuous-time LTI state-space model and compute y(t) for a step input.", "Text"],
+
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "A = {{0, 1}, {-2, -3}};\n",
+      "B = {{0}, {1}};\n",
+      "C = {{1, 0}};\n",
+      "D = {{0.25}};\n",
+      "x0 = {{1}, {0}};\n",
+      "u0 = {{1}};\n",
+      "tmax = 6;\n"
+    }]
+  ], "Input"],
+
+  Cell["Closed-form (constant input) if A is invertible:", "Text"],
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "Phi[t_] := MatrixExp[A t];\n",
+      "x[t_] := Phi[t].x0 + Inverse[A].(Phi[t] - IdentityMatrix[2]).B.u0;\n",
+      "y[t_] := C.x[t] + D.u0;\n"
+    }]
+  ], "Input"],
+
+  Cell["Evaluate y(t) at selected times:", "Text"],
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "Table[{tt, y[tt][[1,1]]}, {tt, {0, 0.5, 1, 2, 6}}]\n"
+    }]
+  ], "Input"],
+
+  Cell["Plot y(t) over time:", "Text"],
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "Plot[Evaluate[y[t][[1,1]]], {t, 0, tmax}, PlotRange -> All, GridLines -> Automatic, AxesLabel -> {\"t\", \"y(t)\"}]\n"
+    }]
+  ], "Input"]
+}]

@@ -1,0 +1,27 @@
+Notebook[{
+Cell["Chapter18_Lesson5.nb", "Title"],
+Cell["Interpretation of Jordan form in control applications.", "Text"],
+Cell[BoxData[RowBox[{"ClearAll", "[", "\"Global`*\"", "]"}]], "Input"],
+Cell[BoxData[RowBox[{
+"A", "=", RowBox[{"{{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "0"}], "},", 
+RowBox[{"{", RowBox[{"0", ",", RowBox[{"-", "1"}], ",", "1"}], "}"}], ",", 
+RowBox[{"{", RowBox[{"0", ",", "0", ",", RowBox[{"-", "1"}]}], "}"}], "}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixForm", "[", "A", "]"}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "t"}], "]", "//", "MatrixForm"}]], "Input"],
+Cell[BoxData[RowBox[{"JordanDecomposition", "[", "A", "]"}]], "Input"],
+Cell[BoxData[RowBox[{
+RowBox[{"ControllabilityMatrix", "[", RowBox[{"aa_", ",", "bb_"}], "]"}], ":=", 
+RowBox[{"ArrayFlatten", "[", RowBox[{"{", RowBox[{"Table", "[", RowBox[{RowBox[{"MatrixPower", "[", RowBox[{"aa", ",", "k"}], "]", ".", "bb"}], ",", RowBox[{"{", RowBox[{"k", ",", "0", ",", RowBox[{RowBox[{"Length", "[", "aa", "]"}], "-", "1"}]}], "}"}]}], "]"}], "}"}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{
+RowBox[{"ObservabilityMatrix", "[", RowBox[{"aa_", ",", "cc_"}], "]"}], ":=", 
+RowBox[{"Join", "@@", RowBox[{"Table", "[", RowBox[{RowBox[{"cc", ".", RowBox[{"MatrixPower", "[", RowBox[{"aa", ",", "k"}], "]"}]}], ",", RowBox[{"{", RowBox[{"k", ",", "0", ",", RowBox[{RowBox[{"Length", "[", "aa", "]"}], "-", "1"}]}], "}"}]}], "]"}]}]}]], "Input"],
+Cell[BoxData[RowBox[{"BGood", "=", RowBox[{"{{", "0", "}", ",", "{", "0", "}", ",", "{", "1", "}}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"BBad", "=", RowBox[{"{{", "1", "}", ",", "{", "0", "}", ",", "{", "0", "}}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixRank", "[", RowBox[{"ControllabilityMatrix", "[", RowBox[{"A", ",", "BGood"}], "]"}], "]"}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixRank", "[", RowBox[{"ControllabilityMatrix", "[", RowBox[{"A", ",", "BBad"}], "]"}], "]"}]], "Input"],
+Cell[BoxData[RowBox[{"CGood", "=", RowBox[{"{{", RowBox[{"1", ",", "0", ",", "0"}], "}}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"CBad", "=", RowBox[{"{{", RowBox[{"0", ",", "0", ",", "1"}], "}}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixRank", "[", RowBox[{"ObservabilityMatrix", "[", RowBox[{"A", ",", "CGood"}], "]"}], "]"}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixRank", "[", RowBox[{"ObservabilityMatrix", "[", RowBox[{"A", ",", "CBad"}], "]"}], "]"}]], "Input"],
+Cell[BoxData[RowBox[{"Plot", "[", RowBox[{RowBox[{"Evaluate", "[", RowBox[{RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "t"}], "]"}], ".", RowBox[{"{", RowBox[{"0", ",", "0", ",", "1"}], "}"}]}], "]"}], ",", RowBox[{"{", RowBox[{"t", ",", "0", ",", "6"}], "}"}], ",", RowBox[{"PlotLegends", "->", RowBox[{"{", RowBox[{"\"x1\"", ",", "\"x2\"", ",", "\"x3\""}], "}"}]}]}], "]"}]], "Input"]
+}, WindowTitle -> "Chapter18_Lesson5.nb"]

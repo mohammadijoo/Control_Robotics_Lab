@@ -1,0 +1,75 @@
+(* Chapter23_Lesson5.nb *)
+(* Wolfram Mathematica code for numerical sensitivity and conditioning in SISO pole placement. *)
+(* Save this text as Chapter23_Lesson5.nb or paste into a Mathematica notebook cell. *)
+
+ClearAll["Global`*"];
+
+A = {{0, 1, 0}, {0, 0, 1}, {-2, -3, -4}};
+B = {{0}, {0}, {1}};
+desiredPoles = {-4, -5, -6};
+
+ControllabilityMatrixLocal[A_, B_] := Module[
+  {n = Length[A]},
+  Transpose[Table[Flatten[MatrixPower[A, k].B], {k, 0, n - 1}]]
+];
+
+PolynomialMatrix[A_, coeffs_] := Module[
+  {n = Length[A], P},
+  P = ConstantArray[0, {n, n}];
+  Do[
+    P = P.A + coeffs[[k]] IdentityMatrix[n],
+    {k, 1, Length[coeffs]}
+  ];
+  P
+];
+
+AckermannGain[A_, B_, poles_] := Module[
+  {n = Length[A], C, poly, pA, eT},
+  C = ControllabilityMatrixLocal[A, B];
+  poly = CoefficientList[Expand[Times @@ (s - # & /@ poles)], s] // Reverse;
+  pA = PolynomialMatrix[A, poly];
+  eT = UnitVector[n, n];
+  {eT}.Inverse[C].pA
+];
+
+EigenvalueConditionNumbers[M_] := Module[
+  {vals, right, left, n},
+  {vals, right} = Eigensystem[M];
+  left = Last[Eigensystem[Transpose[M]]];
+  n = Length[vals];
+  Table[
+    Norm[left[[i]]] Norm[right[[i]]] / Abs[left[[i]].right[[i]]],
+    {i, 1, n}
+  ]
+];
+
+Cmat = ControllabilityMatrixLocal[A, B];
+K = AckermannGain[A, B, desiredPoles];
+M = A - B.K;
+
+Print["Original coordinates"];
+Print["Controllability matrix C = ", MatrixForm[Cmat]];
+Print["Condition number of C = ", N[ConditionNumber[Cmat]]];
+Print["K = ", MatrixForm[N[K]]];
+Print["Closed-loop eigenvalues = ", N[Eigenvalues[M]]];
+Print["Eigenvalue condition numbers = ", N[EigenvalueConditionNumbers[M]]];
+
+Tbad = DiagonalMatrix[{10^-3, 1, 10^3}];
+Abad = Inverse[Tbad].A.Tbad;
+Bbad = Inverse[Tbad].B;
+Cbad = ControllabilityMatrixLocal[Abad, Bbad];
+Kz = AckermannGain[Abad, Bbad, desiredPoles];
+Kx = Kz.Inverse[Tbad];
+
+Print["Badly scaled design coordinates"];
+Print["Condition number of Cbad = ", N[ConditionNumber[Cbad]]];
+Print["Kz = ", MatrixForm[N[Kz]]];
+Print["Equivalent Kx = ", MatrixForm[N[Kx]]];
+Print["Closed-loop eigenvalues = ", N[Eigenvalues[A - B.Kx]]];
+
+BarChart[
+  Log10[{ConditionNumber[Cmat], ConditionNumber[Cbad]}],
+  ChartLabels -> {"original", "bad scaling"},
+  AxesLabel -> {"case", "log10 cond(C)"},
+  PlotLabel -> "Coordinate scaling and controllability conditioning"
+]

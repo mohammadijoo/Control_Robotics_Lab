@@ -1,0 +1,30 @@
+Notebook[{
+  Cell["Chapter24_Lesson1.nb", "Title"],
+  Cell["Existence conditions for MIMO pole assignment", "Subtitle"],
+  Cell[BoxData[ToBoxes[
+    ClearAll[A, B, n, controllabilityMatrix, pbhRank, K, Acl];
+    A = {{0, 1, 0}, {0, 0, 1}, {-1, -5, -6}};
+    B = {{0, 0}, {1, 0}, {0, 1}};
+    n = Length[A];
+    controllabilityMatrix[A_, B_] := ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, Length[A] - 1}]}];
+    MatrixRank[controllabilityMatrix[A, B]]
+  ]], "Input"],
+  Cell[BoxData[ToBoxes[
+    pbhRank[A_, B_, lambda_] := MatrixRank[Join[lambda IdentityMatrix[Length[A]] - A, B, 2]];
+    Eigenvalues[A]
+  ]], "Input"],
+  Cell[BoxData[ToBoxes[
+    And @@ Table[pbhRank[A, B, lambda] == n, {lambda, Eigenvalues[A]}]
+  ]], "Input"],
+  Cell[BoxData[ToBoxes[
+    K = {{8, 6, 1}, {-1, -5, -3}};
+    Acl = A - B.K;
+    Eigenvalues[Acl]
+  ]], "Input"],
+  Cell[BoxData[ToBoxes[
+    ABad = DiagonalMatrix[{1, -2, -3}];
+    BBad = {{0}, {1}, {1}};
+    {MatrixRank[controllabilityMatrix[ABad, BBad]], pbhRank[ABad, BBad, 1]}
+  ]], "Input"],
+  Cell["The second output shows that the unstable uncontrollable pole at +1 fails the PBH rank test and cannot be assigned by state feedback.", "Text"]
+}]

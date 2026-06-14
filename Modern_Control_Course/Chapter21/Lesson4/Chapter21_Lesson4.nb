@@ -1,0 +1,36 @@
+Notebook[{
+Cell["Chapter21_Lesson4.nb", "Title"],
+Cell["Minimum-phase vs non-minimum-phase systems in state-space. This notebook computes finite zeros, classifies continuous-time systems, and compares two state-space examples.", "Text"],
+Cell[BoxData[ToBoxes[
+ClearAll[s, classifyCT, A, B, Cmin, Cnmp, D, gmin, gnmp, zerosMin, zerosNmp];
+A = {{0, 1}, {-6, -5}};
+B = {{0}, {1}};
+D = {{0}};
+Cmin = {{1, 1}};
+Cnmp = {{1, -1}};
+gmin = Cmin . Inverse[s IdentityMatrix[2] - A] . B + D;
+gnmp = Cnmp . Inverse[s IdentityMatrix[2] - A] . B + D;
+zerosMin = s /. Solve[Numerator[Together[gmin[[1, 1]]]] == 0, s];
+zerosNmp = s /. Solve[Numerator[Together[gnmp[[1, 1]]]] == 0, s];
+classifyCT[z_List] := Which[
+  Length[z] == 0, "minimum-phase: no finite zeros detected",
+  Max[Re[N[z]]] > 10^-8, "non-minimum-phase: right-half-plane zero exists",
+  Min[Abs[Re[N[z]]]] <= 10^-8, "borderline non-minimum-phase: imaginary-axis zero exists",
+  True, "minimum-phase: all finite zeros are in the open left-half-plane"
+];
+{TraditionalForm[gmin[[1, 1]]], zerosMin, classifyCT[zerosMin],
+ TraditionalForm[gnmp[[1, 1]]], zerosNmp, classifyCT[zerosNmp]}
+]], "Input"],
+Cell[BoxData[ToBoxes[
+(* Rosenbrock matrix for the non-minimum-phase example. *)
+Rosenbrock = ArrayFlatten[{{s IdentityMatrix[2] - A, -B}, {Cnmp, D}}];
+{MatrixForm[Rosenbrock], Factor[Det[Rosenbrock]]}
+]], "Input"],
+Cell[BoxData[ToBoxes[
+(* Visualize inverse response caused by the RHP zero. *)
+yMin = OutputResponse[TransferFunctionModel[gmin[[1, 1]], s], UnitStep[t], {t, 0, 8}];
+yNmp = OutputResponse[TransferFunctionModel[gnmp[[1, 1]], s], UnitStep[t], {t, 0, 8}];
+Plot[{yMin, yNmp}, {t, 0, 8}, PlotLegends -> {"minimum phase", "non-minimum phase"},
+ PlotLabel -> "Step responses", AxesLabel -> {"t", "y(t)"}]
+]], "Input"]
+}]

@@ -1,0 +1,39 @@
+Notebook[{
+Cell["Chapter28_Lesson1.nb", "Title"],
+Cell["Quadratic Forms in State and Input Variables", "Subtitle"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Q", "=", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"10", ",", "1"}], "}"}], "]"}]}], ";",
+  RowBox[{"R", "=", RowBox[{"{{", "0.25", "}}"}]}], ";",
+  RowBox[{"Nmat", "=", RowBox[{"{{", "0", "}", ",", "{", "0.15", "}}"}]}], ";",
+  RowBox[{"x", "=", RowBox[{"{", RowBox[{"0.7", ",", RowBox[{"-", "0.2"}]}], "}"}]}], ";",
+  RowBox[{"u", "=", RowBox[{"{", "0.4", "}"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"quadraticForm", "[", RowBox[{"z_", ",", "M_"}], "]"}], ":=",
+  RowBox[{"z", ".", "M", ".", "z"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"stageCost", "[", RowBox[{"x_", ",", "u_", ",", "Q_", ",", "R_", ",", "Nmat_"}], "]"}], ":=",
+  RowBox[{
+   RowBox[{"x", ".", "Q", ".", "x"}], "+",
+   RowBox[{"2", RowBox[{"x", ".", "Nmat", ".", "u"}]}], "+",
+   RowBox[{"u", ".", "R", ".", "u"}]}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{"quadraticForm", "[", RowBox[{"x", ",", "Q"}], "]"}]], "Input"],
+Cell[BoxData[
+ RowBox[{"stageCost", "[", RowBox[{"x", ",", "u", ",", "Q", ",", "R", ",", "Nmat"}], "]"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"RinvNT", "=", RowBox[{"LinearSolve", "[", RowBox[{"R", ",", RowBox[{"Transpose", "[", "Nmat", "]"}]}], "]"}]}], ";",
+  RowBox[{"Schur", "=", RowBox[{"Q", "-", RowBox[{"Nmat", ".", "RinvNT"}]}]}], ";",
+  RowBox[{"{", RowBox[{"RinvNT", ",", "Schur", ",", RowBox[{"Eigenvalues", "[", "Schur", "]"}]}], "}"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{"ContourPlot", "[",
+  RowBox[{
+   RowBox[{"{", RowBox[{
+    RowBox[{"{", RowBox[{"x1", ",", "x2"}], "}", ".", "Q", ".", RowBox[{"{", RowBox[{"x1", ",", "x2"}], "}"}]}], "==", "1"}], "}"}], ",",
+   RowBox[{"{", RowBox[{"x1", ",", RowBox[{"-", "1"}], ",", "1"}], "}"}], ",",
+   RowBox[{"{", RowBox[{"x2", ",", RowBox[{"-", "1"}], ",", "1"}], "}"}], ",",
+   RowBox[{"FrameLabel", "->", RowBox[{"{", RowBox[{"\"x1\"", ",", "\"x2\""}], "}"}]}]}], "]"}]], "Input"]
+}]

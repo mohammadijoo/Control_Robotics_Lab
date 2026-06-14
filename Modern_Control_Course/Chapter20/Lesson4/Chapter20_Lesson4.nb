@@ -1,0 +1,51 @@
+(* Chapter20_Lesson4.nb *)
+(* Wolfram Mathematica educational notebook source. Open as a notebook or paste into Mathematica. *)
+
+ClearAll[controllabilityMatrix, observabilityMatrix, exactMinimalReduction];
+
+controllabilityMatrix[A_, B_] := Module[{n = Length[A]},
+  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]
+];
+
+observabilityMatrix[A_, C_] := Module[{n = Length[A]},
+  Join @@ Table[C.MatrixPower[A, k], {k, 0, n - 1}]
+];
+
+exactMinimalReduction[A_, B_, C_, D_] := Module[
+  {R, Qr, A1, B1, C1, O1, Qun, q, Qobs, T, Ahat, Bhat, Chat},
+  R = controllabilityMatrix[A, B];
+  Qr = Orthogonalize[Transpose[RowReduce[Transpose[R]]]];
+  Qr = Select[Qr, Norm[#] > 10^-10 &] // Transpose;
+  A1 = Transpose[Qr].A.Qr;
+  B1 = Transpose[Qr].B;
+  C1 = C.Qr;
+  O1 = observabilityMatrix[A1, C1];
+  Qun = Transpose[NullSpace[O1]];
+  q = If[MatrixQ[Qun], Dimensions[Qun][[2]], 0];
+  If[q == 0, Return[{A1, B1, C1, D}]];
+  Qobs = Transpose[NullSpace[Transpose[Qun]]];
+  T = ArrayFlatten[{{Qun, Qobs}}];
+  Ahat = Transpose[T].A1.T;
+  Bhat = Transpose[T].B1;
+  Chat = C1.T;
+  {Ahat[[q + 1 ;;, q + 1 ;;]], Bhat[[q + 1 ;;, All]], Chat[[All, q + 1 ;;]], D}
+];
+
+A = DiagonalMatrix[{-1, -2, -3}];
+B = {{1}, {0}, {1}};
+Cmat = {{1, 0, 0}};
+Dmat = {{0}};
+
+R = controllabilityMatrix[A, B];
+O = observabilityMatrix[A, Cmat];
+Print["rank(R) = ", MatrixRank[R], " of ", Length[A]];
+Print["rank(O) = ", MatrixRank[O], " of ", Length[A]];
+
+{Amin, Bmin, Cmin, Dmin} = exactMinimalReduction[A, B, Cmat, Dmat];
+Print["Amin = ", MatrixForm[Amin]];
+Print["Bmin = ", MatrixForm[Bmin]];
+Print["Cmin = ", MatrixForm[Cmin]];
+Print["Dmin = ", MatrixForm[Dmin]];
+
+TransferFunctionModel[StateSpaceModel[{A, B, Cmat, Dmat}], s]
+TransferFunctionModel[StateSpaceModel[{Amin, Bmin, Cmin, Dmin}], s]

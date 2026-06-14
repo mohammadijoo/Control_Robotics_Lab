@@ -1,0 +1,5 @@
+Notebook[{
+Cell["companionFromOde[a_List, b_: 1] := Module[{n, A, B, C, D},\n  n = Length[a];\n  A = ConstantArray[0, {n, n}];\n  Do[A[[i, i + 1]] = 1, {i, 1, n - 1}];\n  A[[n, All]] = -a;\n  B = ConstantArray[0, {n, 1}];\n  B[[n, 1]] = b;\n  C = ConstantArray[0, {1, n}];\n  C[[1, 1]] = 1;\n  D = {{0}};\n  {A, B, C, D}\n];\n\n(* Example: y'' + 3 y' + 2 y = u *)\n{A, B, C, D} = companionFromOde[{2, 3}, 1];\n\nu[t_] := 1;  (* step input *)\nx10 = 0; x20 = 0;\n\nsol = NDSolve[\n  {\n    x1'[t] == x2[t],\n    x2'[t] == -2 x1[t] - 3 x2[t] + u[t],\n    x1[0] == x10,\n    x2[0] == x20\n  },\n  {x1, x2},\n  {t, 0, 5}\n];\n\ny[t_] := x1[t] /. sol[[1]];\n{A, B, C, D}\ny[5]", "Input"]
+},
+WindowTitle -> "Chapter5/Lesson2.html"
+]

@@ -1,0 +1,65 @@
+Notebook[{
+Cell["Chapter27_Lesson3.nb", "Title"],
+Cell["Internal Model Principle for step tracking in a continuous-time state-space plant.", "Text"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", RowBox[{"{{", RowBox[{
+     RowBox[{"0", ",", "1"}], ",", RowBox[{
+      RowBox[{"-", "2"}], ",", RowBox[{"-", "0.4"}]}]}], "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"B", "=", RowBox[{"{{", "0", "}", ",", "{", "1", "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Cmat", "=", RowBox[{"{{", RowBox[{"1", ",", "0"}], "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Kx", "=", RowBox[{"{", RowBox[{"26", ",", "8.6"}], "}"}]}], ";",
+  RowBox[{"Ki", "=", "40"}], ";",
+  RowBox[{"r", "=", "1"}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"sol", "=", 
+   RowBox[{"NDSolve", "[", 
+    RowBox[{
+     RowBox[{"{",
+      RowBox[{
+       RowBox[{
+        RowBox[{
+         RowBox[{"x1", "'"}], "[", "t", "]"}], "==", RowBox[{"x2", "[", "t", "]"}]}], ",",
+       RowBox[{
+        RowBox[{
+         RowBox[{"x2", "'"}], "[", "t", "]"}], "==",
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "2"}], " ", RowBox[{"x1", "[", "t", "]"}]}], "-",
+         RowBox[{"0.4", " ", RowBox[{"x2", "[", "t", "]"}]}], "-",
+         RowBox[{"26", " ", RowBox[{"x1", "[", "t", "]"}]}], "-",
+         RowBox[{"8.6", " ", RowBox[{"x2", "[", "t", "]"}]}], "+",
+         RowBox[{"40", " ", RowBox[{"eta", "[", "t", "]"}]}]}]}], ",",
+       RowBox[{
+        RowBox[{
+         RowBox[{"eta", "'"}], "[", "t", "]"}], "==",
+        RowBox[{"r", "-", RowBox[{"x1", "[", "t", "]"}]}]}], ",",
+       RowBox[{
+        RowBox[{"x1", "[", "0", "]"}], "==", "0"}], ",",
+       RowBox[{
+        RowBox[{"x2", "[", "0", "]"}], "==", "0"}], ",",
+       RowBox[{
+        RowBox[{"eta", "[", "0", "]"}], "==", "0"}]}], "}"}], ",",
+     RowBox[{"{", RowBox[{"x1", ",", "x2", ",", "eta"}], "}"}], ",",
+     RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}]}], "]"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{"Plot", "[",
+  RowBox[{
+   RowBox[{"Evaluate", "[", RowBox[{
+     RowBox[{"x1", "[", "t", "]"}], "/.", "sol"}], "]"}], ",",
+   RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}], ",",
+   RowBox[{"GridLines", "->", "Automatic"}], ",",
+   RowBox[{"AxesLabel", "->", RowBox[{"{", RowBox[{"\"t\"", ",", "\"y(t)\""}], "}"}]}], ",",
+   RowBox[{"PlotLabel", "->", "\"Step Tracking with Internal Model\""}]}], "]"}]], "Input"],
+Cell[BoxData[
+ RowBox[{"N", "[",
+  RowBox[{"1", "-", RowBox[{"Evaluate", "[", RowBox[{
+     RowBox[{"x1", "[", "8", "]"}], "/.", "sol"}], "]"}]}], "]"}]], "Input"]
+}]

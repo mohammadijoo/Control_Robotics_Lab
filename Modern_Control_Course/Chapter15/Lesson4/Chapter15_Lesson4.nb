@@ -1,0 +1,52 @@
+(* Chapter15_Lesson4.nb *)
+(* Condition Numbers and Sensitivity in State Reconstruction *)
+(* This notebook-style Wolfram Language code computes a finite-horizon
+   observability Gramian and reconstructs the initial state. *)
+
+ClearAll["Global`*"];
+
+epsSensor = 0.02;
+A = {{-1., 0.}, {0., -2.}};
+Cmat = {{1., epsSensor}};
+T = 5.;
+nSteps = 4000;
+dt = T/nSteps;
+
+x0True = {1., -1.5};
+
+phi[t_] := MatrixExp[A t];
+h[t_] := Cmat . phi[t];
+
+yClean[t_] := First[h[t] . x0True];
+yNoisy[t_] := yClean[t] + 10^-3 Sin[37 t];
+
+W = Sum[
+   Transpose[h[(k + 1/2) dt]] . h[(k + 1/2) dt] dt,
+   {k, 0, nSteps - 1}
+];
+
+b = Sum[
+   Flatten[Transpose[h[(k + 1/2) dt]] yNoisy[(k + 1/2) dt] dt],
+   {k, 0, nSteps - 1}
+];
+
+W = (W + Transpose[W])/2;
+
+x0Hat = LinearSolve[W, b];
+alpha = 10^-5;
+x0Ridge = LinearSolve[W + alpha IdentityMatrix[2], b];
+
+eigs = Eigenvalues[W];
+kappa = Max[eigs]/Min[eigs];
+
+Print["Finite-horizon observability Gramian W_o(T):"];
+Print[MatrixForm[W]];
+Print["Eigenvalues = ", eigs];
+Print["Condition number = ", kappa];
+Print["True x0 = ", x0True];
+Print["Least-squares estimate = ", x0Hat];
+Print["Ridge estimate = ", x0Ridge];
+
+(* Optional symbolic diagonal formula for A=diag(a1,a2), C={c1,c2}:
+   W_ij(T) = c_i c_j (Exp[(a_i+a_j) T] - 1)/(a_i+a_j)
+   when a_i + a_j != 0. *)

@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Example: (s+1)/((s+1)(s+2)) = 1/(s+2) *)\ns = I*0; (* just to avoid symbol warnings in some contexts *)\n\nGnon = TransferFunctionModel[{ { {1, 1} } }, s] /;\n  True; (* placeholder; we'll define explicitly below *)\n\n(* Define transfer functions using polynomials in p *)\np =.; (* clear *)\nGnon = TransferFunctionModel[(p + 1)/((p + 1) (p + 2)), p];\nGred = TransferFunctionModel[1/(p + 2), p];\n\n(* Convert to state space *)\nSSnon = StateSpaceModel[Gnon];\nSSred = StateSpaceModel[Gred];\n\n(* Minimal reduction *)\nSSnonMin = MinimalStateSpaceModel[SSnon];\n\n{StateDimension[SSnon], StateDimension[SSred], StateDimension[SSnonMin]}\n\n(* Compare transfer functions *)\nTransferFunctionModel[SSred] // Simplify\nTransferFunctionModel[SSnonMin] // Simplify\n\n(* Frequency response check at a few points *)\nfreqs = {0.01, 0.1, 1, 10, 100};\nTable[\n  {\n    w,\n    FrequencyResponse[SSred, I w][[1,1]],\n    FrequencyResponse[SSnonMin, I w][[1,1]]\n  },\n  {w, freqs}\n]\n      ", "Input"]
+},
+WindowTitle -> "Chapter6/Lesson5.html"
+]

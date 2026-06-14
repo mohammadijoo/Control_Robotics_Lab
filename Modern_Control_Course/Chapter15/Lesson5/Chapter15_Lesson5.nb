@@ -1,0 +1,38 @@
+(* Chapter15_Lesson5.nb *)
+Notebook[{
+Cell["Chapter 15 - Lesson 5: Duality with Controllability Gramian", "Title"],
+Cell["This Wolfram Mathematica notebook verifies that Wo(A,C) equals Wc(Transpose[A], Transpose[C]).", "Text"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", RowBox[{"{{", RowBox[{RowBox[{"-", "1"}], ",", "2"}], "},{", RowBox[{RowBox[{"-", "3"}], ",", RowBox[{"-", "4"}]}], "}}"}]}], ";",
+  RowBox[{"Cmat", "=", RowBox[{"{{", RowBox[{"1", ",", "0.5"}], "}}"}]}], ";",
+  RowBox[{"T", "=", "3"}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Wo", "=", RowBox[{"NIntegrate", "[",
+   RowBox[{
+    RowBox[{RowBox[{"Transpose", "[", RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "t"}], "]"}], "]"}],
+    ".", RowBox[{"Transpose", "[", "Cmat", "]"}], ".", "Cmat", ".",
+    RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "t"}], "]"}]}], ",",
+    RowBox[{"{", RowBox[{"t", ",", "0", ",", "T"}], "}"}]}], "]"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"WcDual", "=", RowBox[{"NIntegrate", "[",
+   RowBox[{
+    RowBox[{RowBox[{"MatrixExp", "[", RowBox[{RowBox[{"Transpose", "[", "A", "]"}], " ", "t"}], "]"}],
+    ".", RowBox[{"Transpose", "[", "Cmat", "]"}], ".", "Cmat", ".",
+    RowBox[{"Transpose", "[", RowBox[{"MatrixExp", "[", RowBox[{RowBox[{"Transpose", "[", "A", "]"}], " ", "t"}], "]"}], "]"}]}], ",",
+    RowBox[{"{", RowBox[{"t", ",", "0", ",", "T"}], "}"}]}], "]"}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixForm", "[", "Wo", "]"}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixForm", "[", "WcDual", "]"}]], "Input"],
+Cell[BoxData[RowBox[{"Norm", "[", RowBox[{"Wo", "-", "WcDual"}], "]"}]], "Input"],
+Cell["For infinite horizon, solve the continuous-time Lyapunov equations when A is Hurwitz.", "Text"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"WoInf", "=", RowBox[{"LyapunovSolve", "[", RowBox[{RowBox[{"Transpose", "[", "A", "]"}], ",", RowBox[{"-", RowBox[{"Transpose", "[", "Cmat", "]"}], ".", "Cmat"}]}], "]"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"WcDualInf", "=", RowBox[{"LyapunovSolve", "[", RowBox[{RowBox[{"Transpose", "[", "A", "]"}], ",", RowBox[{"-", RowBox[{"Transpose", "[", "Cmat", "]"}], ".", "Cmat"}]}], "]"}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixForm", "[", "WoInf", "]"}]], "Input"],
+Cell[BoxData[RowBox[{"Norm", "[", RowBox[{"WoInf", "-", "WcDualInf"}], "]"}]], "Input"]
+}]

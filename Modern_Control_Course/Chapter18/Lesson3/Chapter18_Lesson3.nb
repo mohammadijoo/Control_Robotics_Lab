@@ -1,0 +1,33 @@
+Notebook[{
+  Cell["Chapter18_Lesson3.nb", "Title"],
+  Cell["Dynamics Associated with Jordan Chains", "Section"],
+  Cell["This notebook computes exp((lambda I + N)t) using the finite nilpotent series and plots the Jordan-coordinate response.", "Text"],
+  Cell[BoxData @ ToBoxes[
+    Module[
+      {lambda = -0.40, n = 3, N, J, z0, eJt, z, t},
+      N = DiagonalMatrix[ConstantArray[1, n - 1], 1];
+      J = lambda IdentityMatrix[n] + N;
+      z0 = {1.0, -0.5, 2.0};
+
+      eJt[tt_] := Exp[lambda tt] Sum[(tt^k/Factorial[k]) MatrixPower[N, k], {k, 0, n - 1}];
+      z[tt_] := eJt[tt].z0;
+
+      Print["Jordan block J ="];
+      Print[MatrixForm[J]];
+
+      Print["exp(Jt) from nilpotent formula at t = 2:"];
+      Print[MatrixForm[eJt[2.0]]];
+
+      Print["Difference from MatrixExp[J*2]:"];
+      Print[Norm[eJt[2.0] - MatrixExp[J*2.0], Infinity]];
+
+      Plot[
+        Evaluate[Table[z[t][[i]], {i, 1, n}]],
+        {t, 0, 12},
+        PlotLegends -> {"z1(t)", "z2(t)", "z3(t)"},
+        AxesLabel -> {"time t", "Jordan-coordinate state"},
+        PlotLabel -> "Jordan-chain dynamics: polynomial-exponential terms"
+      ]
+    ]
+  ], "Input"]
+}]

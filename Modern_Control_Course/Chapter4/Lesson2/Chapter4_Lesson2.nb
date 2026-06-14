@@ -1,0 +1,5 @@
+Notebook[{
+Cell["A = { {0, 1}, {-2, -3} };\nB = { {0}, {1} };\nC = { {1, 0} };\nD = { {0} };\n\nsys = StateSpaceModel[{A, B, C, D}];\n\n(* Step input u(t)=1, initial state x(0)={0.5,0} *)\ntmax = 5;\nx0 = {0.5, 0.0};\n\ny[t_] := OutputResponse[sys, 1, {t, 0, tmax}, x0][[1]];\n\n(* Sample output over time *)\nts = Subdivide[0, tmax, 1000];\nys = y /@ ts;\n\n{ts[[1]], ys[[1]], ts[[-1]], ys[[-1]]}\n      ", "Input"]
+},
+WindowTitle -> "Chapter4/Lesson2.html"
+]

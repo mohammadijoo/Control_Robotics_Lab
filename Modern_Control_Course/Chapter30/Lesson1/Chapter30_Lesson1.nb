@@ -1,0 +1,11 @@
+Notebook[{
+ Cell["Chapter30_Lesson1.nb", "Title"],
+ Cell["Descriptor (Singular) Systems: E xdot = A x + B u", "Subtitle"],
+ Cell["This notebook computes generalized eigenvalues, performs index-1 reduction, and simulates the reduced ODE.", "Text"],
+ Cell["E = DiagonalMatrix[{1, 1, 0}];\nA = {{0, 1, 0}, {-2, -3, 1}, {1, 0, 1}};\nB = {{0}, {1}, {-1}};", "Input"],
+ Cell["generalizedEigenvalues = Eigenvalues[{A, E}]", "Input"],
+ Cell["A11 = A[[1 ;; 2, 1 ;; 2]];\nA12 = A[[1 ;; 2, 3 ;; 3]];\nA21 = A[[3 ;; 3, 1 ;; 2]];\nA22 = A[[3 ;; 3, 3 ;; 3]];\nB1 = B[[1 ;; 2]];\nB2 = B[[3 ;; 3]];\nAr = A11 - A12 . Inverse[A22] . A21;\nBr = B1 - A12 . Inverse[A22] . B2;\n{Ar, Br, Eigenvalues[Ar]}", "Input"],
+ Cell["u[t_] := Piecewise[{{0, t < 1}, {1, t >= 1}}];\nsol = NDSolveValue[{x1'[t] == x2[t], x2'[t] == -3 x1[t] - 3 x2[t] + 2 u[t], x1[0] == 0.2, x2[0] == 0}, {x1, x2}, {t, 0, 8}];", "Input"],
+ Cell["x3[t_] := -sol[[1]][t] + u[t];\nPlot[Evaluate[{sol[[1]][t], sol[[2]][t], x3[t]}], {t, 0, 8}, PlotLegends -> {\"x1 differential\", \"x2 differential\", \"x3 algebraic\"}, GridLines -> Automatic]", "Input"],
+ Cell["constraintResidual[t_] := sol[[1]][t] + x3[t] - u[t];\nMax[Abs[constraintResidual /@ Subdivide[0, 8, 100]]]", "Input"]
+}]

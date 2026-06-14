@@ -1,0 +1,44 @@
+(* Chapter22_Lesson3.nb *)
+(* State Feedback vs Output Feedback (Concept Only) *)
+
+A = {{0, 1}, {-2, -0.4}};
+B = {{0}, {1}};
+Cfull = IdentityMatrix[2];
+Cposition = {{1, 0}};
+
+K = {{4, 2.6}};
+Astate = A - B.K;
+
+Fposition = {{4}};
+AoutputPosition = A - B.Fposition.Cposition;
+
+Ffull = K;
+AoutputFull = A - B.Ffull.Cfull;
+
+cases = {
+  {"open loop", A},
+  {"state feedback", Astate},
+  {"position output feedback", AoutputPosition},
+  {"full output feedback", AoutputFull}
+};
+
+summary = Table[
+  {
+    cases[[i, 1]],
+    MatrixForm[cases[[i, 2]]],
+    Eigenvalues[cases[[i, 2]]],
+    And @@ Thread[Re[Eigenvalues[cases[[i, 2]]]] < 0]
+  },
+  {i, Length[cases]}
+];
+
+Grid[Prepend[summary, {"case", "matrix", "eigenvalues", "stable?"}], Frame -> All]
+
+rankC = MatrixRank[Cposition];
+rankAugmented = MatrixRank[Join[Cposition, K]];
+implementable = rankAugmented == rankC;
+
+Fls = K.Transpose[Cposition].PseudoInverse[Cposition.Transpose[Cposition]];
+Kprojected = Fls.Cposition;
+
+{rankC, rankAugmented, implementable, Fls, Kprojected}

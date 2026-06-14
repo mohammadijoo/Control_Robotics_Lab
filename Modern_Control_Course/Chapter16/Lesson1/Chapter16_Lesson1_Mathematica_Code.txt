@@ -1,0 +1,26 @@
+(* Chapter16_Lesson1.nb *)
+(* Companion Matrix and Controllable Canonical Form *)
+
+a = {2, 3, 4};  (* a0, a1, a2 *)
+b = {5, 6, 7};  (* b0, b1, b2 *)
+n = Length[a];
+
+A = ConstantArray[0, {n, n}];
+Do[A[[i, i + 1]] = 1, {i, 1, n - 1}];
+A[[n, All]] = -a;
+
+B = UnitVector[n, n];
+Cmat = {b};
+Dmat = {{0}};
+
+Qc = Transpose[Table[MatrixPower[A, k].B, {k, 0, n - 1}]];
+detQc = Det[Qc];
+
+s = Symbol["s"];
+G = FullSimplify[(Cmat . Inverse[s IdentityMatrix[n] - A] . B)[[1]]];
+den = s^n + Sum[a[[k]] s^(k - 1), {k, 1, n}];
+num = Sum[b[[k]] s^(k - 1), {k, 1, n}];
+
+{MatrixForm[A], MatrixForm[B], MatrixForm[Cmat], MatrixForm[Qc], detQc}
+FullSimplify[G == num/den]
+G

@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Example 1: m y'' + c y' + k y = u *)\nm = 2.0; c = 3.0; k = 5.0;\n\nA = { {0, 1}, {-k/m, -c/m} };\nB = { {0}, {1/m} };\n\n(* Outputs: y1 = y = x1, y2 = y'' = -(k/m)x1 -(c/m)x2 + (1/m)u *)\nC = { {1, 0}, {-k/m, -c/m} };\nD = { {0}, {1/m} };\n\nsys = StateSpaceModel[{A, B, C, D}];\nsys\n      ", "Input"]
+},
+WindowTitle -> "Chapter5/Lesson4.html"
+]

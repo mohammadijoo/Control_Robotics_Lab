@@ -1,0 +1,63 @@
+(* Chapter10_Lesson5.nb *)
+(* Modern Control - Chapter 10, Lesson 5 *)
+(* Examples of controllable and uncontrollable systems in Wolfram Mathematica. *)
+
+ClearAll[controllabilityMatrix, analyzeSystem];
+
+controllabilityMatrix[A_, B_] := Module[
+  {n = Length[A]},
+  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]
+];
+
+analyzeSystem[name_String, A_, B_] := Module[
+  {Ctr, r, n},
+  Ctr = controllabilityMatrix[A, B];
+  r = MatrixRank[Ctr];
+  n = Length[A];
+  Print["\n", name];
+  Print[StringRepeat["-", StringLength[name]]];
+  Print["Controllability matrix:"];
+  Print[MatrixForm[Ctr]];
+  Print["rank(C) = ", r, " out of n = ", n];
+  If[r == n, Print["Conclusion: controllable"], Print["Conclusion: uncontrollable"]];
+];
+
+(* Example 1: double integrator. *)
+A1 = {{0, 1}, {0, 0}};
+B1 = {{0}, {1}};
+analyzeSystem["Example 1: double integrator", A1, B1];
+
+(* Example 2: two decoupled masses, one actuator. *)
+A2 = {{0, 1, 0, 0},
+      {0, 0, 0, 0},
+      {0, 0, 0, 1},
+      {0, 0, 0, 0}};
+B2 = {{0}, {1}, {0}, {0}};
+analyzeSystem["Example 2: two decoupled masses, one actuator", A2, B2];
+
+(* Example 3: coupled two-mass oscillator. *)
+m1 = 1.0; m2 = 1.0;
+k1 = 1.0; k2 = 1.2; kc = 0.8;
+c1 = 0.1; c2 = 0.2;
+
+A3 = {{0, 1, 0, 0},
+      {-(k1 + kc)/m1, -c1/m1, kc/m1, 0},
+      {0, 0, 0, 1},
+      {kc/m2, 0, -(k2 + kc)/m2, -c2/m2}};
+B3 = {{0}, {1/m1}, {0}, {0}};
+analyzeSystem["Example 3: coupled two-mass oscillator", A3, B3];
+
+(* Example 4: diagonal modal systems. *)
+A4 = DiagonalMatrix[{-1, -2, -3}];
+B4a = {{1}, {1}, {1}};
+B4b = {{1}, {0}, {1}};
+
+analyzeSystem["Example 4a: diagonal system, all modes actuated", A4, B4a];
+analyzeSystem["Example 4b: diagonal system, middle mode not actuated", A4, B4b];
+
+(* Symbolic diagonal modal determinant: if lambdas are distinct and all b_i are nonzero,
+   the controllability matrix has full rank. *)
+A3sym = DiagonalMatrix[{\[Lambda]1, \[Lambda]2, \[Lambda]3}];
+B3sym = {{b1}, {b2}, {b3}};
+Ctr3sym = controllabilityMatrix[A3sym, B3sym];
+FullSimplify[Det[Ctr3sym]]

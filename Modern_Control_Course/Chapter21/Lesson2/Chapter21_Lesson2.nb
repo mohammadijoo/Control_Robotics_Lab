@@ -1,0 +1,7 @@
+Notebook[{
+Cell["Chapter 21 - Lesson 2: Computation of Zeros from (A, B, C, D)", "Title"],
+Cell["This notebook computes transmission / invariant zeros from a state-space realization using both transfer-function and Rosenbrock-pencil viewpoints.", "Text"],
+Cell[BoxData["ClearAll[\"Global`*\"]\nA = {{0, 1}, {-2, -3}};\nB = {{0}, {1}};\nCmat = {{4, 1}};\nDmat = {{0}};\nsys = StateSpaceModel[{A, B, Cmat, Dmat}];\ntf = TransferFunctionModel[sys, s];\nTransferFunctionZeros[tf]"], "Input"],
+Cell[BoxData["n = Length[A];\nm = Dimensions[B][[2]];\np = Dimensions[Cmat][[1]];\nEpen = ArrayFlatten[{{IdentityMatrix[n], ConstantArray[0, {n, m}]}, {ConstantArray[0, {p, n}], ConstantArray[0, {p, m}]}}];\nMpen = ArrayFlatten[{{A, B}, {-Cmat, -Dmat}}];\nallGeneralizedEigenvalues = Eigenvalues[{Mpen, Epen}];\nfiniteZeros = Select[allGeneralizedEigenvalues, NumberQ[N[#]] && Abs[N[#]] < 10^12 &];\nfiniteZeros"], "Input"],
+Cell[BoxData["D2 = {{1}};\nAz = A - B . Inverse[D2] . Cmat;\nEigenvalues[Az]"], "Input"]
+}]

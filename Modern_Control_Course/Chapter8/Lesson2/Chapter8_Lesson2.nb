@@ -1,0 +1,22 @@
+Notebook[{
+Cell["Chapter8_Lesson2.nb", "Title"],
+Cell["Modern Control — Chapter 8, Lesson 2: Semigroup Property and Inverse of Phi(t)", "Subtitle"],
+Cell[BoxData[
+ RowBox[{"A", "=", RowBox[{"{{", RowBox[{RowBox[{"0", ",", "1"}], ",", RowBox[{RowBox[{"-", "4"}], ",", RowBox[{"-", "0.8"}]}]}], "}}"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{RowBox[{"t", "=", "0.7"}], ";", RowBox[{"s", "=", "1.3"}], ";", RowBox[{"x0", "=", RowBox[{"{", RowBox[{"1", ",", RowBox[{"-", "0.25"}]}], "}"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{RowBox[{"Phi", "[", "tau_", "]"}], ":=", RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "tau"}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{RowBox[{"PhiT", "=", RowBox[{"Phi", "[", "t", "]"}]}], ";", RowBox[{"PhiS", "=", RowBox[{"Phi", "[", "s", "]"}]}], ";", RowBox[{"PhiTS", "=", RowBox[{"Phi", "[", RowBox[{"t", "+", "s"}], "]"}]}], ";", RowBox[{"PhiMinusT", "=", RowBox[{"Phi", "[", RowBox[{"-", "t"}], "]"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{"semigroupError", "=", RowBox[{"Norm", "[", RowBox[{"PhiTS", "-", RowBox[{"PhiT", ".", "PhiS"}]}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{"inverseError", "=", RowBox[{"Norm", "[", RowBox[{RowBox[{"Inverse", "[", "PhiT", "]"}], "-", "PhiMinusT"}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{"identityError", "=", RowBox[{"Norm", "[", RowBox[{RowBox[{"PhiT", ".", "PhiMinusT"}], "-", RowBox[{"IdentityMatrix", "[", "2", "]"}]}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{"stateError", "=", RowBox[{"Norm", "[", RowBox[{RowBox[{"PhiTS", ".", "x0"}], "-", RowBox[{"PhiT", ".", RowBox[{"(", RowBox[{"PhiS", ".", "x0"}], ")"}]}]}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{"{", RowBox[{"semigroupError", ",", "inverseError", ",", "identityError", ",", "stateError"}], "}"}]], "Input"]
+}]

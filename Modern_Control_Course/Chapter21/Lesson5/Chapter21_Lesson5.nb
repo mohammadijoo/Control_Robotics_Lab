@@ -1,0 +1,8 @@
+Notebook[{
+Cell["Chapter21_Lesson5.nb\nImpact of zeros on achievable performance and limitations", "Title"],
+Cell[BoxData["ClearAll[s, t, k, z];"], "Input"],
+Cell[BoxData["gmin = TransferFunctionModel[6 (s + 1)/(s^2 + 5 s + 6), s];\ngnmp = TransferFunctionModel[6 (1 - s)/(s^2 + 5 s + 6), s];"], "Input"],
+Cell[BoxData["Print[\"Minimum-phase zeros: \", TransferFunctionZeros[gmin]];\nPrint[\"Non-minimum-phase zeros: \", TransferFunctionZeros[gnmp]];\nPrint[\"Common poles: \", TransferFunctionPoles[gnmp]];"], "Input"],
+Cell[BoxData["resp = OutputResponse[{gmin, gnmp}, UnitStep[t], {t, 0, 8}];\nPlot[Evaluate[resp], {t, 0, 8}, PlotLegends -> {\"zero at -1\", \"zero at +1\"}, GridLines -> Automatic, PlotLabel -> \"RHP zero inverse response\"]"], "Input"],
+Cell[BoxData["gNmpExpr = 6 (1 - s)/(s^2 + 5 s + 6);\nsensitivity[kk_] := 1/(1 + kk gNmpExpr);\ncomplementary[kk_] := kk gNmpExpr/(1 + kk gNmpExpr);\nz = 1;\nTable[{kk, sensitivity[kk] /. s -> z, complementary[kk] /. s -> z}, {kk, {0.5, 2, 10, 100}}]"], "Input"]
+}]

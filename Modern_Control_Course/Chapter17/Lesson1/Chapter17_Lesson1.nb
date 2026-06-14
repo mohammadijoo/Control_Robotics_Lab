@@ -1,0 +1,59 @@
+(* Chapter17_Lesson1.nb *)
+
+ClearAll[observableCanonicalForm, observabilityMatrix, s];
+
+observableCanonicalForm[denInput_List, numInput_List] := Module[
+  {den = N[denInput], num = N[numInput], n, numPad, d, remainder, ao, bo, co},
+
+  If[Abs[den[[1]]] < 10^-14,
+    Print["Denominator leading coefficient must be nonzero."];
+    Return[$Failed];
+  ];
+
+  num = num/den[[1]];
+  den = den/den[[1]];
+  n = Length[den] - 1;
+
+  If[Length[num] > n + 1,
+    Print["Expected a proper transfer function."];
+    Return[$Failed];
+  ];
+
+  numPad = Join[ConstantArray[0, n + 1 - Length[num]], num];
+  d = numPad[[1]];
+  remainder = numPad - d den;
+
+  ao = ConstantArray[0, {n, n}];
+  Do[ao[[i, i - 1]] = 1, {i, 2, n}];
+  Do[ao[[i, n]] = -den[[n - i + 2]], {i, 1, n}];
+
+  bo = Reverse[Rest[remainder]];
+  co = ConstantArray[0, n];
+  co[[n]] = 1;
+
+  {ao, bo, co, d}
+];
+
+observabilityMatrix[a_, c_] := Module[{n = Length[a]},
+  Table[c . MatrixPower[a, k], {k, 0, n - 1}]
+];
+
+den = {1, 4, 6, 8};
+num = {2, 5, 3};
+
+{Ao, Bo, Co, DoFeed} = observableCanonicalForm[den, num];
+
+Print["Ao = "]; MatrixForm[Ao]
+Print["Bo = "]; MatrixForm[Bo]
+Print["Co = "]; MatrixForm[Co]
+Print["Do = ", DoFeed]
+
+Oo = observabilityMatrix[Ao, Co];
+Print["Observability matrix rank = ", MatrixRank[Oo]];
+
+gState = Co . Inverse[s IdentityMatrix[Length[Ao]] - Ao] . Bo + DoFeed // Simplify;
+gPoly = (2 s^2 + 5 s + 3)/(s^3 + 4 s^2 + 6 s + 8);
+
+Print["G_state(s) = ", gState // Simplify];
+Print["G_poly(s)  = ", gPoly];
+Print["Difference = ", Simplify[gState - gPoly]];

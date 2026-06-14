@@ -1,0 +1,64 @@
+Notebook[{
+    Cell["Chapter9_Lesson1.nb", "Title"],
+    Cell["Modern Control — Chapter 9, Lesson 1: Stability, Asymptotic Stability, and Instability", "Subtitle"],
+    Cell[BoxData[
+        RowBox[{
+            RowBox[{"ClearAll", "[", "\"Global`*\"", "]"}], ";"}]], "Input"],
+    Cell[BoxData[
+        RowBox[{
+            RowBox[{"AStable", "=", RowBox[{"{{", RowBox[{
+                RowBox[{"-", "1"}], ",", "2", "},", "{", RowBox[{
+                RowBox[{"-", "3"}], ",", RowBox[{"-", "2"}]}], "}}"}]}], ";"}]], "Input"],
+    Cell[BoxData[
+        RowBox[{
+            RowBox[{"ACenter", "=", RowBox[{"{{", RowBox[{
+                "0", ",", "1", "},", "{", RowBox[{
+                RowBox[{"-", "1"}], ",", "0"}], "}}"}]}], ";"}]], "Input"],
+    Cell[BoxData[
+        RowBox[{
+            RowBox[{"AUnstable", "=", RowBox[{"{{", RowBox[{
+                "0.2", ",", "1", "},", "{", RowBox[{
+                "0", ",", RowBox[{"-", "1"}]}], "}}"}]}], ";"}]], "Input"],
+    Cell[BoxData[
+        RowBox[{
+            RowBox[{"x0", "=", RowBox[{"{", RowBox[{"1", ",", RowBox[{"-", "0.5"}]}], "}"}]}], ";"}]], "Input"],
+    Cell[BoxData[
+        RowBox[{
+            RowBox[{"classify", "[", "A_", "]"}], ":=", RowBox[{"Module", "[",
+                RowBox[{
+                    RowBox[{"{", RowBox[{"lam", ",", "alpha", ",", "tol"}], "}"}], ",",
+                    RowBox[{
+                        RowBox[{"tol", "=", RowBox[{"10", "^", RowBox[{"-", "10"}]}]}], ";",
+                        RowBox[{"lam", "=", RowBox[{"Eigenvalues", "[", "A", "]"}]}], ";",
+                        RowBox[{"alpha", "=", RowBox[{"Max", "[", RowBox[{"Re", "[", "lam", "]"}], "]"}]}], ";",
+                        RowBox[{"Which", "[",
+                            RowBox[{
+                                RowBox[{"alpha", "<", RowBox[{"-", "tol"}]}], ",", "\"asymptotically stable\"", ",",
+                                RowBox[{"alpha", ">", "tol"}], ",", "\"unstable\"", ",",
+                                "True", ",", "\"marginal-candidate: inspect Jordan structure\""}], "]"}]}]}], "]"}]}]], "Input"],
+    Cell[BoxData[
+        RowBox[{
+            RowBox[{"trajectory", "[", RowBox[{"A_", ",", "t_"}], "]"}], ":=",
+            RowBox[{RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "t"}], "]"}], ".", "x0"}]}]], "Input"],
+    Cell[BoxData[
+        RowBox[{"Table", "[",
+            RowBox[{
+                RowBox[{"{", RowBox[{"name", ",", RowBox[{"Eigenvalues", "[", "A", "]"}], ",", RowBox[{"classify", "[", "A", "]"}], ",", RowBox[{"Norm", "[", RowBox[{"trajectory", "[", RowBox[{"A", ",", "10"}], "]"}], "]"}]}], "}"}], ",",
+                RowBox[{"{", RowBox[{"{", RowBox[{"name", ",", "A"}], "}", ",",
+                    RowBox[{"{", RowBox[{
+                        RowBox[{"{", RowBox[{"\"Stable spiral\"", ",", "AStable"}], "}"}], ",",
+                        RowBox[{"{", RowBox[{"\"Marginal center\"", ",", "ACenter"}], "}"}], ",",
+                        RowBox[{"{", RowBox[{"\"Unstable\"", ",", "AUnstable"}], "}"}]}], "}"}]}], "}"}]}], "]"}]], "Input"],
+    Cell[BoxData[
+        RowBox[{"Plot", "[",
+            RowBox[{
+                RowBox[{"Evaluate", "[", RowBox[{"{",
+                    RowBox[{
+                        RowBox[{"Norm", "[", RowBox[{"trajectory", "[", RowBox[{"AStable", ",", "t"}], "]"}], "]"}], ",",
+                        RowBox[{"Norm", "[", RowBox[{"trajectory", "[", RowBox[{"ACenter", ",", "t"}], "]"}], "]"}], ",",
+                        RowBox[{"Norm", "[", RowBox[{"trajectory", "[", RowBox[{"AUnstable", ",", "t"}], "]"}], "]"}]}],
+                    "}"}], "]"}], ",",
+                RowBox[{"{", RowBox[{"t", ",", "0", ",", "10"}], "}"}], ",",
+                RowBox[{"PlotLegends", "->", RowBox[{"{", RowBox[{"\"stable\"", ",", "\"center\"", ",", "\"unstable\""}], "}"}]}], ",",
+                RowBox[{"AxesLabel", "->", RowBox[{"{", RowBox[{"\"t\"", ",", "\"||x(t)||\""}], "}"}]}]}], "]"}]], "Input"]
+}]

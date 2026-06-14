@@ -1,0 +1,5 @@
+Notebook[{
+Cell["A = { {1, 2, 3, 1},\n     {2, 4, 6, 2},\n     {1, 1, 1, 0} };\n\nr = MatrixRank[A];\nns = NullSpace[A];\n\nPrint[\"rank(A) = \", r];\nPrint[\"nullity(A) = \", Length[ns]];\nPrint[\"rank + nullity = \", r + Length[ns], \" (should be n = \", Length[A[[1]]], \")\"];\n\n(* Verification *)\nres = A.# & /@ ns;\nPrint[\"A * v_i (each) = \", res];\n\n(* Row reduction *)\nrr = RowReduce[A];\nPrint[\"RowReduce(A) = \", rr];", "Input"]
+},
+WindowTitle -> "Chapter3/Lesson1.html"
+]

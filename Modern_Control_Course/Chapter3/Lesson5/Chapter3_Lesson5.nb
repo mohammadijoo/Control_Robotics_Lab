@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Time-varying linear system: x'(t) = A(t) x(t) + b(t) *)\nA[t_] := { {0, 1}, {-2 - 0.5 Sin[t], -0.4} };\nb[t_] := {0, Cos[2 t]};\n\neqns = {\n  x1'[t] == A[t][[1,1]] x1[t] + A[t][[1,2]] x2[t] + b[t][[1]],\n  x2'[t] == A[t][[2,1]] x1[t] + A[t][[2,2]] x2[t] + b[t][[2]],\n  x1[0] == 1, x2[0] == 0\n};\n\nsol = NDSolve[eqns, {x1, x2}, {t, 0, 8}, WorkingPrecision -> 40][[1]];\n{x1[8], x2[8]} /. sol\n\n(* LTI case (constant A) via MatrixExp *)\nA0 = { {0, 1}, {-2, -0.4} };\nx0 = {1, 0};\nMatrixExp[A0*8].x0\n      ", "Input"]
+},
+WindowTitle -> "Chapter3/Lesson5.html"
+]

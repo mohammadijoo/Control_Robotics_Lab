@@ -1,0 +1,41 @@
+(* Chapter8_Lesson1.nb
+   Modern Control — Chapter 8, Lesson 1: Definition of the State Transition Matrix
+
+   Note: This file is provided as Wolfram Language code in a .nb container.
+   You may open it as text, or paste its contents into a Mathematica notebook.
+*)
+
+ClearAll["Global`*"];
+
+A  = {{0, 1}, {-2, -3}};
+t0 = 0;
+t1 = 1.25;
+x0 = {1, -0.5};
+
+(* State transition matrix for LTI system x'(t) = A x(t) *)
+Phi[t_] := MatrixExp[A (t - t0)];
+
+xAnalytic = Phi[t1].x0;
+
+Print["A = ", MatrixForm[A]];
+Print["Phi(t1,t0) = ", MatrixForm[Phi[t1]]];
+Print["x_analytic = ", xAnalytic];
+
+(* Verify defining ODE: d/dt Phi(t) = A Phi(t) *)
+PhiDot[t_] := D[Phi[tt], tt] /. tt -> t;
+residual = Simplify[PhiDot[t1] - A.Phi[t1]];
+Print["PhiDot(t1) - A Phi(t1) = ", MatrixForm[residual]];
+
+(* Numerical check using NDSolve *)
+sol = NDSolveValue[{x'[t] == A.x[t], x[t0] == x0}, x, {t, t0, t1},
+  AccuracyGoal -> 15, PrecisionGoal -> 15, Method -> "StiffnessSwitching"];
+
+xNumeric = sol[t1];
+Print["x_numeric = ", xNumeric];
+Print["||x_analytic - x_numeric||_2 = ", Norm[xAnalytic - xNumeric, 2]];
+
+(* Small-time approximation: Phi(t0 + h) ≈ I + A h *)
+h = 10^-4;
+approx = IdentityMatrix[2] + A h;
+err = Norm[Phi[t0 + h] - approx, "Frobenius"];
+Print["||Phi(t0+h) - (I + A h)||_F = ", N[err]];

@@ -1,0 +1,69 @@
+(* Chapter16_Lesson2.nb *)
+
+(* Construction of Controllable Canonical Form (CCF) from SISO transfer-function data. *)
+
+ClearAll[TrimLeadingZeros, ControllableCanonicalForm];
+
+TrimLeadingZeros[c_List, tol_: 10^-12] := Module[{i = 1},
+  If[Length[c] == 0, Print["Coefficient vector cannot be empty."]; Abort[]];
+  While[i < Length[c] && Abs[c[[i]]] < tol, i++];
+  c[[i ;;]]
+];
+
+ControllableCanonicalForm[numIn_List, denIn_List] := Module[
+  {num, den, leading, n, numFull, dFeed, rem, A, B, C},
+
+  num = TrimLeadingZeros[N[numIn]];
+  den = TrimLeadingZeros[N[denIn]];
+
+  If[Abs[den[[1]]] < 10^-12,
+    Print["Leading denominator coefficient must be nonzero."];
+    Abort[];
+  ];
+
+  leading = den[[1]];
+  den = den/leading;
+  num = num/leading;
+
+  n = Length[den] - 1;
+  If[n < 1, Print["Denominator degree must be at least one."]; Abort[]];
+  If[Length[num] > n + 1,
+    Print["Improper transfer function: numerator degree exceeds denominator degree."];
+    Abort[];
+  ];
+
+  numFull = ConstantArray[0, n + 1];
+  numFull[[-Length[num] ;;]] = num;
+
+  dFeed = numFull[[1]];
+  rem = numFull - dFeed den;
+
+  A = ConstantArray[0, {n, n}];
+  Do[A[[i, i + 1]] = 1, {i, 1, n - 1}];
+  A[[n, All]] = -Reverse[den[[2 ;;]]];
+
+  B = ConstantArray[0, {n, 1}];
+  B[[n, 1]] = 1;
+
+  C = {Reverse[rem[[2 ;;]]]};
+
+  <|"A" -> A, "B" -> B, "C" -> C, "D" -> {{dFeed}}|>
+];
+
+(* Example:
+   G(s) = (2 s^2 + 5 s + 3)/(s^3 + 4 s^2 + 6 s + 8)
+*)
+num = {2, 5, 3};
+den = {1, 4, 6, 8};
+
+ss = ControllableCanonicalForm[num, den];
+
+MatrixForm[ss["A"]]
+MatrixForm[ss["B"]]
+MatrixForm[ss["C"]]
+MatrixForm[ss["D"]]
+
+(* Symbolic verification for this example *)
+s = Symbol["s"];
+Gss = ss["C"].Inverse[s IdentityMatrix[Length[ss["A"]]] - ss["A"]].ss["B"] + ss["D"];
+FullSimplify[Gss[[1, 1]]]

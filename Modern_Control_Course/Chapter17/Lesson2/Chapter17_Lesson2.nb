@@ -1,0 +1,34 @@
+Notebook[{
+Cell["Chapter 17 - Lesson 2: Relationship Between CCF and OCF", "Title"],
+Cell["This notebook constructs CCF, obtains OCF by transposition, and verifies the transfer-function equality.", "Text"],
+Cell[BoxData@ToBoxes[
+ClearAll["Global`*"];
+den = {1, 4, 6, 4};
+num = {2, 5, 3};
+n = Length[den] - 1;
+a = Reverse[Rest[den]];
+b = Reverse[PadLeft[num, n]];
+Ac = Join[ArrayFlatten[{{ConstantArray[0, {n - 1, 1}], IdentityMatrix[n - 1]}}], {-a}];
+Bc = Transpose[{Join[ConstantArray[0, n - 1], {1}]}];
+Cc = {b};
+Dc = {{0}};
+Ao = Transpose[Ac];
+Bo = Transpose[Cc];
+Co = Transpose[Bc];
+Do = Dc;
+controllabilityMatrix[A_, B_] := ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}];
+observabilityMatrix[A_, C_] := Join @@ Table[C.MatrixPower[A, k], {k, 0, n - 1}];
+Qc = controllabilityMatrix[Ac, Bc];
+Oo = observabilityMatrix[Ao, Co];
+{MatrixRank[Qc], MatrixRank[Oo], Norm[Oo - Transpose[Qc], "Frobenius"]}
+], "Input"],
+Cell[BoxData@ToBoxes[
+s =.; 
+Gc = Simplify[Cc.Inverse[s IdentityMatrix[n] - Ac].Bc + Dc][[1, 1]];
+Go = Simplify[Co.Inverse[s IdentityMatrix[n] - Ao].Bo + Do][[1, 1]];
+{Gc, Go, Simplify[Gc - Go]}
+], "Input"],
+Cell[BoxData@ToBoxes[
+{StateSpaceModel[{Ac, Bc, Cc, Dc}], StateSpaceModel[{Ao, Bo, Co, Do}]}
+], "Input"]
+}]

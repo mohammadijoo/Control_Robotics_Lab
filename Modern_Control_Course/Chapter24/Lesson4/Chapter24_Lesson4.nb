@@ -1,0 +1,38 @@
+(* Chapter24_Lesson4.nb *)
+(* Partial Pole Placement and Restricted Eigenstructure *)
+
+ClearAll["Global`*"];
+
+A = DiagonalMatrix[{0.2, 0.6, -0.5, -1.0}];
+B = {{1.0, 0.0}, {0.3, 1.0}, {0.2, 0.4}, {0.1, 0.2}};
+assignedLambdas = {-2.0, -3.0};
+G = {{1.0, 0.0}, {0.0, 1.0}};
+
+vFor[lambda_, g_] := LinearSolve[A - lambda IdentityMatrix[4], B.g];
+V = Transpose[{vFor[assignedLambdas[[1]], G[[All, 1]]],
+               vFor[assignedLambdas[[2]], G[[All, 2]]]}];
+
+Nkeep = {{0, 0}, {0, 0}, {1, 0}, {0, 1}};
+X = ArrayFlatten[{{V, Nkeep}}];
+Y = ArrayFlatten[{{G, ConstantArray[0, {2, 2}]}}];
+K = Y.Inverse[X];
+Acl = A - B.K;
+
+Print["K = ", MatrixForm[K]];
+Print["Closed-loop eigenvalues = ", Eigenvalues[Acl]];
+Print["Condition number of X = ", ConditionNumber[X]];
+Print["Assigned-mode residual = ", Norm[Acl.V - V.DiagonalMatrix[assignedLambdas]]];
+Print["Preservation residual = ", Norm[K.Nkeep]];
+
+(* Restricted eigenstructure: require x3 = x4 for lambda = -2. *)
+H = {{0, 0, 1, -1}};
+lambda = -2.0;
+M = LinearSolve[A - lambda IdentityMatrix[4], B];
+S = H.M;
+gRestricted = First[NullSpace[S]];
+vRestricted = M.gRestricted;
+
+Print["S = ", MatrixForm[S]];
+Print["Restricted g = ", gRestricted];
+Print["Restricted v = ", vRestricted];
+Print["H v = ", H.vRestricted];

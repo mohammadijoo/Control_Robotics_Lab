@@ -1,0 +1,5 @@
+Notebook[{
+Cell["ClearAll[\"Global`*\"];\n\nA = { {0, 1}, {-2, -3} };\nB = { {0}, {1} };\nC = { {2, 1} };\nD = { {0} };\n\n(* Similarity transform z = T x *)\nT  = { {1, 1}, {0, 1} };\nTi = Inverse[T];\n\nA2 = T.A.Ti;\nB2 = T.B;\nC2 = C.Ti;\nD2 = D;\n\n(* Transfer functions as symbolic rational expressions *)\nG[s_]  := Simplify[C.Inverse[s IdentityMatrix[2] - A].B + D];\nG2[s_] := Simplify[C2.Inverse[s IdentityMatrix[2] - A2].B2 + D2];\n\nSimplify[G[s] - G2[s]]\n(* Expected output: {{0}} *)\n\n(* Hidden-state augmentation check *)\nAh = {{-5}};\nAaug = ArrayFlatten[{ {A, ConstantArray[0, {2, 1}]},\n                    {ConstantArray[0, {1, 2}], Ah} }];\nBaug = ArrayFlatten[{ {B}, {{0}} }];\nCaug = ArrayFlatten[{ {C, {{0}}} }];\nDaug = D;\n\nGaug[s_] := Simplify[Caug.Inverse[s IdentityMatrix[3] - Aaug].Baug + Daug];\nSimplify[G[s] - Gaug[s]]\n(* Expected output: {{0}} *)\n      ", "Input"]
+},
+WindowTitle -> "Chapter6/Lesson3.html"
+]

@@ -1,0 +1,57 @@
+(* Chapter29_Lesson1.nb *)
+(* Wolfram Mathematica code for a linear time-varying state-space model. *)
+
+ClearAll["Global`*"];
+
+omega[t_] := 1.0 + 0.30 Sin[0.70 t];
+damping[t_] := 0.15 + 0.05 Cos[0.50 t];
+
+A[t_] := {{0, 1}, {-omega[t]^2, -2 damping[t] omega[t]}};
+B[t_] := {{0}, {1.0 + 0.20 Sin[0.30 t]}};
+Cmat[t_] := {{1.0 + 0.10 Sin[0.40 t], 0}};
+Dmat[t_] := {{0}};
+u[t_] := Sin[1.2 t];
+
+t0 = 0;
+tf = 20;
+x10 = 1;
+x20 = 0;
+
+sol = NDSolve[
+   {
+    x1'[t] == x2[t],
+    x2'[t] == -omega[t]^2 x1[t] - 2 damping[t] omega[t] x2[t] +
+      (1.0 + 0.20 Sin[0.30 t]) u[t],
+    x1[t0] == x10,
+    x2[t0] == x20
+    },
+   {x1, x2},
+   {t, t0, tf},
+   WorkingPrecision -> MachinePrecision
+   ];
+
+y[t_] := (Cmat[t].{{x1[t]}, {x2[t]}} + Dmat[t].{{u[t]}})[[1, 1]] /. sol[[1]];
+
+Plot[
+ Evaluate[{x1[t], x2[t], y[t]} /. sol[[1]]],
+ {t, t0, tf},
+ PlotLegends -> {"x1(t)", "x2(t)", "y(t)"},
+ AxesLabel -> {"time", "response"},
+ PlotLabel -> "Chapter 29 Lesson 1: LTV state-space response"
+ ]
+
+(* State-transition matrix Phi(t,t0): solve Phi_dot = A(t) Phi, Phi(t0,t0) = I. *)
+phiSol = NDSolve[
+   Flatten[
+    Join[
+     Table[Derivative[1, 0][phi][i, j][t] ==
+       Sum[A[t][[i, k]] phi[k, j][t], {k, 1, 2}], {i, 1, 2}, {j, 1, 2}],
+     Table[phi[i, j][t0] == KroneckerDelta[i, j], {i, 1, 2}, {j, 1, 2}]
+     ]
+    ],
+   Flatten[Table[phi[i, j], {i, 1, 2}, {j, 1, 2}]],
+   {t, t0, tf}
+   ];
+
+Phi[t_] := Table[phi[i, j][t], {i, 1, 2}, {j, 1, 2}] /. phiSol[[1]];
+MatrixForm[Phi[tf]]

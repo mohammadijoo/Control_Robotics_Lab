@@ -1,0 +1,44 @@
+Notebook[{
+ Cell["Chapter21_Lesson1.nb", "Title"],
+ Cell["Finite transmission zeros from the Rosenbrock system matrix.", "Text"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"A", "=", RowBox[{"{{", RowBox[{
+      RowBox[{"0", ",", "1"}], "}", ",", "{", RowBox[{
+      RowBox[{"-2", ",", "-3"}]}], "}}"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"B", "=", RowBox[{"{{", "0", "}", ",", "{", "1", "}}"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"Cmat", "=", RowBox[{"{{", RowBox[{"4", ",", "1"}], "}}"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"Dmat", "=", RowBox[{"{{", "0", "}}"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"R", "[", "s_", "]"}], ":=", RowBox[{"ArrayFlatten", "[", 
+    RowBox[{"{{", RowBox[{
+     RowBox[{RowBox[{"s", " ", RowBox[{"IdentityMatrix", "[", "2", "]"}]}], "-", "A"}], ",", RowBox[{"-", "B"}]}],
+     "}", ",", "{", RowBox[{"Cmat", ",", "Dmat"}], "}}"}], "]"}]}]], "Input"],
+ Cell[BoxData[
+  RowBox[{"MatrixForm", "[", RowBox[{"R", "[", "s", "]"}], "]"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{"zeroPolynomial", "=", RowBox[{"Factor", "[", RowBox[{"Det", "[", RowBox[{"R", "[", "s", "]"}], "]"}], "]"}]}]], "Input"],
+ Cell[BoxData[
+  RowBox[{"zeros", "=", RowBox[{"s", "/.", RowBox[{"Solve", "[", RowBox[{
+    RowBox[{"zeroPolynomial", "==", "0"}], ",", "s"}], "]"}]}]}]], "Input"],
+ Cell[BoxData[
+  RowBox[{"MatrixRank", "[", RowBox[{"R", "[", RowBox[{"-", "4"}], "]"}], "]"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{"NullSpace", "[", RowBox[{"R", "[", RowBox[{"-", "4"}], "]"}], "]"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"x0", "=", RowBox[{"{{", "1", "}", ",", "{", RowBox[{"-", "4"}], "}}"}]}], ";",
+   RowBox[{"u0", "=", RowBox[{"{{", "6", "}}"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{"Simplify", "[", RowBox[{
+   RowBox[{RowBox[{"-", "4"}], " ", "x0"}], "-", RowBox[{"A", ".", "x0"}], "-", RowBox[{"B", ".", "u0"}]}], "]"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{"Simplify", "[", RowBox[{RowBox[{"Cmat", ".", "x0"}], "+", RowBox[{"Dmat", ".", "u0"}]}], "]"}]], "Input"]
+}]

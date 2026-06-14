@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* System matrices *)\nA = { {0., 1.},\n     {-4., -2.} };\nB = { {1., 0.},\n     {0., 1.} };\nC = IdentityMatrix[2];\nD = { {0., 0.},\n     {0., 0.} };\n\n(* Build state-space model *)\nsys = StateSpaceModel[{A, B, C, D}];\n\n(* Response to a unit step in input 1, zero in input 2 *)\nu1[t_] := {UnitStep[t], 0.0};\nresp = OutputResponse[sys, u1, {t, 0, 10}];\n\nPlot[Evaluate[resp], {t, 0, 10},\n     PlotLegends -> {\"y1(t)\", \"y2(t)\"},\n     AxesLabel -> {\"t\", \"output\"}]\n      ", "Input"]
+},
+WindowTitle -> "Chapter1/Lesson4.html"
+]

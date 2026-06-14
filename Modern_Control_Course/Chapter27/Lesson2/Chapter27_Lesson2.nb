@@ -1,0 +1,37 @@
+(* Chapter27_Lesson2.nb *)
+(* Wolfram Mathematica input cells for feedforward gain design. *)
+
+ClearAll["Global`*"];
+
+A = {{0, 1}, {0, 0}};
+B = {{0}, {1}};
+Cmat = {{1, 0}};
+Dmat = {{0}};
+K = {{4, 4}};
+
+Acl = A - B.K;
+Ccl = Cmat - Dmat.K;
+
+(* Closed-loop DC-gain method: G0 = D - (C - D K).Inverse[A - B K].B *)
+G0 = Dmat - Ccl.Inverse[Acl].B;
+Ndc = Inverse[G0];
+
+(* Regulator-equation method. *)
+n = Length[A];
+p = Length[Cmat];
+Rosenbrock0 = ArrayFlatten[{{A, B}, {Cmat, Dmat}}];
+RHS = Join[ConstantArray[0, {n, p}], IdentityMatrix[p]];
+Sol = LinearSolve[Rosenbrock0, RHS];
+X = Sol[[1 ;; n, All]];
+U = Sol[[n + 1 ;; All, All]];
+Nreg = U + K.X;
+
+Print["Closed-loop eigenvalues = ", Eigenvalues[Acl]];
+Print["G0 = ", MatrixForm[G0]];
+Print["N from DC gain = ", MatrixForm[Ndc]];
+Print["N from regulator equations = ", MatrixForm[Nreg]];
+
+sys = StateSpaceModel[{Acl, B.Ndc, Ccl, Dmat.Ndc}];
+OutputResponse[sys, UnitStep[t], {t, 0, 6}]
+Plot[Evaluate[%], {t, 0, 6}, GridLines -> Automatic,
+     PlotLabel -> "Reference Tracking with Static Feedforward Gain"]

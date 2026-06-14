@@ -1,0 +1,5 @@
+Notebook[{
+Cell["A = { {0, 1}, {-2, -3} };\nB = { {0}, {1} };\nC = { {1, 1} };\nD = { {0} };\n\nsys = StateSpaceModel[{A, B, C, D}];\n\n(* Poles from A *)\nEigenvalues[A]\n\n(* Transfer function and its poles/zeros *)\ntf = TransferFunctionModel[sys, s];\ntf // Simplify\n\nSystemPoles[tf]\nSystemZeros[tf]\n\n(* Transmission / invariant zeros (state-space notion) *)\nInvariantZeros[sys]", "Input"]
+},
+WindowTitle -> "Chapter6/Lesson2.html"
+]

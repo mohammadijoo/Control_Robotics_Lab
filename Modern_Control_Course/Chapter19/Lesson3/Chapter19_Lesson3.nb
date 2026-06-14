@@ -1,0 +1,225 @@
+Notebook[{
+Cell["Chapter19_Lesson3.nb", "Title"],
+Cell["Kalman Decomposition: Block Structure of A, B, C", "Subtitle"],
+Cell["Block order: {controllable-observable, controllable-unobservable, uncontrollable-observable, uncontrollable-unobservable}.", "Text"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ClearAll", "[", "\"Global`*\"", "]"}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"controllabilityMatrix", "[", 
+   RowBox[{"A_", ",", "B_"}], "]"}], ":=", 
+  RowBox[{"ArrayFlatten", "[", 
+   RowBox[{"{", 
+    RowBox[{"Table", "[", 
+     RowBox[{
+      RowBox[{"MatrixPower", "[", 
+       RowBox[{"A", ",", "k"}], "]"}], ".", "B"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"k", ",", "0", ",", 
+        RowBox[{
+         RowBox[{"Length", "[", "A", "]"}], "-", "1"}]}], "}"}]}], "]"}], 
+    "}"}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"observabilityMatrix", "[", 
+   RowBox[{"A_", ",", "C_"}], "]"}], ":=", 
+  RowBox[{"Join", "@@", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"C", ".", 
+      RowBox[{"MatrixPower", "[", 
+       RowBox[{"A", ",", "k"}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"k", ",", "0", ",", 
+       RowBox[{
+        RowBox[{"Length", "[", "A", "]"}], "-", "1"}]}], "}"}]}], "]"}]}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"basisColumns", "[", "M_", "]"}], ":=", 
+  RowBox[{"Transpose", "[", 
+   RowBox[{"Orthogonalize", "[", 
+    RowBox[{"Transpose", "[", "M", "]"}], "]"}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"intersectionBasis", "[", 
+   RowBox[{"U_", ",", "V_"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"K", ",", "alpha", ",", "m"}], "}"}], ",", 
+    RowBox[{
+     RowBox[{"m", "=", 
+      RowBox[{"Dimensions", "[", "U", "]"}]}], ";", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"m", "[", 
+         RowBox[{"[", "2", "]"}], "]"}], "==", "0"}], ",", 
+       RowBox[{"Return", "[", 
+        RowBox[{"ConstantArray", "[", 
+         RowBox[{"0", ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"m", "[", 
+             RowBox[{"[", "1", "]"}], "]"}], ",", "0"}], "}"}]}], "]"}], 
+        "]"}]}], "]"}], ";", 
+     RowBox[{"K", "=", 
+      RowBox[{"NullSpace", "[", 
+       RowBox[{"Transpose", "[", 
+        RowBox[{"Join", "[", 
+         RowBox[{
+          RowBox[{"Transpose", "[", "U", "]"}], ",", 
+          RowBox[{"Transpose", "[", 
+           RowBox[{"-", "V"}], "]"}]}], "]"}], "]"}], "]"}]}], ";", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"K", "==", 
+        RowBox[{"{", "}"}]}], ",", 
+       RowBox[{"ConstantArray", "[", 
+        RowBox[{"0", ",", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"m", "[", 
+            RowBox[{"[", "1", "]"}], "]"}], ",", "0"}], "}"}]}], "]"}], ",", 
+       RowBox[{
+        RowBox[{"alpha", "=", 
+         RowBox[{"Transpose", "[", 
+          RowBox[{"K", "[", 
+           RowBox[{"[", 
+            RowBox[{"All", ",", 
+             RowBox[{"1", ";;", 
+              RowBox[{"m", "[", 
+               RowBox[{"[", "2", "]"}], "]"}]}]}], "]"}], "]"}], "]"}]}], ";", 
+        RowBox[{"basisColumns", "[", 
+         RowBox[{"U", ".", "alpha"}], "]"}]}]}], "]"}]}]}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"appendIndependent", "[", 
+   RowBox[{"current_", ",", "candidates_", ",", "target_"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"M", "=", "current", ",", "r", ",", "trial"}], "}"}], ",", 
+    RowBox[{
+     RowBox[{"r", "=", 
+      RowBox[{"MatrixRank", "[", "M", "]"}]}], ";", 
+     RowBox[{"Do", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"trial", "=", 
+         RowBox[{"Join", "[", 
+          RowBox[{"M", ",", 
+           RowBox[{"candidates", "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", 
+              RowBox[{"{", "j", "}"}]}], "]"}], "]"}], ",", "2"}], "]"}]}], ";", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"MatrixRank", "[", "trial", "]"}], ">", "r"}], ",", 
+          RowBox[{
+           RowBox[{"M", "=", "trial"}], ";", 
+           RowBox[{"r", "++"}], ";", 
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{"r", ">=", "target"}], ",", 
+             RowBox[{"Break", "[", "]"}]}], "]"}]}]}], "]"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"j", ",", 
+         RowBox[{"Dimensions", "[", "candidates", "]"}], "[", 
+         RowBox[{"[", "2", "]"}], "]"}], "}"}]}], "]"}], ";", "M"}]}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", 
+   RowBox[{"(", GridBox[{
+      {"-1.0", "0.0", "0.7", "0.0"},
+      {"0.2", "-2.0", "0.3", "-0.4"},
+      {"0.0", "0.0", "-3.0", "0.0"},
+      {"0.0", "0.0", "0.6", "-4.0"}
+     }], ")"}]}], ";", 
+  RowBox[{"B", "=", 
+   RowBox[{"(", GridBox[{{"1.0"}, {"0.5"}, {"0.0"}, {"0.0"}}], ")"}]}], ";", 
+  RowBox[{"Cmat", "=", 
+   RowBox[{"(", GridBox[{{"2.0", "0.0", "-1.0", "0.0"}}], ")"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"R", "=", 
+   RowBox[{"basisColumns", "[", 
+    RowBox[{"controllabilityMatrix", "[", 
+     RowBox[{"A", ",", "B"}], "]"}], "]"}]}], ";", 
+  RowBox[{"Nsub", "=", 
+   RowBox[{"Transpose", "[", 
+    RowBox[{"NullSpace", "[", 
+     RowBox[{"observabilityMatrix", "[", 
+      RowBox[{"A", ",", "Cmat"}], "]"}], "]"}], "]"}]}], ";", 
+  RowBox[{"V2", "=", 
+   RowBox[{"intersectionBasis", "[", 
+    RowBox[{"R", ",", "Nsub"}], "]"}]}], ";", 
+  RowBox[{"V1", "=", 
+   RowBox[{
+    RowBox[{"appendIndependent", "[", 
+     RowBox[{"V2", ",", "R", ",", 
+      RowBox[{"Dimensions", "[", "R", "]"}], "[", 
+      RowBox[{"[", "2", "]"}], "]"}], "]"}], "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Dimensions", "[", "V2", "]"}], "[", 
+        RowBox[{"[", "2", "]"}], "]"}], "+", "1"}], ";;"}], "]"}], "]"}]}], 
+  ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"V4", "=", 
+   RowBox[{
+    RowBox[{"appendIndependent", "[", 
+     RowBox[{"V2", ",", "Nsub", ",", 
+      RowBox[{"Dimensions", "[", "Nsub", "]"}], "[", 
+      RowBox[{"[", "2", "]"}], "]"}], "]"}], "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Dimensions", "[", "V2", "]"}], "[", 
+        RowBox[{"[", "2", "]"}], "]"}], "+", "1"}], ";;"}], "]"}], "]"}]}], 
+  ";", 
+  RowBox[{"V124", "=", 
+   RowBox[{"Join", "[", 
+    RowBox[{"V1", ",", "V2", ",", "V4", ",", "2"}], "]"}]}], ";", 
+  RowBox[{"completed", "=", 
+   RowBox[{"appendIndependent", "[", 
+    RowBox[{"V124", ",", 
+     RowBox[{"IdentityMatrix", "[", 
+      RowBox[{"Length", "[", "A", "]"}], "]"}], ",", 
+     RowBox[{"Length", "[", "A", "]"}]}], "]"}]}], ";", 
+  RowBox[{"V3", "=", 
+   RowBox[{"completed", "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Dimensions", "[", "V124", "]"}], "[", 
+        RowBox[{"[", "2", "]"}], "]"}], "+", "1"}], ";;"}], "]"}], "]"}]}], 
+  ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"T", "=", 
+   RowBox[{"Join", "[", 
+    RowBox[{"V1", ",", "V2", ",", "V3", ",", "V4", ",", "2"}], "]"}]}], ";", 
+  RowBox[{"Abar", "=", 
+   RowBox[{
+    RowBox[{"Inverse", "[", "T", "]"}], ".", "A", ".", "T"}]}], ";", 
+  RowBox[{"Bbar", "=", 
+   RowBox[{
+    RowBox[{"Inverse", "[", "T", "]"}], ".", "B"}]}], ";", 
+  RowBox[{"Cbar", "=", 
+   RowBox[{"Cmat", ".", "T"}]}], ";", 
+  RowBox[{"{", 
+   RowBox[{"MatrixForm", "[", "Abar", "]"}], ",", 
+    RowBox[{"MatrixForm", "[", "Bbar", "]"}], ",", 
+    RowBox[{"MatrixForm", "[", "Cbar", "]"}]}], "}"}]}]], "Input"]
+},
+WindowSize->{1200, 760},
+WindowTitle->"Chapter19_Lesson3.nb"
+]

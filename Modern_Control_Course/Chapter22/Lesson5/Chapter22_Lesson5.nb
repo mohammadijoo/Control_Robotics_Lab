@@ -1,0 +1,64 @@
+Notebook[{
+  Cell["Chapter22_Lesson5.nb", "Title"],
+  Cell["Practical Constraints and Limitations of State Feedback", "Subtitle"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"A", "=", "{{0,1},{0,0}}"}], ";",
+      RowBox[{"B", "=", "{{0},{1}}"}], ";",
+      RowBox[{"K", "=", "{{6,5}}"}], ";",
+      RowBox[{"umax", "=", "1.0"}], ";",
+      RowBox[{"maxRate", "=", "8.0"}], ";",
+      RowBox[{"dt", "=", "0.001"}], ";",
+      RowBox[{"tf", "=", "6.0"}], ";"
+    }]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"sat", "[", "u_", "]"}], ":=", 
+      RowBox[{"Clip", "[", RowBox[{"u", ",", RowBox[{"{", RowBox[{"-umax", ",", "umax"}], "}"}]}], "]"}]
+    }]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"rateLimit", "[", RowBox[{"u_", ",", "uprev_"}], "]"}], ":=",
+      RowBox[{"Clip", "[", 
+        RowBox[{"u", ",", RowBox[{"{", 
+          RowBox[{RowBox[{"uprev", "-", RowBox[{"maxRate", " ", "dt"}]}], ",",
+                  RowBox[{"uprev", "+", RowBox[{"maxRate", " ", "dt"}]}]}], "}"}]}], "]"}]
+    }]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"simulate", "[", "constrained_", "]"}], ":=", 
+      RowBox[{"Module", "[", 
+        RowBox[{
+          RowBox[{"{", RowBox[{"n", ",", "x", ",", "u", ",", "ucmd", ",", "k"}], "}"}], ",",
+          RowBox[{
+            RowBox[{"n", "=", RowBox[{"Round", "[", RowBox[{"tf", "/", "dt"}], "]"}]}], ";",
+            RowBox[{"x", "=", RowBox[{"ConstantArray", "[", RowBox[{"{", RowBox[{"0.", ",", "0."}], "}", ",", RowBox[{"n", "+", "1"}]}], "]"}]}], ";",
+            RowBox[{"u", "=", RowBox[{"ConstantArray", "[", RowBox[{"0.", ",", RowBox[{"n", "+", "1"}]}], "]"}]}], ";",
+            RowBox[{RowBox[{"x", "[", RowBox[{"[", "1", "]"}], "]"}], "=", RowBox[{"{", RowBox[{"1.2", ",", "0."}], "}"}]}], ";",
+            RowBox[{"For", "[", 
+              RowBox[{
+                RowBox[{"k", "=", "1"}], ",", RowBox[{"k", "<=", "n"}], ",", RowBox[{"k", "++"}], ",",
+                RowBox[{
+                  RowBox[{"ucmd", "=", RowBox[{"-", RowBox[{"First", "[", RowBox[{"K", ".", RowBox[{"x", "[", RowBox[{"[", "k", "]"}], "]"}]}], "]"}]}]}], ";",
+                  RowBox[{RowBox[{"u", "[", RowBox[{"[", "k", "]"}], "]"}], "=",
+                    RowBox[{"If", "[", RowBox[{"constrained", ",", 
+                      RowBox[{"rateLimit", "[", RowBox[{RowBox[{"sat", "[", "ucmd", "]"}], ",", RowBox[{"If", "[", RowBox[{RowBox[{"k", "==", "1"}], ",", "0.", ",", RowBox[{"u", "[", RowBox[{"[", RowBox[{"k", "-", "1"}], "]"}], "]"}]}], "]"}]}], "]"}], ",", "ucmd"}], "]"}]}], ";",
+                  RowBox[{RowBox[{"x", "[", RowBox[{"[", RowBox[{"k", "+", "1"}], "]"}], "]"}], "=", 
+                    RowBox[{RowBox[{"x", "[", RowBox[{"[", "k", "]"}], "]"}], "+", 
+                      RowBox[{"dt", RowBox[{"(", RowBox[{RowBox[{"A", ".", RowBox[{"x", "[", RowBox[{"[", "k", "]"}], "]"}]}], "+", RowBox[{"Flatten", "[", RowBox[{"B", " ", RowBox[{"u", "[", RowBox[{"[", "k", "]"}], "]"}]}], "]"}]}], ")"}]}]}]}]}]}], "]"}], ";",
+            RowBox[{"{", RowBox[{"x", ",", "u"}], "}"}]
+          }]
+        }], "]"}]
+    }]], "Input"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"ideal", "=", RowBox[{"simulate", "[", "False", "]"}]}], ";",
+      RowBox[{"constrained", "=", RowBox[{"simulate", "[", "True", "]"}]}], ";",
+      RowBox[{"ListLinePlot", "[", 
+        RowBox[{
+          RowBox[{"{", 
+            RowBox[{RowBox[{"ideal", "[", RowBox[{"[", RowBox[{"1", ",", "All", ",", "1"}], "]"}], "]"}], ",",
+                    RowBox[{"constrained", "[", RowBox[{"[", RowBox[{"1", ",", "All", ",", "1"}], "]"}], "]"}]}], "}"}], ",",
+          RowBox[{"PlotLegends", "->", RowBox[{"{", RowBox[{"\"ideal x1\"", ",", "\"constrained x1\""}], "}"}]}]}], "]"}]
+    }]], "Input"]
+}]

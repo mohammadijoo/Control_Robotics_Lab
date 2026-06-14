@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* System: x'(t) = -x(t) + u(t), y(t) = x(t) *)\nu[t_] := UnitStep[t];\n\nsol = NDSolve[\n  {\n    x'[t] == -x[t] + u[t],\n    x[0] == 0.2\n  },\n  x,\n  {t, 0, 5}\n];\n\nxTF = x[5] /. sol[[1]];\nyTF = xTF;\n\nPrint[\"x(tf) = \", N[xTF]];\nPrint[\"y(tf) = \", N[yTF]];", "Input"]
+},
+WindowTitle -> "Chapter4/Lesson1.html"
+]

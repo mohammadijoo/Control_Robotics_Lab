@@ -1,0 +1,66 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+Notebook[{
+Cell["Chapter26_Lesson1.nb", "Title"],
+
+Cell["Need for steady-state accuracy in a state-space framework.", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", RowBox[{"{{", RowBox[{
+     RowBox[{"0", ",", "1"}], ",", RowBox[{
+      RowBox[{"-", "2"}], ",", RowBox[{"-", "3"}]}]}], "}}"}]}], ";",
+  RowBox[{"B", "=", RowBox[{"{{", "0", "}", ",", "{", "1", "}}"}]}], ";",
+  RowBox[{"Cmat", "=", RowBox[{"{{", RowBox[{"1", ",", "0"}], "}}"}]}], ";",
+  RowBox[{"K", "=", RowBox[{"{{", RowBox[{"4", ",", "2"}], "}}"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Acl", "=", RowBox[{"A", "-", RowBox[{"B", ".", "K"}]}]}], ";",
+  RowBox[{"dcClosed", "=", RowBox[{"-", RowBox[{"Cmat", ".", RowBox[{"Inverse", "[", "Acl", "]"}], ".", "B"}]}]}], ";",
+  RowBox[{"Nbar", "=", RowBox[{"1", "/", RowBox[{"dcClosed", "[", RowBox[{"[", RowBox[{"1", ",", "1"}], "]"}], "]"}]}]}], ";",
+  RowBox[{"{", RowBox[{"Acl", ",", "dcClosed", ",", "Nbar"}], "}"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"xss", "[", RowBox[{"nb_", ",", "r_", ",", "d_"}], "]"}], ":=",
+  RowBox[{"-", RowBox[{"Inverse", "[", "Acl", "]"}], ".", "B", " ", RowBox[{"(", RowBox[{
+    RowBox[{"nb", " ", "r"}], "+", "d"}], ")"}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"yss", "[", RowBox[{"nb_", ",", "r_", ",", "d_"}], "]"}], ":=",
+  RowBox[{"First", "[", RowBox[{"Flatten", "[", RowBox[{"Cmat", ".", RowBox[{"xss", "[", RowBox[{"nb", ",", "r", ",", "d"}], "]"}]}], "]"}], "]"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"Table", "[",
+  RowBox[{
+   RowBox[{"{", RowBox[{"case", ",", RowBox[{"yss", "@@", "case"}], ",",
+    RowBox[{"1", "-", RowBox[{"yss", "@@", "case"}]}]}], "}"}], ",",
+   RowBox[{"{", RowBox[{"case", ",", RowBox[{"{",
+    RowBox[{
+     RowBox[{"{", RowBox[{"1", ",", "1", ",", "0"}], "}"}], ",",
+     RowBox[{"{", RowBox[{"Nbar", ",", "1", ",", "0"}], "}"}], ",",
+     RowBox[{"{", RowBox[{"Nbar", ",", "1", ",", "0.2"}], "}"}]}], "}"}]}], "}"}]}], "]"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"response", "[", RowBox[{"nb_", ",", "r_", ",", "d_"}], "]"}], ":=",
+  RowBox[{"OutputResponse", "[",
+   RowBox[{
+    RowBox[{"StateSpaceModel", "[", RowBox[{"{", RowBox[{"Acl", ",", "B", ",", "Cmat", ",", RowBox[{"{{", "0", "}}"}]}], "}"}], "]"}], ",",
+    RowBox[{"nb", " ", "r", "+", "d"}], ",", "t"}], "]"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"Plot", "[",
+  RowBox[{
+   RowBox[{"Evaluate", "[", RowBox[{"{",
+    RowBox[{
+     RowBox[{"response", "[", RowBox[{"1", ",", "1", ",", "0"}], "]"}], ",",
+     RowBox[{"response", "[", RowBox[{"Nbar", ",", "1", ",", "0"}], "]"}], ",",
+     RowBox[{"response", "[", RowBox[{"Nbar", ",", "1", ",", "0.2"}], "]"}]}], "}"}], "]"}], ",",
+   RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}], ",",
+   RowBox[{"PlotLegends", "->", RowBox[{"{", RowBox[{
+    "\"Nbar=1\"", ",", "\"Nbar computed\"", ",", "\"Nbar computed, d=0.2\""}], "}"}]}], ",",
+   RowBox[{"GridLines", "->", "Automatic"}]}], "]"}]], "Input"]
+}]

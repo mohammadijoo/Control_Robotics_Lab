@@ -1,0 +1,35 @@
+(* Chapter23_Lesson1.nb *)
+(* Formulating the SISO pole-placement problem for a second-order companion-form system. *)
+
+ClearAll["Global`*"];
+
+A = {{0, 1}, {-2, -3}};
+b = {{0}, {1}};
+
+controllabilityMatrix[A_, b_] := Module[{n = Length[A]},
+  ArrayFlatten[{Table[MatrixPower[A, i].b, {i, 0, n - 1}]}]
+];
+
+Ctrb = controllabilityMatrix[A, b];
+MatrixRank[Ctrb]
+Det[Ctrb]
+
+s = Unique["s"];
+openPolynomial = CharacteristicPolynomial[A, s] // Expand
+openCoefficientsAscending = CoefficientList[openPolynomial, s][[1 ;; 2]]
+
+desiredPoles = {-4, -5};
+desiredPolynomial = Times @@ (s - desiredPoles) // Expand
+desiredCoefficientsAscending = CoefficientList[desiredPolynomial, s][[1 ;; 2]]
+
+(* For companion form, K = {alpha0 - a0, alpha1 - a1}. *)
+K = {desiredCoefficientsAscending - openCoefficientsAscending};
+Acl = A - b.K;
+
+K // MatrixForm
+Acl // MatrixForm
+Eigenvalues[Acl]
+CharacteristicPolynomial[Acl, s] // Expand
+
+(* Verify equality with the desired characteristic polynomial. *)
+FullSimplify[CharacteristicPolynomial[Acl, s] == desiredPolynomial]

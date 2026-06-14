@@ -1,0 +1,62 @@
+Notebook[{
+Cell["Chapter14_Lesson3: Duality Between Controllability and Observability", "Title"],
+Cell["This notebook verifies the rank-test duality between controllability and observability.", "Text"],
+Cell[BoxData[
+ RowBox[{"ClearAll", "[", RowBox[{"ctrb", ",", "obsv", ",", "rankReport"}], "]"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ctrb", "[", RowBox[{"A_", ",", "B_"}], "]"}], ":=", 
+  RowBox[{"ArrayFlatten", "[", 
+   RowBox[{"{", 
+    RowBox[{"Table", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"MatrixPower", "[", RowBox[{"A", ",", "k"}], "]"}], ".", "B"}], ",", 
+      RowBox[{"{", RowBox[{"k", ",", "0", ",", 
+       RowBox[{
+        RowBox[{"Length", "[", "A", "]"}], "-", "1"}]}], "}"}]}], "]"}], "}"}], 
+   "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"obsv", "[", RowBox[{"A_", ",", "C_"}], "]"}], ":=", 
+  RowBox[{"Join", "@@", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"C", ".", 
+      RowBox[{"MatrixPower", "[", RowBox[{"A", ",", "k"}], "]"}]}], ",", 
+     RowBox[{"{", RowBox[{"k", ",", "0", ",", 
+      RowBox[{
+       RowBox[{"Length", "[", "A", "]"}], "-", "1"}]}], "}"}]}], "]"}]}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", RowBox[{"0", ",", "1", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", RowBox[{"0", ",", "0", ",", "1"}], "}"}], ",", 
+     RowBox[{"{", RowBox[{
+      RowBox[{"-", "2"}], ",", 
+      RowBox[{"-", "3"}], ",", 
+      RowBox[{"-", "4"}]}], "}"}]}], "}"}]}], ";", 
+  RowBox[{"B", "=", RowBox[{"{", 
+    RowBox[{RowBox[{"{", "0", "}"}], ",", RowBox[{"{", "0", "}"}], ",", RowBox[{"{", "1", "}"}]}], "}"}]}], ";",
+  RowBox[{"Cmat", "=", RowBox[{"{", RowBox[{"{", RowBox[{"1", ",", "0", ",", "0"}], "}"}], "}"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Ctrb", "=", RowBox[{"ctrb", "[", RowBox[{"A", ",", "B"}], "]"}]}], ";",
+  RowBox[{"Obsv", "=", RowBox[{"obsv", "[", RowBox[{"A", ",", "Cmat"}], "]"}]}], ";",
+  RowBox[{"CtrbDual", "=", RowBox[{"ctrb", "[", RowBox[{RowBox[{"Transpose", "[", "A", "]"}], ",", RowBox[{"Transpose", "[", "Cmat", "]"}]}], "]"}]}], ";",
+  RowBox[{"ObsvDual", "=", RowBox[{"obsv", "[", RowBox[{RowBox[{"Transpose", "[", "A", "]"}], ",", RowBox[{"Transpose", "[", "B", "]"}]}], "]"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rankReport", "=", 
+   RowBox[{"<|", 
+    RowBox[{
+     RowBox[{"\"rank Ctrb(A,B)\"", "->", RowBox[{"MatrixRank", "[", "Ctrb", "]"}]}], ",",
+     RowBox[{"\"rank Obsv(A,C)\"", "->", RowBox[{"MatrixRank", "[", "Obsv", "]"}]}], ",",
+     RowBox[{"\"rank Ctrb(A^T,C^T)\"", "->", RowBox[{"MatrixRank", "[", "CtrbDual", "]"}]}], ",",
+     RowBox[{"\"rank Obsv(A^T,B^T)\"", "->", RowBox[{"MatrixRank", "[", "ObsvDual", "]"}]}], ",",
+     RowBox[{"\"Obsv == Transpose[CtrbDual]\"", "->", RowBox[{"(", RowBox[{"Obsv", "==", RowBox[{"Transpose", "[", "CtrbDual", "]"}]}], ")"}]}], ",",
+     RowBox[{"\"Transpose[Ctrb] == ObsvDual\"", "->", RowBox[{"(", RowBox[{RowBox[{"Transpose", "[", "Ctrb", "]"}], "==", "ObsvDual"}], ")"}]}]}], "|>"}]}], ";",
+  RowBox[{"rankReport", "//", "MatrixForm"}]}]], "Input"]
+}]

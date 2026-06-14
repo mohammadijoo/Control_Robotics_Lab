@@ -1,0 +1,11 @@
+Notebook[{
+  Cell["Chapter17_Lesson4.nb", "Title"],
+  Cell["Transformations Between Physical and Modal Coordinates", "Subtitle"],
+  Cell["ClearAll[\"Global`*\"]", "Input"],
+  Cell["A = {{0, 1}, {-2, -3}};\nB = {{0}, {1}};\nCmat = {{1, 0}};\nDmat = {{0}};", "Input"],
+  Cell["{eigVals, eigVecs} = Eigensystem[A];\nT = Transpose[eigVecs];\nTinv = Inverse[T];\nLambda = Simplify[Tinv . A . T];\nBm = Simplify[Tinv . B];\nCm = Simplify[Cmat . T];", "Input"],
+  Cell["MatrixForm /@ {T, Tinv, Lambda, Bm, Cm}", "Input"],
+  Cell["x0 = {{2}, {-1}};\nz0 = Simplify[Tinv . x0];\nx0Recovered = Simplify[T . z0];\nMatrixForm /@ {z0, x0Recovered}", "Input"],
+  Cell["s = 1 + I/2;\nGphys = Simplify[Cmat . Inverse[s IdentityMatrix[2] - A] . B + Dmat];\nGmodal = Simplify[Cm . Inverse[s IdentityMatrix[2] - Lambda] . Bm + Dmat];\n{Gphys, Gmodal, FullSimplify[Gphys == Gmodal]}", "Input"],
+  Cell["stateSolutionPhysical[t_] = MatrixExp[A t] . x0;\nstateSolutionModal[t_] = T . MatrixExp[Lambda t] . z0;\nFullSimplify[stateSolutionPhysical[t] == stateSolutionModal[t]]", "Input"]
+}]

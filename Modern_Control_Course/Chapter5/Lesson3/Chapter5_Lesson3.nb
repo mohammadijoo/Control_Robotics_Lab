@@ -1,0 +1,5 @@
+Notebook[{
+Cell["A = { {0, 1}, {-2, -3} };\nB = { {0, 0}, {4, -1} };\nC = { {1, 0}, {0, 1} };\nD = { {0, 0}, {0, 1/2} };\n\nsys = StateSpaceModel[{A, B, C, D}];\n\ntmax = 10;\nu1[t_] := 1;\nu2[t_] := Exp[-0.7 t];\n\nu[t_] := {u1[t], u2[t]};\n\nx0 = {0, 0};\n\n(* State response and output response *)\nxResp = StateResponse[sys, u[t], {t, 0, tmax}, x0];\nyResp = OutputResponse[sys, u[t], {t, 0, tmax}, x0];\n\n(* Check identity: y2(t) == x2(t) + 0.5 u2(t) *)\ncheck = Simplify[\n  yResp[[2]] - (xResp[[2]] + (1/2) u2[t])\n];\n\ncheck\n      ", "Input"]
+},
+WindowTitle -> "Chapter5/Lesson3.html"
+]

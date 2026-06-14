@@ -1,0 +1,62 @@
+(* Chapter26_Lesson3.nb *)
+(* Design of state-feedback gains for an augmented system with integral action. *)
+
+ClearAll[controllabilityMatrix, ackermannSISO, polynomialFromRoots];
+
+controllabilityMatrix[A_, B_] := Module[{n = Length[A]},
+  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]
+];
+
+polynomialFromRoots[roots_] := CoefficientList[Expand[Times @@ (s - # & /@ roots)], s];
+
+ackermannSISO[A_, B_, desiredPoles_] := Module[
+  {n, co, coeffAsc, phiA, en},
+  n = Length[A];
+  co = controllabilityMatrix[A, B];
+  coeffAsc = polynomialFromRoots[desiredPoles];
+  phiA = Sum[coeffAsc[[k + 1]] MatrixPower[A, k], {k, 0, n}];
+  en = UnitVector[n, n];
+  Transpose[{en}].Inverse[co].phiA
+];
+
+A = {{0, 1}, {-2, -0.6}};
+B = {{0}, {1}};
+Cmat = {{1, 0}};
+Dmat = {{0}};
+
+n = Length[A];
+p = Length[Cmat];
+Aaug = ArrayFlatten[{{A, ConstantArray[0, {n, p}]}, {-Cmat, ConstantArray[0, {p, p}]}}];
+Baug = Join[B, -Dmat];
+Eaug = Join[ConstantArray[0, {n, p}], IdentityMatrix[p]];
+
+MatrixRank[controllabilityMatrix[Aaug, Baug]]
+
+poles = {-2, -2.5, -3};
+Kaug = ackermannSISO[Aaug, Baug, poles];
+Kx = Kaug[[All, 1 ;; n]];
+Ki = Kaug[[All, n + 1 ;; n + p]];
+Acl = Aaug - Baug.Kaug;
+
+Kaug // MatrixForm
+Kx // MatrixForm
+Ki // MatrixForm
+Eigenvalues[Acl]
+
+r = {1};
+sol = NDSolve[
+  {
+    xa'[t] == Acl.xa[t] + Flatten[Eaug.r],
+    xa[0] == ConstantArray[0, n + p]
+  },
+  xa,
+  {t, 0, 8}
+];
+
+y[t_] := (Cmat.Take[xa[t] /. First[sol], n])[[1]];
+u[t_] := (-Kaug.(xa[t] /. First[sol]))[[1]];
+
+Plot[{y[t], 1}, {t, 0, 8}, PlotLegends -> {"y", "r"},
+  AxesLabel -> {"time [s]", "output"}]
+Plot[u[t], {t, 0, 8}, PlotLegends -> {"u"},
+  AxesLabel -> {"time [s]", "control input"}]

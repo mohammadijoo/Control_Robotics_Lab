@@ -1,0 +1,48 @@
+(* Chapter13_Lesson4.nb *)
+(* Relationship of Observability to Sensor Placement *)
+(* Paste this into a Wolfram Mathematica notebook or save as a .wl script. *)
+
+ClearAll[observabilityMatrix, cFromSensors, scorePlacement];
+
+observabilityMatrix[A_, C_] := Module[
+  {n = Length[A]},
+  Join @@ Table[C . MatrixPower[A, k], {k, 0, n - 1}]
+];
+
+cFromSensors[sensors_, n_] := Module[
+  {C = ConstantArray[0, {Length[sensors], n}]},
+  Do[C[[i, sensors[[i]]]] = 1, {i, Length[sensors]}];
+  C
+];
+
+scorePlacement[A_, sensors_] := Module[
+  {n = Length[A], C, O, gram, sv},
+  C = cFromSensors[sensors, n];
+  O = observabilityMatrix[A, C];
+  gram = Transpose[O].O;
+  sv = SingularValueList[O];
+  <|
+    "Sensors" -> sensors,
+    "Rank" -> MatrixRank[O],
+    "SmallestSingularValue" -> Min[sv],
+    "LogDetProxy" -> Log[Det[gram + 10^-9 IdentityMatrix[n]]]
+  |>
+];
+
+A = {
+  {0.0, 1.0, 0.0, 0.0},
+  {-2.0, -0.4, 0.8, 0.0},
+  {0.0, 0.0, -1.0, 1.0},
+  {0.6, 0.0, -3.0, -0.5}
+};
+
+placements = Join @@ Table[Subsets[Range[Length[A]], {r}], {r, 1, 2}];
+scores = scorePlacement[A, #] & /@ placements;
+
+SortBy[scores, {-#Rank, -#SmallestSingularValue, -#LogDetProxy} &] // Dataset
+
+(* Example: inspect the observability matrix for measuring x1 only. *)
+C1 = cFromSensors[{1}, Length[A]];
+O1 = observabilityMatrix[A, C1];
+MatrixForm[O1]
+MatrixRank[O1]

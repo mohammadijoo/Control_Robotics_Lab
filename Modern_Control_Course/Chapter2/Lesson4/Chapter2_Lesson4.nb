@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Similarity transformation and invariant checks *)\nA = { {2, 1}, {0, 3} };\nT = { {1, 1}, {0, 1} };\n\nAtilde = Inverse[T].A.T;\n\n{Eigenvalues[A], Eigenvalues[Atilde]}\n{Tr[A], Tr[Atilde]}\n{Det[A], Det[Atilde]}\n\n(* Coordinate conversion: x = T z, z = T^{-1} x *)\nz = {z1, z2};\nx = T.z;\nzrec = Inverse[T].x;\nSimplify[zrec]\n      ", "Input"]
+},
+WindowTitle -> "Chapter2/Lesson4.html"
+]

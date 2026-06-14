@@ -1,0 +1,56 @@
+(* Chapter10_Lesson2.nb *)
+(* Reachable States and Reachable Subspace for continuous-time LTI systems *)
+
+ClearAll["Global`*"];
+
+A = {{0, 1, 0}, {-2, -3, 0}, {0, 0, -1}};
+B = {{0}, {1}, {0}};
+n = Length[A];
+
+ReachabilityMatrix[A_, B_] := Module[{Ak = IdentityMatrix[Length[A]], blocks = {}},
+  Do[
+    AppendTo[blocks, Ak.B];
+    Ak = Ak.A;
+    ,
+    {k, 0, Length[A] - 1}
+  ];
+  ArrayFlatten[{blocks}]
+];
+
+R = ReachabilityMatrix[A, B];
+
+reachableDimension = MatrixRank[R];
+reachableBasis = Orthogonalize[Transpose[R]];
+
+Print["A = ", MatrixForm[A]];
+Print["B = ", MatrixForm[B]];
+Print["R = [B AB A^2B] = ", MatrixForm[R]];
+Print["Dimension of reachable subspace = ", reachableDimension];
+Print["Basis vectors for reachable subspace = ", reachableBasis];
+
+xDesired = {1, -1/2, 2};
+q = Orthogonalize[Transpose[R]];
+projectionMatrix = Transpose[q].q;
+xReachable = projectionMatrix.xDesired;
+xUnreachable = xDesired - xReachable;
+
+Print["Desired target = ", xDesired];
+Print["Reachable component = ", xReachable];
+Print["Unreachable component = ", xUnreachable];
+
+(* Finite-time reachable-state expression from x(0)=0 *)
+xT[T_] := Integrate[MatrixExp[A (T - tau)].B*u[tau], {tau, 0, T},
+  Assumptions -> T > 0];
+
+Print["Formal reachable state x(T) = "];
+Print[MatrixForm[xT[T]]];
+
+(* Numerical illustration with u(t)=Sin[2t] *)
+u[t_] := Sin[2 t];
+xNumeric[T_?NumericQ] := NIntegrate[
+  Flatten[MatrixExp[A (T - tau)].B]*u[tau],
+  {tau, 0, T}
+];
+
+TableForm[Table[{T, xNumeric[T]}, {T, 0, 5, 1}],
+  TableHeadings -> {None, {"T", "x(T)"}}]

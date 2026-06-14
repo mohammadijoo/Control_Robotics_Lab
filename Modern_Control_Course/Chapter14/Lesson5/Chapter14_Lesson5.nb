@@ -1,0 +1,7 @@
+Notebook[{
+Cell["Chapter14_Lesson5.nb", "Title"],
+Cell["Time-Varying Observability Gramian", "Section"],
+Cell[BoxData[
+'(* Chapter14_Lesson5.nb *)\n(* Wolfram Mathematica implementation of an LTV observability Gramian. *)\n\nClearAll["Global`*"];\n\nt0 = 0;\ntf = 6;\n\nA[t_] := {{0, 1}, {-(2 + 0.5 Sin[1.3 t]), -(0.15 + 0.05 Cos[t])}};\nCmat[t_] := {{1, 0.2 Sin[0.7 t]}};\n\nphiVars = Array[phi, {2, 2}];\nphiMat[t_] := phiVars /. phi[i_, j_] :> phi[i, j][t];\n\neqnsPhi = Flatten[\n   Table[D[phi[i, j][t], t] == (A[t].phiMat[t])[[i, j]], {i, 2}, {j, 2}]\n];\n\nicsPhi = Flatten[\n   Table[phi[i, j][t0] == IdentityMatrix[2][[i, j]], {i, 2}, {j, 2}]\n];\n\nsolPhi = NDSolveValue[\n   Join[eqnsPhi, icsPhi],\n   Flatten[Table[phi[i, j], {i, 2}, {j, 2}]],\n   {t, t0, tf},\n   WorkingPrecision -> 30\n];\n\nPhi[t_?NumericQ] := Partition[solPhi[t], 2];\n\nW = NIntegrate[\n   Transpose[Phi[s]].Transpose[Cmat[s]].Cmat[s].Phi[s],\n   {s, t0, tf},\n   WorkingPrecision -> 30\n];\n\nEigenvaluesW = Eigenvalues[W];\nConditionNumberW = Norm[W, 2] Norm[Inverse[W], 2];\n\nx0True = {1, -0.7};\n\nz = NIntegrate[\n   Transpose[Phi[s]].Transpose[Cmat[s]].(Cmat[s].Phi[s].x0True),\n   {s, t0, tf},\n   WorkingPrecision -> 30\n];\n\nx0Hat = LinearSolve[W, z];\n\nPrint["Observability Gramian W_o = "];\nPrint[MatrixForm[W]];\nPrint["Eigenvalues = ", EigenvaluesW];\nPrint["Condition number = ", ConditionNumberW];\nPrint["True x0 = ", x0True];\nPrint["Reconstructed x0 = ", x0Hat];\nPrint["Error norm = ", Norm[x0Hat - x0True]];\n'
+], "Input"]
+}]

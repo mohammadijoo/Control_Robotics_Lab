@@ -1,0 +1,26 @@
+Notebook[{
+  Cell["Chapter16_Lesson5.nb", "Title"],
+  Cell["Controllable canonical form: construction, rank, and direct pole placement.", "Text"],
+  Cell[BoxData[ToBoxes[
+    ClearAll[s, a, beta, n, A, B, Cmat, Qc, desired, K, Acl];
+    a = {6, 11, 6};
+    beta = {2, 5, 3};
+    n = Length[a];
+    A = ConstantArray[0, {n, n}];
+    Do[A[[i, i + 1]] = 1, {i, 1, n - 1}];
+    A[[n]] = -a;
+    B = Transpose[{UnitVector[n, n]}];
+    Cmat = {Reverse[beta]};
+    Qc = Transpose[Table[Flatten[MatrixPower[A, k].B], {k, 0, n - 1}]];
+    {A, B, Cmat, MatrixRank[Qc], Det[Qc]}
+  ]], "Input"],
+  Cell[BoxData[ToBoxes[
+    desired = Most[CoefficientList[Expand[(s + 2) (s + 3) (s + 4)], s]];
+    K = {desired - a};
+    Acl = A - B.K;
+    {K, Expand[CharacteristicPolynomial[Acl, s]], Eigenvalues[Acl]}
+  ]], "Input"],
+  Cell[BoxData[ToBoxes[
+    TransferFunctionModel[StateSpaceModel[{A, B, Cmat, {{0}}}], s]
+  ]], "Input"]
+}]

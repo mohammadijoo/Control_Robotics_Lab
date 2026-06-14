@@ -1,0 +1,9 @@
+Notebook[{
+Cell["Chapter26_Lesson2.nb", "Title"],
+Cell["Modern Control - Chapter 26, Lesson 2: Augmenting the State with Integral of Tracking Error", "Subtitle"],
+Cell[BoxData[RowBox[{"ClearAll", "[", "\"Global`*\"", "]", ";"}]], "Input"],
+Cell[BoxData["A = {{0, 1}, {-2, -3}};\nB = {{0}, {1}};\nCmat = {{1, 0}};\nDmat = {{0}};\nn = Length[A];\np = Length[Cmat];\nAa = ArrayFlatten[{{A, ConstantArray[0, {n, p}]}, {-Cmat, ConstantArray[0, {p, p}]}}];\nBa = Join[B, -Dmat];\nBr = Join[ConstantArray[0, {n, p}], IdentityMatrix[p]];\nCa = ArrayFlatten[{{Cmat, ConstantArray[0, {p, p}]}}];"], "Input"],
+Cell[BoxData["ControllabilityMatrix[M_, N_] := ArrayFlatten[{Table[MatrixPower[M, k].N, {k, 0, Length[M] - 1}]}];\nplantRank = MatrixRank[ControllabilityMatrix[A, B]];\naugRank = MatrixRank[ControllabilityMatrix[Aa, Ba]];\nrosenbrockZeroRank = MatrixRank[ArrayFlatten[{{A, B}, {Cmat, Dmat}}]];\n{Aa, Ba, Br, plantRank, augRank, rosenbrockZeroRank}"], "Input"],
+Cell[BoxData["phiM[M_] := MatrixPower[M, 3] + 9 MatrixPower[M, 2] + 26 M + 24 IdentityMatrix[Length[M]];\nCc = ControllabilityMatrix[Aa, Ba];\nKaug = {{0, 0, 1}} . Inverse[Cc] . phiM[Aa];\nKiEquivalent = -Kaug[[1, 3]];\n{Kaug, KiEquivalent}\nAcl = Aa - Ba.Kaug;\nEigenvalues[Acl]"], "Input"],
+Cell[BoxData["r[t_] := 1;\nsol = NDSolve[Join[Thread[{x1'[t], x2'[t], q'[t]} == Acl.{x1[t], x2[t], q[t]} + Flatten[Br] r[t]], {x1[0] == 0, x2[0] == 0, q[0] == 0}], {x1, x2, q}, {t, 0, 8}];\nPlot[Evaluate[x1[t] /. sol], {t, 0, 8}, PlotRange -> All, GridLines -> Automatic, AxesLabel -> {\"t\", \"y(t)\"}, PlotLabel -> \"Integral-augmented step tracking\"]"], "Input"]
+}, WindowTitle -> "Chapter26_Lesson2.nb"]

@@ -1,0 +1,31 @@
+Notebook[{
+  Cell["Chapter23_Lesson3.nb", "Title"],
+  Cell["Ackermann's formula for SISO pole placement", "Subtitle"],
+  Cell[BoxData[ToBoxes[
+    ClearAll[controllabilityMatrix, matrixPolynomial, ackermannGain];
+    controllabilityMatrix[A_, B_] := Module[{n = Length[A]},
+      Transpose[Table[Flatten[MatrixPower[A, k].B], {k, 0, n - 1}]]
+    ];
+    matrixPolynomial[A_, coeff_] := Module[{n = Length[A]},
+      MatrixPower[A, n] + Sum[coeff[[i + 1]] If[n - i == 0, IdentityMatrix[n], MatrixPower[A, n - i]], {i, 1, n}]
+    ];
+    ackermannGain[A_, B_, desiredPoles_] := Module[{n, Ctrb, coeff, phiA, eT},
+      n = Length[A];
+      Ctrb = controllabilityMatrix[A, B];
+      If[MatrixRank[Ctrb] != n, Print["System is not controllable."]; Abort[]];
+      coeff = CoefficientList[Expand[Times @@ (s - # & /@ desiredPoles)], s] // Reverse;
+      phiA = matrixPolynomial[A, coeff];
+      eT = UnitVector[n, n];
+      Chop[eT.Inverse[Ctrb].phiA]
+    ];
+  ]], "Input"],
+  Cell[BoxData[ToBoxes[
+    A = {{0, 1}, {-2, -3}};
+    B = {{0}, {1}};
+    desiredPoles = {-2 + 2 I, -2 - 2 I};
+    K = ackermannGain[A, B, desiredPoles]
+  ]], "Input"],
+  Cell[BoxData[ToBoxes[
+    Eigenvalues[A - B.K]
+  ]], "Input"]
+}]

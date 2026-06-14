@@ -1,0 +1,69 @@
+Notebook[{
+Cell["Chapter22_Lesson2.nb", "Title"],
+Cell["Closed-Loop State Matrix and Mode Relocation", "Subtitle"],
+Cell["For x'[t] = A x[t] + B u[t] and u[t] = -K x[t] + r[t], the autonomous closed-loop matrix is Acl = A - B.K.", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", RowBox[{"{{", RowBox[{"0", ",", "1"}], "}", ",", "{", RowBox[{"-2", ",", RowBox[{"-", "0.4"}]}], "}}"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"B", "=", RowBox[{"{{", "0", "}", ",", "{", "1", "}}"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"Eigenvalues", "[", "A", "]"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"desiredPoles", "=", RowBox[{"{", RowBox[{RowBox[{"-", "2"}], ",", RowBox[{"-", "3"}]}], "}"}]}], ";"}]], "Input"],
+
+Cell["From-scratch 2x2 SISO coefficient matching.", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"charCoeffs2", "[", "M_", "]"}], ":=", 
+  RowBox[{"{", RowBox[{RowBox[{"-", RowBox[{"Tr", "[", "M", "]"}]}], ",", RowBox[{"Det", "[", "M", "]"}]}], "}"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"coeffsFor", "[", RowBox[{"k1_", ",", "k2_"}], "]"}], ":=", 
+  RowBox[{"charCoeffs2", "[", RowBox[{"A", "-", RowBox[{"B", ".", RowBox[{"{{", RowBox[{"k1", ",", "k2"}], "}}"}]}]}], "]"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"c00", "=", RowBox[{"coeffsFor", "[", RowBox[{"0", ",", "0"}], "]"}]}], ";",
+  RowBox[{"c10", "=", RowBox[{"coeffsFor", "[", RowBox[{"1", ",", "0"}], "]"}]}], ";",
+  RowBox[{"c01", "=", RowBox[{"coeffsFor", "[", RowBox[{"0", ",", "1"}], "]"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"M", "=", RowBox[{"Transpose", "[", RowBox[{"{", RowBox[{RowBox[{"c10", "-", "c00"}], ",", RowBox[{"c01", "-", "c00"}]}], "}"}], "]"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"target", "=", RowBox[{"{", RowBox[{RowBox[{"-", RowBox[{"Total", "[", "desiredPoles", "]"}]}], ",", RowBox[{"Times", "@@", "desiredPoles"}]}], "}"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"k", "=", RowBox[{"LinearSolve", "[", RowBox[{"M", ",", RowBox[{"target", "-", "c00"}]}], "]"}]}], ";",
+  RowBox[{"K", "=", RowBox[{"{", "k", "}"}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Acl", "=", RowBox[{"A", "-", RowBox[{"B", ".", "K"}]}]}], ";",
+  RowBox[{"Acl", "//", "MatrixForm"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"Eigenvalues", "[", "Acl", "]"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"CharacteristicPolynomial", "[", RowBox[{"Acl", ",", "s"}], "]"}]], "Input"],
+
+Cell["Symbolic verification: det(s I - (A - B K)) equals the desired polynomial.", "Text"],
+
+Cell[BoxData[
+ RowBox[{"Expand", "[", RowBox[{
+  RowBox[{"Det", "[", RowBox[{RowBox[{"s", " ", RowBox[{"IdentityMatrix", "[", "2", "]"}]}], "-", "Acl"}], "]"}],
+  "-", RowBox[{"Times", "@@", RowBox[{"(", RowBox[{"s", "-", "desiredPoles"}], ")"}]}]}], "]"}]], "Input"]
+}]

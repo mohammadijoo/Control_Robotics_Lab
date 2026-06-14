@@ -1,0 +1,5 @@
+Notebook[{
+Cell["A = { {0, 1}, {-1, 0} };\nt = 7/10;\n\nE1 = MatrixExp[A t]; (* built-in *)\nE2 = Sum[MatrixPower[A t, k]/k!, {k, 0, 40}]; (* truncated series *)\n\nPrint[\"MatrixExp[A t] = \", E1 // N];\nPrint[\"Series (40 terms) = \", E2 // N];\nPrint[\"Fro error = \", Norm[E1 - E2, \"Frobenius\"] // N];\n\nx0 = {1, 0};\nxExact = E1 . x0;\nPrint[\"x(t) = \", xExact // N];", "Input"]
+},
+WindowTitle -> "Chapter3/Lesson3.html"
+]

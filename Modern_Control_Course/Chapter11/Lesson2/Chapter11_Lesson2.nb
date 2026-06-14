@@ -1,0 +1,45 @@
+(* Chapter11_Lesson2.nb *)
+(* PBH controllability test in Wolfram Mathematica / Wolfram Language. *)
+
+ClearAll[pbhRankTest, controllabilityMatrix, reportPBH];
+
+controllabilityMatrix[A_, B_] := Module[{n = Length[A]},
+  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]
+];
+
+pbhRankTest[A_, B_] := Module[{n, lambdas, rows, M, r},
+  n = Length[A];
+  lambdas = DeleteDuplicates[Eigenvalues[A]];
+  rows = Table[
+    M = ArrayFlatten[{{lambda IdentityMatrix[n] - A, B}}];
+    r = MatrixRank[M];
+    <|"lambda" -> lambda, "PBHRank" -> r, "RequiredRank" -> n, "Passed" -> (r == n)|>,
+    {lambda, lambdas}
+  ];
+  <|"Controllable" -> And @@ (rows[[All, "Passed"]]), "Details" -> rows|>
+];
+
+reportPBH[A_, B_, name_] := Module[{C, result},
+  Print["\n", name];
+  Print["A = ", MatrixForm[A]];
+  Print["B = ", MatrixForm[B]];
+  C = controllabilityMatrix[A, B];
+  Print["Kalman controllability rank = ", MatrixRank[C], "/", Length[A]];
+  result = pbhRankTest[A, B];
+  Print[Dataset[result["Details"]]];
+  Print["PBH controllable? ", result["Controllable"]];
+];
+
+A1 = DiagonalMatrix[{0, -1, -2}];
+Bbad = {{0}, {1}, {1}};
+Bgood = {{1}, {1}, {1}};
+
+reportPBH[A1, Bbad, "Example 1: unactuated first mode"];
+reportPBH[A1, Bgood, "Example 2: all modes actuated"];
+
+Arep = DiagonalMatrix[{1, 1, 2}];
+BrepBad = {{1}, {1}, {1}};
+BrepGood = {{1, 0}, {0, 1}, {1, 1}};
+
+reportPBH[Arep, BrepBad, "Example 3: repeated eigenvalue with insufficient input rank"];
+reportPBH[Arep, BrepGood, "Example 4: repeated eigenvalue with enough input rank"];

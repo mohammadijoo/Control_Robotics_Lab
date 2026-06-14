@@ -1,0 +1,41 @@
+(* Chapter12_Lesson4.nb *)
+(* Modern Control — Chapter 12, Lesson 4 *)
+(* Wolfram Mathematica implementation of finite-horizon controllability energy directions. *)
+
+ClearAll["Global`*"];
+A = {{-1, 0}, {0, -4}};
+B = {{1}, {0.08}};
+T = 2;
+
+W = NIntegrate[
+   MatrixExp[A s].B.Transpose[B].Transpose[MatrixExp[A s]],
+   {s, 0, T}
+];
+W = (W + Transpose[W])/2;
+
+{lambda, Q} = Eigensystem[W];
+ord = Ordering[lambda];
+lambda = lambda[[ord]];
+Q = Transpose[Q[[ord]]];
+
+energy[delta_] := delta.LinearSolve[W, delta];
+
+e1 = {1, 0};
+e2 = {0, 1};
+
+Print["Wc(T) = ", MatrixForm[W]];
+Print["Eigenvalues = ", lambda];
+Print["Condition number = ", Max[lambda]/Min[lambda]];
+Print["Energy to reach e1 = ", energy[e1]];
+Print["Energy to reach e2 = ", energy[e2]];
+Print["Best-axis energy = ", 1/Max[lambda]];
+Print["Worst-axis energy = ", 1/Min[lambda]];
+
+rho = 1;
+ellipse[theta_] := Q.DiagonalMatrix[rho Sqrt[lambda]].{Cos[theta], Sin[theta]};
+ParametricPlot[ellipse[theta], {theta, 0, 2 Pi},
+ AxesLabel -> {"x1", "x2"},
+ PlotLabel -> "Finite-horizon controllability energy ellipsoid",
+ AspectRatio -> Automatic,
+ GridLines -> Automatic
+]

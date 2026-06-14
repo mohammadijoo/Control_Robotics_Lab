@@ -1,0 +1,101 @@
+(* Chapter25_Lesson3.nb
+
+Trade-offs in state-feedback design:
+speed of response vs. control effort vs. sensitivity.
+
+This file is plain Wolfram Language content saved with .nb extension.
+It can be pasted into a Mathematica notebook or opened as text.
+*)
+
+ClearAll["Global`*"];
+
+A = {{0, 1}, {-2, -0.4}};
+B = {{0}, {1}};
+x0 = {1, 0};
+
+(* For this second-order SISO plant,
+   u = -{k1,k2}.x gives:
+   Ac = {{0,1},{-2-k1,-0.4-k2}}.
+   Desired poles -a +- I b imply:
+   s^2 + 2 a s + (a^2 + b^2).
+*)
+feedbackGain[a_, b_] := Module[
+  {desiredS, desiredConst, k1, k2},
+  desiredS = 2 a;
+  desiredConst = a^2 + b^2;
+  k1 = desiredConst - 2;
+  k2 = desiredS - 0.4;
+  {k1, k2}
+];
+
+closedLoopMatrix[k_] := A - B . {k};
+
+(* Solve Ac^T P + P Ac + K^T K == 0 by vectorization. *)
+lyapunovEffortMatrix[Ac_, k_] := Module[
+  {n, Q, M, vecP, P},
+  n = Length[Ac];
+  Q = Transpose[{k}] . {k};
+  M = KroneckerProduct[IdentityMatrix[n], Transpose[Ac]] +
+      KroneckerProduct[Transpose[Ac], IdentityMatrix[n]];
+  vecP = LinearSolve[M, -Flatten[Q]];
+  P = ArrayReshape[vecP, {n, n}];
+  P
+];
+
+cases = {
+  {"slow", 1, 1},
+  {"medium", 3, 3},
+  {"fast", 6, 6}
+};
+
+table = Table[
+  Module[{name, a, b, k, Ac, P, Ju, eigs},
+    {name, a, b} = c;
+    k = feedbackGain[a, b];
+    Ac = closedLoopMatrix[k];
+    P = lyapunovEffortMatrix[Ac, k];
+    Ju = x0 . P . x0;
+    eigs = Eigenvalues[Ac];
+    {name, a, k, Norm[k], N[Ju], N[eigs]}
+  ],
+  {c, cases}
+];
+
+Grid[
+  Prepend[table, {"case", "speed", "K", "Norm[K]", "J_u(x0)", "Eigenvalues"}],
+  Frame -> All
+]
+
+stateResponse[name_, a_, b_] := Module[
+  {k, Ac, x},
+  k = feedbackGain[a, b];
+  Ac = closedLoopMatrix[k];
+  x[t_] := MatrixExp[Ac t].x0;
+  {name, x}
+];
+
+responses = stateResponse @@@ cases;
+
+Plot[
+  Evaluate[Table[responses[[i, 2]][t][[1]], {i, Length[responses]}]],
+  {t, 0, 10},
+  PlotLegends -> responses[[All, 1]],
+  AxesLabel -> {"t", "x1(t)"},
+  PlotLabel -> "Faster closed-loop poles reduce settling time"
+]
+
+Plot[
+  Evaluate[
+    Table[
+      With[{k = feedbackGain[cases[[i, 2]], cases[[i, 3]]],
+            xfun = responses[[i, 2]]},
+        -k . xfun[t]
+      ],
+      {i, Length[cases]}
+    ]
+  ],
+  {t, 0, 10},
+  PlotLegends -> cases[[All, 1]],
+  AxesLabel -> {"t", "u(t)"},
+  PlotLabel -> "Faster closed-loop poles require larger input"
+]

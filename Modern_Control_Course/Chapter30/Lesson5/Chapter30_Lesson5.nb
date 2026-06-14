@@ -1,0 +1,65 @@
+Notebook[{
+Cell["Chapter30_Lesson5.nb", "Title"],
+Cell["Bridge lab for Modern Control: LQR, observer design, robustness preview, and finite-horizon MPC.", "Text"],
+Cell[BoxData[
+RowBox[{
+"ClearAll", "[", "\"Global`*\"", "]"}]], "Input"],
+Cell[BoxData[
+RowBox[{
+RowBox[{"A", "=", "{{0,1},{0,0}}"}], ";",
+RowBox[{"B", "=", "{{0},{1}}"}], ";",
+RowBox[{"Cmat", "=", "{{1,0}}"}], ";",
+RowBox[{"Q", "=", "DiagonalMatrix[{10,1}]"}], ";",
+RowBox[{"R", "=", "{{1/4}}"}], ";"}]], "Input"],
+Cell["Continuous-time LQR from the algebraic Riccati equation.", "Section"],
+Cell[BoxData[
+RowBox[{
+RowBox[{"P", "=", "{{p11,p12},{p12,p22}}"}], ";",
+RowBox[{"care", "=", 
+RowBox[{
+RowBox[{"Transpose[A].P"}], "+", RowBox[{"P.A"}], "-", 
+RowBox[{"P.B.Inverse[R].Transpose[B].P"}], "+", "Q"}]}], ";",
+RowBox[{"sols", "=", RowBox[{"Solve", "[", 
+RowBox[{RowBox[{"Thread", "[", RowBox[{"Flatten[care]", "==", "0"}], "]"}], ",", 
+"{p11,p12,p22}", ",", "Reals"}], "]"}]}], ";",
+RowBox[{"Psol", "=", RowBox[{"N", "[", RowBox[{"P", "/.", RowBox[{"sols", "[[4]]"}]}], "]"}]}], ";",
+RowBox[{"Klqr", "=", RowBox[{"N", "[", RowBox[{"Inverse[R].Transpose[B].Psol"}], "]"}]}], ";",
+RowBox[{"Eigenvalues", "[", RowBox[{"A", "-", RowBox[{"B.Klqr"}]}], "]"}]}]], "Input"],
+Cell["Observer gain by direct characteristic-polynomial matching for the double integrator.", "Section"],
+Cell[BoxData[
+RowBox[{
+RowBox[{"L", "=", "{{17},{72}}"}], ";",
+RowBox[{"Eigenvalues", "[", RowBox[{"A", "-", RowBox[{"L.Cmat"}]}], "]"}]}]], "Input"],
+Cell["Finite-horizon unconstrained MPC recursion for a sampled double integrator.", "Section"],
+Cell[BoxData[
+RowBox[{
+RowBox[{"Ts", "=", "0.05"}], ";",
+RowBox[{"Ad", "=", "{{1,Ts},{0,1}}"}], ";",
+RowBox[{"Bd", "=", "{{Ts^2/2},{Ts}}"}], ";",
+RowBox[{"Qd", "=", "Q"}], ";",
+RowBox[{"Rd", "=", "R"}], ";",
+RowBox[{"Nhor", "=", "25"}], ";",
+RowBox[{"Plist", "=", "{Psol}"}], ";",
+RowBox[{"Klist", "=", "{}"}], ";",
+RowBox[{"Do", "[", 
+RowBox[{
+RowBox[{
+RowBox[{"Pnext", "=", RowBox[{"First", "[", "Plist", "]"}]}], ";",
+RowBox[{"S", "=", RowBox[{"Rd", "+", RowBox[{"Transpose[Bd].Pnext.Bd"}]}]}], ";",
+RowBox[{"K", "=", RowBox[{"Inverse[S].Transpose[Bd].Pnext.Ad"}]}], ";",
+RowBox[{"PrependTo", "[", RowBox[{"Klist", ",", "K"}], "]"}], ";",
+RowBox[{"PrependTo", "[", RowBox[{"Plist", ",", 
+RowBox[{"Qd", "+", RowBox[{"Transpose[Ad].Pnext.", RowBox[{"(", RowBox[{"Ad", "-", RowBox[{"Bd.K"}]}], ")"}]}]}]}], "]"}]}],
+",", "{Nhor}"}], "]"}], ";",
+RowBox[{"First", "[", "Klist", "]"}]}]], "Input"],
+Cell["Robustness scan for A_delta = A + delta E.", "Section"],
+Cell[BoxData[
+RowBox[{
+RowBox[{"Eunc", "=", "{{0,0},{1,0}}"}], ";",
+RowBox[{"Table", "[", 
+RowBox[{
+RowBox[{"{", RowBox[{"delta", ",", 
+RowBox[{"Max", "[", RowBox[{"Re", "[", RowBox[{"Eigenvalues", "[", 
+RowBox[{"A", "+", RowBox[{"delta Eunc"}], "-", RowBox[{"B.Klqr"}]}], "]"}], "]"}], "]"}]}], "}"}],
+",", RowBox[{"{", RowBox[{"delta", ",", "-4", ",", "4", ",", "0.5"}], "}"}]}], "]"}]}]], "Input"]
+}]

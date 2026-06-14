@@ -1,0 +1,45 @@
+(* Chapter13_Lesson1.nb *)
+(* Wolfram Mathematica / Wolfram Language code for intuitive observability. *)
+
+ClearAll[observabilityMatrix, reportSystem];
+
+observabilityMatrix[A_, C_] := Module[
+  {n = Length[A]},
+  Join @@ Table[C . MatrixPower[A, k], {k, 0, n - 1}]
+];
+
+reportSystem[name_, A_, C_, x0_] := Module[
+  {O, z, xhat},
+  O = observabilityMatrix[A, C];
+  z = O . x0;
+  xhat = PseudoInverse[O] . z;
+  Print["\n", name];
+  Print["A = ", MatrixForm[A]];
+  Print["C = ", MatrixForm[C]];
+  Print["O_n = ", MatrixForm[O]];
+  Print["Rank[O_n] = ", MatrixRank[O], " out of n = ", Length[A]];
+  Print["stacked derivatives = ", z];
+  Print["least-squares reconstructed x0 = ", xhat];
+];
+
+A1 = {{0, 1}, {-2, -3}};
+C1 = {{1, 0}};
+x01 = {1, 2};
+reportSystem["Example 1: position sensor, observable", A1, C1, x01];
+
+A2 = {{-1, 0}, {0, -2}};
+C2 = {{1, 0}};
+x02 = {3, 4};
+reportSystem["Example 2: second state invisible, unobservable", A2, C2, x02];
+
+(* Zero-input output y(t)=C Exp[A t] x0. *)
+y1[t_] := C1 . MatrixExp[A1 t] . {1, 2};
+y2[t_] := C1 . MatrixExp[A1 t] . {1, -1};
+
+Plot[
+  {First[y1[t]], First[y2[t]]},
+  {t, 0, 5},
+  PlotLegends -> {"x0 = {1,2}", "x0 = {1,-1}"},
+  AxesLabel -> {"time", "y(t)"},
+  PlotLabel -> "Distinguishable zero-input output traces"
+]

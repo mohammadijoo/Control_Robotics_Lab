@@ -1,0 +1,7 @@
+Notebook[{
+Cell["Chapter 19 - Lesson 4: Minimal Realization via Decomposition", "Title"],
+Cell["This notebook computes controllability and observability matrices, compares full and minimal transfer functions, and verifies transfer equivalence for the worked example.", "Text"],
+Cell["ClearAll[controllabilityMatrix, observabilityMatrix, transferFunction];\n\ncontrollabilityMatrix[A_, B_] := Module[{n = Length[A]},\n  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]\n];\n\nobservabilityMatrix[A_, C_] := Module[{n = Length[A]},\n  ArrayFlatten[Table[{C.MatrixPower[A, k]}, {k, 0, n - 1}]]\n];\n\ntransferFunction[A_, B_, C_, D_, s_] :=\n  Simplify[C.Inverse[s IdentityMatrix[Length[A]] - A].B + D];\n\nAco = {{0, 1}, {-2, -3}};\nBco = {{0}, {1}};\nCco = {{1, 0}};\n\nA = ArrayFlatten[{{Aco, ConstantArray[0, {2, 1}], ConstantArray[0, {2, 1}]},\n                  {ConstantArray[0, {1, 2}], {{-4}}, {{0}}},\n                  {ConstantArray[0, {1, 2}], {{0}}, {{-5}}}}];\nB = {{0}, {1}, {1}, {0}};\nC = {{1, 0, 0, 2}};\nD = {{0}};\n\nWc = controllabilityMatrix[A, B];\nWo = observabilityMatrix[A, C];\n\n{MatrixRank[Wc], MatrixRank[Wo]}\n\nGfull = transferFunction[A, B, C, D, s]\n\nAmin = A[[1 ;; 2, 1 ;; 2]];\nBmin = B[[1 ;; 2, All]];\nCmin = C[[All, 1 ;; 2]];\nDmin = D;\n\nGmin = transferFunction[Amin, Bmin, Cmin, Dmin, s]\n\nFullSimplify[Gfull == Gmin]\n", "Input"]
+},
+WindowSize -> {900, 700},
+StyleDefinitions -> "Default.nb"]

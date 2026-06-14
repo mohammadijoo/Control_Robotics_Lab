@@ -1,0 +1,5 @@
+Notebook[{
+Cell["s = Unique[\"s\"];\n\nG1 = (s + 1)/(s + 2);\nG2 = (s + 2)/(s + 3);\n\nG = Together[G2*G1];\nGred = Cancel[G2*G1];\n\nPrint[\"G(s) Together: \", G];\nPrint[\"G(s) Cancel:   \", Gred];\n\n(* Control systems objects *)\nG1m = TransferFunctionModel[(s + 1)/(s + 2), s];\nG2m = TransferFunctionModel[(s + 2)/(s + 3), s];\nGcascade = SystemsModelSeriesConnect[G2m, G1m];\n\nGmin = TransferFunctionModel[(s + 1)/(s + 3), s];\n\nSseries = StateSpaceModel[Gcascade];\nSmin = MinimalStateSpaceModel[Sseries];\n\nPrint[\"State dimension (cascade SS): \", StateDimension[Sseries]];\nPrint[\"State dimension (minimal SS): \", StateDimension[Smin]];\n      ", "Input"]
+},
+WindowTitle -> "Chapter6/Lesson4.html"
+]

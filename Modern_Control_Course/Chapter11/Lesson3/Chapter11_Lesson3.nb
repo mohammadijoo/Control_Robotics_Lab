@@ -1,0 +1,8 @@
+Notebook[{
+Cell["Chapter11_Lesson3.nb", "Title"],
+Cell["Controllability in companion controllable canonical form", "Subtitle"],
+Cell[BoxData["(* Chapter11_Lesson3.nb *)\n\nClearAll[CompanionPair, ControllabilityMatrixCustom, coeffs, Ac, Bc, Qc];\n\nCompanionPair[coeffs_List] := Module[{n, A, B},\n  n = Length[coeffs];\n  A = ConstantArray[0, {n, n}];\n  Do[A[[i, i + 1]] = 1, {i, 1, n - 1}];\n  A[[n, All]] = -coeffs;\n  B = ConstantArray[0, {n, 1}];\n  B[[n, 1]] = 1;\n  {A, B}\n];\n\nControllabilityMatrixCustom[A_, B_] := Module[{n},\n  n = Length[A];\n  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]\n];\n\ncoeffs = {6, 11, 6}; (* p(s)=s^3+6s^2+11s+6 *)\n{Ac, Bc} = CompanionPair[coeffs];\nQc = ControllabilityMatrixCustom[Ac, Bc];\n\nAc // MatrixForm\nBc // MatrixForm\nQc // MatrixForm\nMatrixRank[Qc]\nDet[Qc]\n\n(* Optional verification *)\nEigenvalues[Ac]\nCharacteristicPolynomial[Ac, s] // Expand\n"], "Input"]
+},
+WindowSize->{900, 700},
+WindowTitle->"Chapter11_Lesson3.nb"
+]

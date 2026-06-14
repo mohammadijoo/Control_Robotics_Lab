@@ -1,0 +1,53 @@
+(* Chapter28_Lesson4.nb *)
+(* Wolfram Mathematica notebook-style code. Save as .nb or paste cells into a notebook. *)
+
+ClearAll["Global`*"];
+
+a = 0.4;
+b = 1.0;
+x0 = 1.0;
+
+cases = {
+   <|"name" -> "balanced", "q" -> 1.0, "r" -> 1.0|>,
+   <|"name" -> "larger_state_weight", "q" -> 25.0, "r" -> 1.0|>,
+   <|"name" -> "larger_input_weight", "q" -> 1.0, "r" -> 25.0|>,
+   <|"name" -> "small_input_weight", "q" -> 1.0, "r" -> 0.04|>
+};
+
+gain[a_, b_, q_, r_] := (a + Sqrt[a^2 + b^2 q/r])/b;
+lambdaCL[a_, b_, q_, r_] := a - b gain[a, b, q, r];
+
+table = cases /. c_Association :> {
+    c["name"],
+    c["q"],
+    c["r"],
+    gain[a, b, c["q"], c["r"]],
+    lambdaCL[a, b, c["q"], c["r"]],
+    -1/lambdaCL[a, b, c["q"], c["r"]],
+    -gain[a, b, c["q"], c["r"]] x0
+};
+
+Grid[
+  Prepend[table, {"case", "q", "r", "k", "lambda_cl", "settling indicator", "u(0)"}],
+  Frame -> All
+]
+
+sols = Table[
+   Module[{k = gain[a, b, c["q"], c["r"]], x},
+    x = NDSolveValue[
+      {x'[t] == (a - b k) x[t], x[0] == x0},
+      x,
+      {t, 0, 8}
+    ];
+    {c["name"], x}
+   ],
+   {c, cases}
+];
+
+Plot[
+ Evaluate[sols[[All, 2]][t]],
+ {t, 0, 8},
+ PlotLegends -> sols[[All, 1]],
+ AxesLabel -> {"time [s]", "x(t)"},
+ PlotLabel -> "Qualitative effect of q/r on scalar closed-loop decay"
+]

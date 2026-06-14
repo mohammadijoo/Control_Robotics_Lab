@@ -1,0 +1,78 @@
+(* Chapter10_Lesson4.nb *)
+
+(* Physical Interpretation: Actuator Placement and Authority
+   Modern Control - Chapter 10, Lesson 4
+
+   Paste this code into a Mathematica notebook. It computes the reachability
+   matrix, finite-horizon controllability Gramian, directional authority,
+   and modal authority for several actuator placements.
+*)
+
+ClearAll["Global`*"];
+
+controllabilityMatrix[A_, B_] := Module[{n = Length[A]},
+  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]
+];
+
+finiteHorizonGramian[A_, B_, T_] := NIntegrate[
+  MatrixExp[A tau].B.Transpose[B].MatrixExp[Transpose[A] tau],
+  {tau, 0, T}
+];
+
+modalAuthority[A_, B_] := Module[{vals, vecs, vinv, scores},
+  {vals, vecs} = Eigensystem[A];
+  (* Eigensystem returns eigenvectors as rows; transpose makes columns. *)
+  vinv = Inverse[Transpose[vecs]];
+  scores = Norm /@ (vinv.B);
+  Transpose[{vals, scores}]
+];
+
+K = {{2, -1}, {-1, 2}};
+Damp = {{0.08, 0}, {0, 0.08}};
+A = ArrayFlatten[{
+   {ConstantArray[0, {2, 2}], IdentityMatrix[2]},
+   {-K, -Damp}
+}];
+
+placements = {
+   {"force on mass 1 only", {{1}, {0}}},
+   {"force on mass 2 only", {{0}, {1}}},
+   {"same force on both masses", {{1}, {1}}},
+   {"independent forces on both masses", IdentityMatrix[2]}
+};
+
+targets = {
+   {"displace mass 1", {1, 0, 0, 0}},
+   {"displace mass 2", {0, 1, 0, 0}},
+   {"relative motion", {1/Sqrt[2], -1/Sqrt[2], 0, 0}},
+   {"common motion", {1/Sqrt[2], 1/Sqrt[2], 0, 0}}
+};
+
+Tfinal = 5;
+
+Table[
+  Module[{name, G, B, Ctrb, W, dirScores, modScores},
+    name = placement[[1]];
+    G = placement[[2]];
+    B = ArrayFlatten[{{ConstantArray[0, {2, Length[Transpose[G]]}]}, {G}}];
+
+    Ctrb = controllabilityMatrix[A, B];
+    W = finiteHorizonGramian[A, B, Tfinal];
+
+    dirScores = Table[
+      {target[[1]], N[target[[2]].W.target[[2]]]},
+      {target, targets}
+    ];
+
+    modScores = modalAuthority[A, B];
+
+    <|
+      "Placement" -> name,
+      "ReachabilityRank" -> MatrixRank[Ctrb],
+      "GramianEigenvalues" -> N[Eigenvalues[W]],
+      "DirectionalAuthority" -> dirScores,
+      "ModalAuthority" -> N[modScores]
+    |>
+  ],
+  {placement, placements}
+] // Dataset

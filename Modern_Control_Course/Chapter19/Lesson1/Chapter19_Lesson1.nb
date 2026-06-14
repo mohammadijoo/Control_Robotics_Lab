@@ -1,0 +1,5 @@
+Notebook[{
+Cell["Chapter19_Lesson1.nb", "Title"],
+Cell["Modern Control - Chapter 19, Lesson 1: Controllable/Uncontrollable Subspaces", "Subtitle"],
+Cell["ClearAll[\"Global`*\"]\n\nA = {{0, 1, 0}, {0, 0, 0}, {0, 0, -2}};\nB = {{0}, {1}, {0}};\nn = Length[A];\n\nWc = ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}];\nr = MatrixRank[Wc];\n\nQc = Transpose[Orthogonalize[Transpose[Wc]]];\nQu = Transpose[NullSpace[Transpose[Qc]]];\nT = ArrayFlatten[{{Qc, Qu}}];\n\nAbar = Chop[Inverse[T].A.T];\nBbar = Chop[Inverse[T].B];\n\nPrint[\"Wc = \", MatrixForm[Wc]];\nPrint[\"Rank(Wc) = \", r, \" out of n = \", n];\nPrint[\"Qc = \", MatrixForm[Qc]];\nPrint[\"Qu = \", MatrixForm[Qu]];\nPrint[\"Abar = \", MatrixForm[Abar]];\nPrint[\"Bbar = \", MatrixForm[Bbar]];", "Input"]
+}]

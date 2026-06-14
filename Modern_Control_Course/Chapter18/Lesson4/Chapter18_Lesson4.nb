@@ -1,0 +1,14 @@
+Notebook[{
+Cell["Chapter 18 Lesson 4: Repeated Eigenvalues and Non-Diagonalizable Systems", "Title"],
+Cell["This notebook computes the exponential of a 3 x 3 Jordan block and verifies the polynomial-times-exponential response structure.", "Text"],
+Cell["lambda = -0.4;
+A = {{lambda, 1, 0}, {0, lambda, 1}, {0, 0, lambda}};
+x0 = {1, -2, 1.5};", "Input"],
+Cell["geomMult = Length[A] - MatrixRank[A - lambda IdentityMatrix[3]];
+geomMult", "Input"],
+Cell["PhiJordan[t_] := Exp[lambda t] {{1, t, t^2/2}, {0, 1, t}, {0, 0, 1}};
+FullSimplify[MatrixExp[A t] - PhiJordan[t]]", "Input"],
+Cell["x[t_] := PhiJordan[t].x0;
+Table[{t, x[t]}, {t, 0, 8, 1}]", "Input"],
+Cell["Plot[Evaluate[x[t]], {t, 0, 8}, PlotLegends -> {\"x1\", \"x2\", \"x3\"}, GridLines -> Automatic, PlotLabel -> \"Jordan-block state response\"]", "Input"]
+}]

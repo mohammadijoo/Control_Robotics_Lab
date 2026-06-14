@@ -1,0 +1,53 @@
+Notebook[{
+ Cell["Chapter22_Lesson1.nb", "Title"],
+ Cell["Structure of state-feedback law: u = -K x + r", "Subtitle"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"A", "=", RowBox[{"{{", RowBox[{
+     RowBox[{"0", ",", "1"}], "}", ",", "{", RowBox[{"-2", ",", "-0.4"}], "}"}], "}}"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"B", "=", RowBox[{"{{", "0", "}", ",", "{", "1", "}}"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"Cmat", "=", RowBox[{"{{", RowBox[{"1", ",", "0"}], "}}"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"K", "=", RowBox[{"{{", RowBox[{"4", ",", "2.6"}], "}}"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"Acl", "=", RowBox[{"A", "-", RowBox[{"B", ".", "K"}]}]}], ";"}]], "Input"],
+ Cell[BoxData[RowBox[{"MatrixForm", "[", "Acl", "]"}]], "Input"],
+ Cell[BoxData[RowBox[{"Eigenvalues", "[", "Acl", "]"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"r", "=", "1"}], ";",
+   RowBox[{"xbar", "=", RowBox[{"-", RowBox[{"LinearSolve", "[", RowBox[{"Acl", ",", RowBox[{"B", " ", "r"}]}], "]"}]}]}], ";",
+   RowBox[{"ybar", "=", RowBox[{"Cmat", ".", "xbar"}]}]}]], "Input"],
+ Cell[BoxData[RowBox[{"{", RowBox[{"xbar", ",", "ybar"}], "}"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"sol", "=", RowBox[{"NDSolve", "[",
+    RowBox[{
+     RowBox[{"{",
+      RowBox[{
+       RowBox[{RowBox[{"x1", "'"}], "[", "t", "]"}], "==",
+        RowBox[{RowBox[{"x2", "[", "t", "]"}]}]}], ",",
+       RowBox[{RowBox[{RowBox[{"x2", "'"}], "[", "t", "]"}], "==",
+        RowBox[{RowBox[{"-2", " ", RowBox[{"x1", "[", "t", "]"}]}], "-",
+         RowBox[{"0.4", " ", RowBox[{"x2", "[", "t", "]"}]}], "+",
+         RowBox[{"(", RowBox[{
+          RowBox[{"-", RowBox[{"K", "[", RowBox[{"[", RowBox[{"1", ",", "1"}], "]"}], "]"}], " ", RowBox[{"x1", "[", "t", "]"}]}], "-",
+          RowBox[{RowBox[{"K", "[", RowBox[{"[", RowBox[{"1", ",", "2"}], "]"}], "]"}], " ", RowBox[{"x2", "[", "t", "]"}]}], "+", "r"}], ")"}]}]}], ",",
+       RowBox[{RowBox[{"x1", "[", "0", "]"}], "==", "0.2"}], ",",
+       RowBox[{RowBox[{"x2", "[", "0", "]"}], "==", "0"}]}], "}"}], ",",
+     RowBox[{"{", RowBox[{"x1", ",", "x2"}], "}"}], ",",
+     RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}]}], "]"}]}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{"Plot", "[",
+   RowBox[{
+    RowBox[{"Evaluate", "[", RowBox[{RowBox[{"x1", "[", "t", "]"}], "/.", "sol"}], "]"}], ",",
+    RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}], ",",
+    RowBox[{"PlotLabel", "->", "\"Closed-loop output y = x1\""}], ",",
+    RowBox[{"AxesLabel", "->", RowBox[{"{", RowBox[{"\"t\"", ",", "\"y\""}], "}"}]}]}], "]"}]], "Input"]
+}]

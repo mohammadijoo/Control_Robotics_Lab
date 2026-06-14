@@ -1,0 +1,48 @@
+Notebook[{
+Cell["Chapter10_Lesson3.nb", "Title"],
+Cell["Finite-Time Reachability and Minimum-Energy Control Duration", "Section"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", RowBox[{"{{", RowBox[{"0", ",", "1"}], "}", ",", RowBox[{"{", RowBox[{"0", ",", "0"}], "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"B", "=", RowBox[{"{{", "0", "}", ",", RowBox[{"{", "1", "}"}]}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"x0", "=", RowBox[{"{", RowBox[{"0", ",", "0"}], "}"}]}], ";",
+  RowBox[{"xT", "=", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"controllabilityMatrix", "[", RowBox[{"A_", ",", "B_"}], "]"}], ":=",
+  RowBox[{"ArrayFlatten", "[", RowBox[{"{", RowBox[{"Table", "[", RowBox[{
+  RowBox[{"MatrixPower", "[", RowBox[{"A", ",", "k"}], "]"}], ".", "B"}], ",",
+  RowBox[{"{", RowBox[{"k", ",", "0", ",", RowBox[{
+  RowBox[{"Length", "[", "A", "]"}], "-", "1"}]}], "}"}]}], "]"}], "}"}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"finiteTimeGramian", "[", RowBox[{"A_", ",", "B_", ",", "T_"}], "]"}], ":=",
+  RowBox[{"NIntegrate", "[", RowBox[{
+  RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "s"}], "]"}], ".", "B", ".",
+  RowBox[{"Transpose", "[", "B", "]"}], ".", RowBox[{"Transpose", "[",
+  RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "s"}], "]"}], "]"}]}], ",",
+  RowBox[{"{", RowBox[{"s", ",", "0", ",", "T"}], "}"}]}], "]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{"MatrixRank", "[", RowBox[{"controllabilityMatrix", "[", RowBox[{"A", ",", "B"}], "]"}], "]"}]], "Input"],
+Cell[BoxData[
+ RowBox[{"Table", "[", RowBox[{
+  RowBox[{"Module", "[", RowBox[{
+  RowBox[{"{", RowBox[{"W", ",", "d", ",", "energy", ",", "u"}], "}"}], ",",
+  RowBox[{
+  RowBox[{"W", "=", RowBox[{"finiteTimeGramian", "[", RowBox[{"A", ",", "B", ",", "T"}], "]"}]}], ";",
+  RowBox[{"d", "=", RowBox[{"xT", "-", RowBox[{
+  RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "T"}], "]"}], ".", "x0"}]}]}], ";",
+  RowBox[{"energy", "=", RowBox[{"d", ".", RowBox[{"PseudoInverse", "[", "W", "]"}], ".", "d"}]}], ";",
+  RowBox[{"u", "=", RowBox[{"Function", "[", RowBox[{"t", ",",
+  RowBox[{
+  RowBox[{"Transpose", "[", "B", "]"}], ".", RowBox[{"Transpose", "[",
+  RowBox[{"MatrixExp", "[", RowBox[{"A", " ", RowBox[{"(", RowBox[{"T", "-", "t"}], ")"}]}], "]"}], "]"}], ".",
+  RowBox[{"PseudoInverse", "[", "W", "]"}], ".", "d"}]}], "]"}]}], ";",
+  RowBox[{"{", RowBox[{"T", ",", "W", ",", "energy", ",",
+  RowBox[{"u", "[", "0", "]"}], ",", RowBox[{"u", "[", RowBox[{"T", "/", "2"}], "]"}], ",", RowBox[{"u", "[", "T", "]"}]}], "}"}]}]}],
+  "]"}], ",", RowBox[{"{", RowBox[{"T", ",", RowBox[{"{", RowBox[{"0.5", ",", "1.0", ",", "2.0", ",", "4.0"}], "}"}]}], "}"}]}], "]"}]], "Input"]
+}]

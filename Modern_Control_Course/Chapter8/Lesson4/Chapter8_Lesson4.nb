@@ -1,0 +1,20 @@
+Notebook[{
+Cell["Chapter8_Lesson4.nb — Computing Phi(t) using Jordan Form", "Title"],
+Cell["This notebook computes the state transition matrix Phi(t)=P exp(J t) P^-1 from a known Jordan decomposition.", "Text"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Clear", "[", "\"Global`*\"", "]"}], ";", "\n",
+  RowBox[{"J", "=", "{{2,1,0},{0,2,0},{0,0,-1}}"}], ";", "\n",
+  RowBox[{"P", "=", "{{1,1,0},{0,1,1},{1,0,1}}"}], ";", "\n",
+  RowBox[{"A", "=", RowBox[{"Simplify", "[", RowBox[{"P", ".", "J", ".", RowBox[{"Inverse", "[", "P", "]"}]}], "]"}]}], ";", "\n",
+  RowBox[{
+   RowBox[{"expJ", "[", "t_", "]"}], ":=", "{{Exp[2 t],t Exp[2 t],0},{0,Exp[2 t],0},{0,0,Exp[-t]}}"}], ";", "\n",
+  RowBox[{
+   RowBox[{"PhiJordan", "[", "t_", "]"}], ":=", RowBox[{"Simplify", "[", RowBox[{"P", ".", RowBox[{"expJ", "[", "t", "]"}], ".", RowBox[{"Inverse", "[", "P", "]"}]}], "]"}]}], ";", "\n",
+  RowBox[{
+   RowBox[{"PhiBuiltIn", "[", "t_", "]"}], ":=", RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "t"}], "]"}]}], ";", "\n",
+  RowBox[{"FullSimplify", "[", RowBox[{RowBox[{"PhiJordan", "[", "t", "]"}], "==", RowBox[{"PhiBuiltIn", "[", "t", "]"}]}], "]"}], "\n",
+  RowBox[{"N", "[", RowBox[{RowBox[{"PhiJordan", "[", "0.40", "]"}], "//", "MatrixForm"}], "]"}], "\n",
+  RowBox[{"N", "[", RowBox[{"Norm", "[", RowBox[{RowBox[{RowBox[{"PhiJordan", "[", "0.40", "]"}], "-", RowBox[{"PhiBuiltIn", "[", "0.40", "]"}]}], ",", "\"Frobenius\""}], "]"}], "]"}]
+ }]], "Input"]
+}]

@@ -1,0 +1,125 @@
+(* ::Package:: *)
+
+(* Chapter7_Lesson5.nb
+   Modern Control — Chapter 7, Lesson 5: Numerical Simulation of State Equations
+
+   This notebook (in text form) demonstrates:
+     - Continuous-time simulation with NDSolve
+     - Fixed-step RK4 implemented from scratch
+     - Exact ZOH discretization via MatrixExp and Van Loan augmentation
+*)
+
+Notebook[{
+  Cell["Chapter 7 — Lesson 5: Numerical Simulation of State Equations", "Title"],
+
+  Cell["Define an LTI state equation x'(t) = A x(t) + B u(t).", "Text"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"A", "=", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",",
+                                        RowBox[{"{", RowBox[{"-2", ",", RowBox[{"-", "3"}]}], "}"}]}], "}"}]}], ";",
+      RowBox[{"B", "=", RowBox[{"{", RowBox[{RowBox[{"{", "0", "}"}], ",", RowBox[{"{", "1", "}"}]}], "}"}]}], ";",
+      RowBox[{"u", "[", "t_", "]"}], ":=", RowBox[{"Sin", "[", RowBox[{"2", " ", "t"}], "]"}], ";",
+      RowBox[{"x0", "=", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], ";",
+      RowBox[{"t0", "=", "0"}], ";", RowBox[{"tf", "=", "10"}], ";", RowBox[{"h", "=", "0.01"}], ";"
+    }]], "Input"],
+
+  Cell["1) Reference continuous-time solution using NDSolve.", "Section"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"sol", "=", RowBox[{"NDSolveValue", "[",
+        RowBox[{
+          RowBox[{"{",
+            RowBox[{
+              RowBox[{
+                RowBox[{"x", "'"}], "[", "t", "]"}], "\[Equal]",
+                RowBox[{
+                  RowBox[{"A", ".", RowBox[{"x", "[", "t", "]"}]}], "+",
+                  RowBox[{"Flatten", "[", RowBox[{"B", " ", RowBox[{"u", "[", "t", "]"}]}], "]"}]
+                }
+              }],
+              ",",
+              RowBox[{
+                RowBox[{"x", "[", "t0", "]"}], "\[Equal]", "x0"
+              }]
+            }], "}"}], ",",
+          "x", ",", RowBox[{"{", RowBox[{"t", ",", "t0", ",", "tf"}], "}"}]
+        }], "]"}]}], ";"
+    }]], "Input"],
+
+  Cell["2) Fixed-step RK4 implemented from scratch.", "Section"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"f", "[", RowBox[{"t_", ",", "x_"}], "]"}], ":=",
+        RowBox[{
+          RowBox[{"A", ".", "x"}], "+",
+          RowBox[{"Flatten", "[", RowBox[{"B", " ", RowBox[{"u", "[", "t", "]"}]}], "]"}]
+        }], ";",
+      RowBox[{"rk4Step", "[", RowBox[{"t_", ",", "x_", ",", "h_"}], "]"}], ":=",
+        RowBox[{"Module", "[",
+          RowBox[{
+            RowBox[{"{", RowBox[{"k1", ",", "k2", ",", "k3", ",", "k4"}], "}"}], ",",
+            RowBox[{
+              RowBox[{"k1", "=", RowBox[{"f", "[", RowBox[{"t", ",", "x"}], "]"}]}], ";",
+              RowBox[{"k2", "=", RowBox[{"f", "[", RowBox[{"t", "+", RowBox[{"h", "/", "2"}], ",",
+                                RowBox[{"x", "+", RowBox[{"h", " ", RowBox[{"k1", "/", "2"}]}]}]}], "]"}]}], ";",
+              RowBox[{"k3", "=", RowBox[{"f", "[", RowBox[{"t", "+", RowBox[{"h", "/", "2"}], ",",
+                                RowBox[{"x", "+", RowBox[{"h", " ", RowBox[{"k2", "/", "2"}]}]}]}], "]"}]}], ";",
+              RowBox[{"k4", "=", RowBox[{"f", "[", RowBox[{"t", "+", "h", ",",
+                                RowBox[{"x", "+", RowBox[{"h", " ", "k3"}]}]}], "]"}]}], ";",
+              RowBox[{"x", "+", RowBox[{"h", " ", RowBox[{"(", RowBox[{"k1", "+", RowBox[{"2", " ", "k2"}], "+",
+                               RowBox[{"2", " ", "k3"}], "+", "k4"}], ")"}], "/", "6"}]}]
+            }
+          }], "]"}], ";"
+    }]], "Input"],
+
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"tgrid", "=", RowBox[{"Range", "[", RowBox[{"t0", ",", "tf", ",", "h"}], "]"}]}], ";",
+      RowBox[{"xrk4", "=", RowBox[{"NestList", "[",
+        RowBox[{
+          RowBox[{
+            RowBox[{"rk4Step", "[", RowBox[{"#2", ",", "#1", ",", "h"}], "]"}], "&"
+          }], ",",
+          "x0", ",",
+          RowBox[{"Most", "[", "tgrid", "]"}]
+        }], "]"}]}], ";"
+    }]], "Input"],
+
+  Cell["3) Exact ZOH discretization (Van Loan).", "Section"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"n", "=", RowBox[{"Length", "[", "A", "]"}]}], ";",
+      RowBox[{"m", "=", RowBox[{"Dimensions", "[", "B", "]"}], "[", RowBox[{"[", "2", "]"}], "]"}], ";",
+      RowBox[{"M", "=", RowBox[{"ArrayFlatten", "[",
+        RowBox[{"{",
+          RowBox[{
+            RowBox[{"{", RowBox[{"A", ",", "B"}], "}"}], ",",
+            RowBox[{"{", RowBox[{RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"{", RowBox[{"m", ",", "n"}], "}"}]}], "]"}], ",",
+                             RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"{", RowBox[{"m", ",", "m"}], "}"}]}], "]"}]}], "}"}]
+          }], "}"}], "]"}]}], ";",
+      RowBox[{"E", "=", RowBox[{"MatrixExp", "[", RowBox[{"M", " ", "h"}], "]"}]}], ";",
+      RowBox[{"Ad", "=", RowBox[{"E", "[", RowBox[{"[", RowBox[{RowBox[{"1", ";;", "n"}], ",", RowBox[{"1", ";;", "n"}]}], "]"}], "]"}]}], ";",
+      RowBox[{"Bd", "=", RowBox[{"E", "[", RowBox[{"[", RowBox[{RowBox[{"1", ";;", "n"}], ",", RowBox[{"n", "+", "1", ";;", "n", "+", "m"}]}], "]"}], "]"}]}], ";"
+    }]], "Input"],
+
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"xzoh", "=", RowBox[{"FoldList", "[",
+        RowBox[{
+          RowBox[{
+            RowBox[{"Ad", ".", "#1", "+", RowBox[{"Flatten", "[", RowBox[{"Bd", " ", RowBox[{"u", "[", "#2", "]"}]}], "]"}]}], "&"
+          }], ",",
+          "x0", ",",
+          RowBox[{"Most", "[", "tgrid", "]"}]
+        }], "]"}]}], ";"
+    }]], "Input"],
+
+  Cell["Compute max-norm errors versus NDSolve on the same grid.", "Text"],
+  Cell[BoxData[
+    RowBox[{
+      RowBox[{"xref", "=", RowBox[{"sol", "/@", "tgrid"}]}], ";",
+      RowBox[{"errRK4", "=", RowBox[{"Max", "[", RowBox[{"Norm", "/@", RowBox[{"(", RowBox[{"xrk4", "-", "xref"}], ")"}]}], "]"}]}], ";",
+      RowBox[{"errZOH", "=", RowBox[{"Max", "[", RowBox[{"Norm", "/@", RowBox[{"(", RowBox[{"xzoh", "-", "xref"}], ")"}]}], "]"}]}], ";",
+      RowBox[{"{", RowBox[{"errRK4", ",", "errZOH"}], "}"}]
+    }]], "Input"]
+}]

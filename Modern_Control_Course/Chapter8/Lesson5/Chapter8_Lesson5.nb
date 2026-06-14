@@ -1,0 +1,48 @@
+Notebook[{
+Cell["Chapter8_Lesson5.nb", "Title"],
+Cell["Numerical computation of the state transition matrix Phi(t)=MatrixExp[A t].", "Text"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", "{{0,1,0},{0,0,1},{-2,-3,-4}}"}], ";",
+  RowBox[{"B", "=", "{{0},{0},{1}}"}], ";",
+  RowBox[{"t", "=", "0.5"}], ";",
+  RowBox[{"h", "=", "0.1"}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Phi", "=", "N[MatrixExp[A t]]"}], ";",
+  RowBox[{"MatrixForm[Phi]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SemigroupError", "=", 
+   "Norm[N[MatrixExp[A t].MatrixExp[A 0.25]-MatrixExp[A (t+0.25)]], Infinity]"}],
+  ";", "SemigroupError"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"InverseError", "=", 
+   "Norm[N[MatrixExp[A t].MatrixExp[-A t]-IdentityMatrix[3]], Infinity]"}],
+  ";", "InverseError"}]], "Input"],
+Cell["Van Loan block exponential for exact zero-order-hold discretization.", "Text"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"M", "=", "ArrayFlatten[{{A,B},{ConstantArray[0,{1,3}],ConstantArray[0,{1,1}]}}]"}], ";",
+  RowBox[{"EM", "=", "N[MatrixExp[M h]]"}], ";",
+  RowBox[{"Ad", "=", "EM[[1;;3,1;;3]]"}], ";",
+  RowBox[{"Bd", "=", "EM[[1;;3,4;;4]]"}], ";",
+  RowBox[{"{MatrixForm[Ad],MatrixForm[Bd]}"}]}]], "Input"],
+Cell["Educational scaling-and-squaring Taylor implementation.", "Text"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ExpmTaylorScalingSquaring[M_, order_:40] := Module[{n, mnorm, scale, As, E, term, k},",
+  "n=Length[M];",
+  "mnorm=Norm[M, Infinity];",
+  "scale=If[mnorm>0, Max[0, Ceiling[Log[2,mnorm]]], 0];",
+  "As=N[M/2^scale];",
+  "E=IdentityMatrix[n];",
+  "term=IdentityMatrix[n];",
+  "For[k=1,k<=order,k++, term=term.As/k; E=E+term];",
+  "Do[E=E.E,{scale}]; E]"}]}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PhiScratch", "=", "ExpmTaylorScalingSquaring[A t,45]"}], ";",
+  RowBox[{"Norm[PhiScratch-Phi,Infinity]"}]}]], "Input"]
+}]

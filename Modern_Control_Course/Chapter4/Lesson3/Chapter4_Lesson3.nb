@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Define matrices *)\nA = { {0, 1, 0},\n     {0, 0, 0},\n     {0, 0, -1} };\nB = { {0}, {1}, {0} };\nC = { {1, 0, 0} };\nD = { {0} };\n\nn = Length[A];\n\n(* Build O = [C; C.A; ...; C.A^(n-1)] *)\nO = ArrayFlatten@Table[C.MatrixPower[A, k], {k, 0, n - 1}];\n\nrankO = MatrixRank[O];\nNyBasis = NullSpace[O];  (* list of basis vectors *)\n\nPrint[\"O = \", O];\nPrint[\"rank(O) = \", rankO];\nPrint[\"Ny basis vectors = \", NyBasis];\n\n(* State-space model and minimal reduction (ControlSystems` package) *)\nNeeds[\"ControlSystems`\"];\nsys = StateSpaceModel[{A, B, C, D}];\n\n(* MinimalStateSpaceModel attempts to remove redundant states *)\nsysMin = MinimalStateSpaceModel[sys];\n\nPrint[\"Original order = \", Length[sys[\"State\"]]];\nPrint[\"Reduced order = \", Length[sysMin[\"State\"]]];\n      ", "Input"]
+},
+WindowTitle -> "Chapter4/Lesson3.html"
+]

@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Physical parameters *)\nm = 1.0;\nc = 0.4;\nk = 2.0;\n\nA = { {0, 1}, {-k/m, -c/m} };\nB = { {0}, {1/m} };\nC = {{1, 0}};\nD = {{0}};\n\nsys = StateSpaceModel[{A, B, C, D}];\n\n(* Step response of position to a unit step input *)\nresp = OutputResponse[sys, UnitStep[t], {t, 0, 10}];\nPlot[resp[[1]], {t, 0, 10}, PlotLabel -> \"Position response\"]\n      ", "Input"]
+},
+WindowTitle -> "Chapter1/Lesson1.html"
+]

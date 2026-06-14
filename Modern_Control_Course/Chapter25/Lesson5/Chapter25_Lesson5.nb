@@ -1,0 +1,57 @@
+(* Chapter25_Lesson5.nb *)
+Notebook[{
+Cell["Chapter25_Lesson5.nb", "Title"],
+Cell["Structural Constraints: Limited Actuators and Sparse Feedback", "Subtitle"],
+Cell["This Wolfram Mathematica notebook-style script studies actuator selection, controllability rank, sparse feedback masks, and closed-loop eigenvalues.", "Text"],
+Cell[BoxData[
+ ToBoxes[
+  ClearAll["Global`*"];
+  A = {{0, 1, 0, 0}, {-2, -0.25, 0.7, 0}, {0, 0, 0, 1}, {0.6, 0, -1.5, -0.20}};
+  Bcandidates = {{0, 0, 0}, {1, 0.2, 0}, {0, 0, 0}, {0, 0.4, 1}};
+  n = Length[A];
+  controllabilityMatrix[A_, B_] := ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}];
+  subsets = Rest[Subsets[Range[3]]];
+  actuatorReport = Table[
+    Bsel = Bcandidates[[All, s]];
+    {s, MatrixRank[controllabilityMatrix[A, Bsel]]},
+    {s, subsets}
+  ];
+  actuatorReport
+ ]
+], "Input"],
+Cell["A selected two-actuator structure is used below. The dense feedback is compared with a sparse communication mask.", "Text"],
+Cell[BoxData[
+ ToBoxes[
+  B = Bcandidates[[All, {1, 3}]];
+  Kdense = {{3.0, 2.0, 0.9, 0.4}, {0.6, 0.3, 2.6, 1.8}};
+  mask = {{1, 1, 0, 0}, {0, 0, 1, 1}};
+  Ksparse = Kdense*mask;
+  {
+    "OpenLoopEigenvalues" -> Eigenvalues[A],
+    "DenseClosedLoopEigenvalues" -> Eigenvalues[A - B.Kdense],
+    "SparseClosedLoopEigenvalues" -> Eigenvalues[A - B.Ksparse]
+  }
+ ]
+], "Input"],
+Cell["Finite-horizon controllability Gramian proxy for actuator-authority comparison.", "Text"],
+Cell[BoxData[
+ ToBoxes[
+  gramianApprox[A_, B_, T_, h_] := Module[{W, Phi, steps},
+    W = ConstantArray[0, {Length[A], Length[A]}];
+    Phi = IdentityMatrix[Length[A]];
+    steps = Round[T/h];
+    Do[
+      W = W + Phi.B.Transpose[B].Transpose[Phi] h;
+      Phi = Phi + h A.Phi,
+      {steps}
+    ];
+    W
+  ];
+  Table[
+    Bsel = Bcandidates[[All, s]];
+    {s, Tr[gramianApprox[A, Bsel, 5, 0.01]]},
+    {s, subsets}
+  ]
+ ]
+], "Input"]
+}]

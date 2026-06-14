@@ -1,0 +1,5 @@
+Notebook[{
+Cell["Chapter18_Lesson1.nb", "Title"],
+Cell["Jordan blocks and generalized eigenvectors for a state-space matrix.", "Text"],
+Cell['(* Chapter18_Lesson1.nb *)\n(* Wolfram Mathematica / Wolfram Language code for Jordan blocks and generalized eigenvectors. *)\n\nClearAll[lambda, t, A, Nmat, v1, v2, v3, w, Tmat, Jmat, S, ExpJ3];\n\nA = {\n  {2, 1, 0, 0},\n  {0, 2, 1, 0},\n  {0, 0, 2, 0},\n  {0, 0, 0, -1}\n};\n\nlambda = 2;\nNmat = A - lambda IdentityMatrix[4];\n\nTable[\n  {"k" -> k, "Rank" -> MatrixRank[MatrixPower[Nmat, k]],\n   "Nullity" -> 4 - MatrixRank[MatrixPower[Nmat, k]]},\n  {k, 1, 4}\n]\n\nv3 = {0, 0, 1, 0};\nv2 = Nmat.v3;\nv1 = Nmat.v2;\n\n{"v1" -> v1, "v2" -> v2, "v3" -> v3}\n\n{"N.v1" -> Nmat.v1, "N.v2" -> Nmat.v2, "N.v3" -> Nmat.v3}\n\nw = {0, 0, 0, 1};\nTmat = Transpose[{v1, v2, v3, w}];\nJmat = Inverse[Tmat].A.Tmat;\nMatrixForm[Jmat]\n\nS = {\n  {0, 1, 0},\n  {0, 0, 1},\n  {0, 0, 0}\n};\n\nExpJ3 = Exp[lambda t] (IdentityMatrix[3] + t S + (t^2/2) MatrixPower[S, 2]);\nMatrixForm[ExpJ3]\n\n(* Mathematica also provides JordanDecomposition[A] for symbolic matrices. *)\nJordanDecomposition[A]\n', "Input"]
+}]

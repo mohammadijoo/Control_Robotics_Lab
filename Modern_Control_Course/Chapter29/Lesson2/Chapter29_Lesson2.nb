@@ -1,0 +1,79 @@
+Notebook[{
+Cell["Chapter29_Lesson2.nb", "Title"],
+Cell[BoxData[ToBoxes[
+(* Chapter29_Lesson2.nb *)
+(* Time-varying state transition matrix and Peano-Baker approximation. *)
+
+ClearAll[\"Global`*\"];
+
+A[t_] := {{0, 1}, {-2 - 1/2 Sin[t], -2/5 + 1/5 Cos[2 t]}};
+
+t0 = 0;
+tf = 6;
+n = 2;
+
+phiSol = NDSolveValue[
+   {Phi'[t] == A[t].Phi[t], Phi[t0] == IdentityMatrix[n]},
+   Phi,
+   {t, t0, tf},
+   WorkingPrecision -> 30,
+   AccuracyGoal -> 18,
+   PrecisionGoal -> 18
+];
+
+PhiODE = N[phiSol[tf], 12];
+
+PeanoBaker[t0_, tf_, order_Integer, steps_Integer] := Module[
+   {h, grid, terms, smid, integrand, k, j},
+   h = N[(tf - t0)/steps];
+   grid = N[Subdivide[t0, tf, steps]];
+   terms = Table[ConstantArray[0, {2, 2}], {order + 1}, {steps + 1}];
+
+   Do[terms[[1, j]] = IdentityMatrix[2], {j, 1, steps + 1}];
+
+   Do[
+    terms[[k, 1]] = ConstantArray[0, {2, 2}];
+    Do[
+     smid = 0.5 (grid[[j - 1]] + grid[[j]]);
+     integrand = A[smid].terms[[k - 1, j - 1]];
+     terms[[k, j]] = terms[[k, j - 1]] + h integrand;
+     ,
+     {j, 2, steps + 1}
+     ];
+    ,
+    {k, 2, order + 1}
+    ];
+
+   Total[Table[terms[[k, steps + 1]], {k, 1, order + 1}]]
+];
+
+Print[\"Phi(tf,t0) from NDSolve:\"];
+Print[MatrixForm[PhiODE]];
+
+Do[
+  PhiPB = N[PeanoBaker[t0, tf, q, 5000], 12];
+  err = Norm[PhiPB - PhiODE, \"Frobenius\"];
+  Print[\"Peano-Baker order \", q, \" error: \", ScientificForm[err, 6]];
+  ,
+  {q, {1, 2, 3, 4, 6, 8}}
+];
+
+Phi60 = NDSolveValue[
+   {P'[t] == A[t].P[t], P[0] == IdentityMatrix[2]},
+   P, {t, 0, 6}
+][6];
+
+Phi62 = NDSolveValue[
+   {P'[t] == A[t].P[t], P[2.5] == IdentityMatrix[2]},
+   P, {t, 2.5, 6}
+][6];
+
+Phi20 = NDSolveValue[
+   {P'[t] == A[t].P[t], P[0] == IdentityMatrix[2]},
+   P, {t, 0, 2.5}
+][2.5];
+
+Print[\"Composition error: \", Norm[Phi60 - Phi62.Phi20, \"Frobenius\"]];
+
+]], "Input"]
+}]

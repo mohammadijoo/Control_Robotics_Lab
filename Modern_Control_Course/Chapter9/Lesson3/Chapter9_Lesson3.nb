@@ -1,0 +1,61 @@
+(* Chapter9_Lesson3.nb *)
+(* Wolfram Mathematica / Wolfram Language code for modal decomposition
+   and dominant-mode approximation. Paste into a Mathematica notebook or
+   open this file as plain text in Mathematica. *)
+
+ClearAll["Global`*"];
+
+A = {{-0.25, 1.50, 0.0},
+     {-1.50, -0.25, 0.0},
+     {0.0, 0.0, -3.0}};
+
+Cmat = {{1.0, 0.0, 0.4}};
+x0 = {1.0, -0.2, 2.0};
+
+{vals, vecsRaw} = Eigensystem[A];
+V = Transpose[vecsRaw];
+W = Inverse[V];
+z0 = W.x0;
+
+Print["Eigenvalues:"];
+Print[N[vals]];
+
+dominant = Take[Ordering[Re[vals], All, Greater], 2];
+Print["Dominant mode indices: ", dominant];
+
+xFull[t_] := MatrixExp[A t].x0;
+
+xModal[t_] := Re[V.DiagonalMatrix[Exp[vals t]].z0];
+
+xDominant[t_] := Module[{x = ConstantArray[0, 3]},
+   Do[
+    x = x + V[[All, i]] Exp[vals[[i]] t] z0[[i]],
+    {i, dominant}
+   ];
+   Re[x]
+];
+
+yFull[t_] := First[Cmat.xFull[t]];
+yModal[t_] := First[Cmat.xModal[t]];
+yDominant[t_] := First[Cmat.xDominant[t]];
+
+Print["All-mode reconstruction error at t=5:"];
+Print[N[Abs[yFull[5] - yModal[5]]]];
+
+Plot[
+ {yFull[t], yDominant[t]},
+ {t, 0, 20},
+ PlotLegends -> {"full output", "dominant-mode approximation"},
+ AxesLabel -> {"time [s]", "output"},
+ PlotLabel -> "Modal decomposition and dominant modes",
+ PlotRange -> All
+]
+
+Plot[
+ Abs[yFull[t] - yDominant[t]] + 10^-14,
+ {t, 0, 20},
+ ScalingFunctions -> "Log",
+ AxesLabel -> {"time [s]", "|full - dominant|"},
+ PlotLabel -> "Error from neglected fast mode",
+ PlotRange -> All
+]

@@ -1,0 +1,15 @@
+Notebook[{
+  Cell["Chapter25_Lesson4.nb", "Title"],
+  Cell["Impact of Model Uncertainty on State-Feedback Designs", "Subtitle"],
+  Cell[BoxData[RowBox[{"A", "=", RowBox[{"{{", RowBox[{RowBox[{"0", ",", "1"}], ",", RowBox[{RowBox[{"-", "2"}], ",", RowBox[{"-", "0.5"}]}]}], "}}"}]}]], "Input"],
+  Cell[BoxData[RowBox[{"B", "=", RowBox[{"{{", "0", "}", ",", "{", "1", "}}"}]}]], "Input"],
+  Cell[BoxData[RowBox[{"K", "=", RowBox[{"{{", RowBox[{"4", ",", "4.5"}], "}}"}]}]], "Input"],
+  Cell[BoxData[RowBox[{"Acl", "=", RowBox[{"A", "-", RowBox[{"B", ".", "K"}]}]}]], "Input"],
+  Cell[BoxData[RowBox[{"Eigenvalues", "[", "Acl", "]"}]], "Input"],
+  Cell["Monte Carlo uncertainty: Atrue = A + dA and Btrue = B (1 + rho).", "Text"],
+  Cell[BoxData[RowBox[{"SeedRandom", "[", "25", "]"}]], "Input"],
+  Cell[BoxData[RowBox[{"samples", "=", RowBox[{"Table", "[", RowBox[{RowBox[{"Module", "[", RowBox[{RowBox[{"{", RowBox[{"dA", ",", "rho", ",", "Atrue", ",", "Btrue", ",", "eig"}], "}"}], ",", RowBox[{RowBox[{"dA", "=", RowBox[{"0.05", " ", RowBox[{"RandomVariate", "[", RowBox[{RowBox[{"NormalDistribution", "[", RowBox[{"0", ",", "1"}], "]"}], ",", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}]}], "]"}]}]}], ";", RowBox[{"rho", "=", RowBox[{"RandomReal", "[", RowBox[{"{", RowBox[{RowBox[{"-", "0.25"}], ",", "0.25"}], "}"}], "]"}]}], ";", RowBox[{"Atrue", "=", RowBox[{"A", "+", "dA"}]}], ";", RowBox[{"Btrue", "=", RowBox[{"B", " ", RowBox[{"(", RowBox[{"1", "+", "rho"}], ")"}]}]}], ";", RowBox[{"eig", "=", RowBox[{"Eigenvalues", "[", RowBox[{"Atrue", "-", RowBox[{"Btrue", ".", "K"}]}], "]"}]}], ";", RowBox[{"Max", "[", RowBox[{"Re", "[", "eig", "]"}], "]"}]}]}], "]"}], ",", RowBox[{"{", "5000", "}"}]}], "]"}]}]], "Input"],
+  Cell[BoxData[RowBox[{"Count", "[", RowBox[{"samples", ",", RowBox[{"x_", "/;", RowBox[{"x", ">=", "0"}]}]}], "]"}]], "Input"],
+  Cell[BoxData[RowBox[{"Max", "[", "samples", "]"}]], "Input"],
+  Cell[BoxData[RowBox[{"Histogram", "[", RowBox[{"samples", ",", "50", ",", RowBox[{"PlotLabel", "->", "\"Closed-loop pole movement under uncertainty\""}]}], "]"}]], "Input"]
+}]

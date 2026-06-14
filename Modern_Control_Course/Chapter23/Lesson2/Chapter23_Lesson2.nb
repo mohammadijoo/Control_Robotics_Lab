@@ -1,0 +1,114 @@
+Notebook[{
+Cell["Chapter23_Lesson2.nb", "Title"],
+Cell["Pole Assignment via Controllable Canonical Form", "Subtitle"],
+
+Cell[TextData[{
+"Convention: Ac has ones on the superdiagonal, last row {-a0,-a1,...,-a(n-1)}, ",
+"bc is the last basis vector, and u = -Kc z + r."
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ClearAll", "[", 
+   RowBox[{"companionPair", ",", "desiredCoeffsAscending", ",", "ccfGain"}], 
+   "]"}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"companionPair", "[", "aAscending_List", "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"n", ",", "A", ",", "b"}], "}"}], ",", 
+     RowBox[{
+      RowBox[{"n", "=", 
+       RowBox[{"Length", "[", "aAscending", "]"}]}], ";", 
+      RowBox[{"A", "=", 
+       RowBox[{"ConstantArray", "[", 
+        RowBox[{"0", ",", 
+         RowBox[{"{", 
+          RowBox[{"n", ",", "n"}], "}"}]}], "]"}]}], ";", 
+      RowBox[{"Do", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"A", "[", 
+          RowBox[{"[", 
+           RowBox[{"i", ",", 
+            RowBox[{"i", "+", "1"}]}], "]"}], "]"}], "=", "1"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "1", ",", 
+          RowBox[{"n", "-", "1"}]}], "}"}]}], "]"}], ";", 
+      RowBox[{
+       RowBox[{"A", "[", 
+        RowBox[{"[", "n", "]"}], "]"}], "=", 
+       RowBox[{"-", "aAscending"}]}], ";", 
+      RowBox[{"b", "=", 
+       RowBox[{"UnitVector", "[", 
+        RowBox[{"n", ",", "n"}], "]"}]}], ";", 
+      RowBox[{"{", 
+       RowBox[{"A", ",", "b"}], "}"}]}]}], "]"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"desiredCoeffsAscending", "[", "poles_List", "]"}], ":=", 
+   RowBox[{"Reverse", "[", 
+    RowBox[{"Rest", "[", 
+     RowBox[{"CoefficientList", "[", 
+      RowBox[{
+       RowBox[{"Expand", "[", 
+        RowBox[{"Times", "@@", 
+         RowBox[{"(", 
+          RowBox[{"s", "-", "poles"}], ")"}]}], "]"}], ",", "s"}], "]"}], 
+     "]"}], "]"}]}], ";"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"ccfGain", "[", 
+    RowBox[{"aAscending_List", ",", "desiredPoles_List"}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "alpha", "}"}], ",", 
+     RowBox[{
+      RowBox[{"alpha", "=", 
+       RowBox[{"desiredCoeffsAscending", "[", "desiredPoles", "]"}]}], ";", 
+      RowBox[{"alpha", "-", "aAscending"}]}]}], "]"}]}], ";"}]], "Input"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"a", "=", 
+   RowBox[{"{", 
+    RowBox[{"6", ",", "11", ",", "6"}], "}"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"desiredPoles", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"-", "4"}], ",", 
+     RowBox[{"-", "5"}], ",", 
+     RowBox[{"-", "6"}]}], "}"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"Ac", ",", "bc"}], "}"}], "=", 
+   RowBox[{"companionPair", "[", "a", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"Kc", "=", 
+   RowBox[{"ccfGain", "[", 
+    RowBox[{"a", ",", "desiredPoles"}], "]"}]}], ";"}], "\n", 
+ RowBox[{"Acl", "=", 
+  RowBox[{"Ac", "-", 
+   RowBox[{"Outer", "[", 
+    RowBox[{"Times", ",", "bc", ",", "Kc"}], "]"}]}]}], "\n", 
+ RowBox[{"Eigenvalues", "[", "Acl", "]"}]}], "Input"],
+
+Cell[BoxData[
+ RowBox[{"CharacteristicPolynomial", "[", 
+  RowBox[{"Acl", ",", "s"}], "]"}]], "Input"]
+},
+WindowSize->{900, 700},
+WindowMargins->{{Automatic, 100}, {Automatic, 50}},
+FrontEndVersion->"13.0 for Microsoft Windows (64-bit)",
+StyleDefinitions->"Default.nb"
+]

@@ -1,0 +1,5 @@
+Notebook[{
+Cell["A = { {0, 1}, {-2, -3} };\nB = { {0}, {1} };\nx0 = {1, 0};\n\nu[t_] := If[0 <= t <= 2, {1}, {0}]; (* 1-input as a 1-vector *)\n\nxZS[t_?NumericQ] := NIntegrate[\n  MatrixExp[A (t - s)].B.u[s],\n  {s, 0, t}\n] // Flatten;\n\nxTotal[t_?NumericQ] := MatrixExp[A t].x0 + xZS[t];\n\nxTotal[0]\nxTotal[6]", "Input"]
+},
+WindowTitle -> "Chapter7/Lesson2.html"
+]

@@ -1,0 +1,10 @@
+Notebook[{
+Cell["Chapter29_Lesson3: Stability Notions for LTV Systems", "Title"],
+Cell["This notebook evaluates scalar state-transition functions for two LTV examples: a uniformly exponentially stable system and a uniformly stable but not uniformly attractive system.", "Text"],
+Cell[BoxData["ClearAll[phiUES, phiUSNotUA, ratioUES, sampleTable]\n\nphiUES[t_, t0_] := Exp[-0.5 (t - t0) + 0.25 (Cos[t0] - Cos[t])]\nphiUSNotUA[t_, t0_] := (1 + t0)/(1 + t)\n\nM = Exp[0.5];\nalpha = 0.5;\nratioUES[t_, t0_] := Abs[phiUES[t, t0]]/(M Exp[-alpha (t - t0)])"], "Input"],
+Cell[BoxData["sampleTable = Table[{tau, Max[Table[ratioUES[t0 + tau, t0], {t0, 0, 20, 0.5}]]}, {tau, {0, 1, 2, 5, 10}}]\nTableForm[sampleTable, TableHeadings -> {None, {\"tau\", \"max ratio\"}}]"], "Input"],
+Cell["The next table shows why xdot = -x/(1+t) is not uniformly attractive. For a fixed horizon T, the transition value approaches 1 as the initial time grows.", "Text"],
+Cell[BoxData["TableForm[Table[{T, Table[phiUSNotUA[t0 + T, t0], {t0, {0, 10, 100, 1000, 10000}}]}, {T, {1, 5, 20}}], TableHeadings -> {None, {\"T\", \"Phi values for increasing t0\"}}]"], "Input"]
+},
+WindowTitle -> "Chapter29_Lesson3.nb"
+]

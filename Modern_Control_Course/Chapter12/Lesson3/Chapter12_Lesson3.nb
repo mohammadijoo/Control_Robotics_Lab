@@ -1,0 +1,54 @@
+Notebook[{
+ Cell["Chapter12_Lesson3.nb", "Title"],
+ Cell["Gramian-Based Controllability Tests", "Section"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"A", "=", "{{0,1},{-2,-3}}"}], ";",
+   RowBox[{"B", "=", "{{0},{1}}"}], ";",
+   RowBox[{"T", "=", "2"}], ";"}]], "Input"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"Wc", "=",
+    RowBox[{"NIntegrate", "[",
+     RowBox[{
+      RowBox[{
+       RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "tau"}], "]"}], ".",
+       "B", ".", RowBox[{"Transpose", "[", "B", "]"}], ".",
+       RowBox[{"Transpose", "[",
+        RowBox[{"MatrixExp", "[", RowBox[{"A", " ", "tau"}], "]"}], "]"}]}],
+      ",", RowBox[{"{", RowBox[{"tau", ",", "0", ",", "T"}], "}"}]}],
+     "]"}]}], ";",
+   RowBox[{"Wc", "=", RowBox[{"N", "[", RowBox[{
+     RowBox[{"(", RowBox[{"Wc", "+", RowBox[{"Transpose", "[", "Wc", "]"}]}],
+     ")"}], "/", "2"}], "]"}]}]}]], "Input"],
+ Cell[BoxData[RowBox[{"Eigenvalues", "[", "Wc", "]"}]], "Input"],
+ Cell[BoxData[RowBox[{"MatrixRank", "[", "Wc", "]"}]], "Input"],
+ Cell[BoxData[RowBox[{"Det", "[", "Wc", "]"}]], "Input"],
+ Cell["Infinite-horizon Gramian for Hurwitz A", "Section"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"vars", "=", RowBox[{"{", RowBox[{"w11", ",", "w12", ",", "w22"}], "}"}]}], ";",
+   RowBox[{"W", "=", RowBox[{"{{", RowBox[{"w11", ",", "w12"}], "},{", RowBox[{"w12", ",", "w22"}], "}}"}]}], ";",
+   RowBox[{"eqs", "=", RowBox[{"Thread", "[",
+    RowBox[{"Flatten", "[", RowBox[{
+     RowBox[{"A", ".", "W"}], "+", RowBox[{"W", ".", RowBox[{"Transpose", "[", "A", "]"}]}], "+",
+     RowBox[{"B", ".", RowBox[{"Transpose", "[", "B", "]"}]}]}], "]"}], "==", "0"}], "]"}]}], ";",
+   RowBox[{"Winf", "=", RowBox[{"W", "/.", RowBox[{"First", "[", RowBox[{"Solve", "[", RowBox[{"eqs", ",", "vars"}], "]"}], "]"}]}]}]}]], "Input"],
+ Cell[BoxData[RowBox[{"Eigenvalues", "[", "Winf", "]"}]], "Input"],
+ Cell["Minimum-energy steering", "Section"],
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"xf", "=", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], ";",
+   RowBox[{"eta", "=", RowBox[{"LinearSolve", "[", RowBox[{"Wc", ",", "xf"}], "]"}]}], ";",
+   RowBox[{"Emin", "=", RowBox[{"xf", ".", "eta"}]}]}]], "Input"],
+ Cell[BoxData[
+  RowBox[{"Table", "[",
+   RowBox[{
+    RowBox[{
+     RowBox[{"Transpose", "[", "B", "]"}], ".",
+     RowBox[{"MatrixExp", "[", RowBox[{
+      RowBox[{"Transpose", "[", "A", "]"}], " ", RowBox[{"(", RowBox[{"T", "-", "t"}], ")"}]}], "]"}], ".",
+     "eta"}],
+    ",", RowBox[{"{", RowBox[{"t", ",", "0", ",", "T", ",", "T/8"}], "}"}]}],
+   "]"}]], "Input"]
+}]

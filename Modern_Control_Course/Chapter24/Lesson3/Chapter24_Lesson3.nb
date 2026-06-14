@@ -1,0 +1,28 @@
+(* Chapter24_Lesson3.nb *)
+(* Wolfram Mathematica code for transformation-based MIMO pole placement. *)
+
+ClearAll["Global`*"];
+
+Abar = {{0, 1, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 1}, {0, 0, 0, 0}};
+Bbar = {{0, 0}, {1, 0}, {0, 0}, {0, 1}};
+T = {{1.0, 0.2, 0.0, 0.1}, {0.1, 1.0, 0.2, 0.0}, {0.0, 0.1, 1.0, 0.3}, {0.2, 0.0, 0.1, 1.0}};
+
+A = T . Abar . Inverse[T];
+B = T . Bbar;
+
+F = {{6.0, 5.0, 0.0, 0.0}, {0.0, 0.0, 20.0, 9.0}};
+K = F . Inverse[T];
+Acl = A - B . K;
+Abarcl = Abar - Bbar . F;
+
+Print["K = "];
+MatrixForm[K]
+
+Print["Closed-loop eigenvalues in original coordinates:"];
+Eigenvalues[Acl]
+
+Print["Closed-loop eigenvalues in transformed coordinates:"];
+Eigenvalues[Abarcl]
+
+Print["Similarity residual norm:"];
+Norm[Inverse[T] . Acl . T - Abarcl, "Frobenius"]

@@ -1,0 +1,10 @@
+Notebook[{
+Cell["Chapter18_Lesson2.nb", "Title"],
+Cell["Construction of Jordan canonical form using exact symbolic linear algebra.", "Text"],
+Cell[BoxData[
+"ClearAll[\"Global`*\"]\n\nA = {{2, 1, 0, 0, 0, 0},\n     {0, 2, 1, -1, 1, -1},\n     {0, 0, 2, 0, 0, 0},\n     {0, 0, 0, 2, -3, 4},\n     {0, 0, 0, 0, -1, 1},\n     {0, 0, 0, 0, 0, -1}};\n\n{P, J} = JordanDecomposition[A];\nJ // MatrixForm\nSimplify[Inverse[P].A.P - J] // MatrixForm"
+], "Input"],
+Cell[BoxData[
+"nullity[m_] := Length[NullSpace[m]];\nnullitySequence[A_, lambda_, maxPower_] :=\n  Prepend[Table[nullity[MatrixPower[A - lambda IdentityMatrix[Length[A]], k]], {k, 1, maxPower}], 0];\n\nblockSizesFromNullities[nullities_, algebraicMultiplicity_] := Module[\n  {trimmed, bAtLeast, exactCounts, sizes},\n  trimmed = Take[nullities, FirstPosition[nullities, algebraicMultiplicity][[1]]];\n  bAtLeast = Differences[trimmed];\n  bAtLeast = Append[bAtLeast, 0];\n  exactCounts = Table[bAtLeast[[k]] - bAtLeast[[k + 1]], {k, 1, Length[bAtLeast] - 1}];\n  sizes = Flatten[Table[ConstantArray[k, exactCounts[[k]]], {k, 1, Length[exactCounts]}]];\n  Reverse[Sort[sizes]]\n];\n\nDo[\n  ns = nullitySequence[A, lambda, Length[A]];\n  Print[\"lambda = \", lambda];\n  Print[\"nullities n_k = \", ns];\n  Print[\"Jordan block sizes = \", blockSizesFromNullities[ns, alg]];\n  , {{lambda, alg}, {{2, 4}, {-1, 2}}}\n]"
+], "Input"]
+}]

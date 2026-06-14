@@ -1,0 +1,46 @@
+Notebook[{Cell["Chapter17_Lesson5.nb", "Title"],
+Cell["Practical Considerations in Choosing Canonical Forms", "Subtitle"],
+Cell[BoxData[ToBoxes[
+  ClearAll[obs, froCond, transformSystem];
+  obs[A_, C_] := Module[{n = Length[A], Ak = IdentityMatrix[Length[A]]},
+    Table[With[{row = C.Ak}, Ak = Ak.A; row[[1]]], {Length[A]}]
+  ];
+  froCond[M_] := Norm[M, "Frobenius"] Norm[Inverse[M], "Frobenius"];
+  transformSystem[A_, B_, C_, T_] := {Inverse[T].A.T, Inverse[T].B, C.T};
+]], "Input"],
+Cell[BoxData[ToBoxes[
+  A0 = {{0, 1, 0}, {0, 0, 1}, {-6, -11, -6}};
+  B0 = {{0}, {0}, {1}};
+  C0 = {{1, 0, 0}};
+  S = DiagonalMatrix[{1, 0.05, 20}];
+  A = S.A0.Inverse[S];
+  B = S.B0;
+  Cmat = C0.Inverse[S];
+  Ao = Transpose[A0];
+  Co = {{0, 0, 1}};
+  Omat = obs[A, Cmat];
+  Oocf = obs[Ao, Co];
+  Tocf = Inverse[Omat].Oocf;
+  {Aocf, Bocf, Cocf} = transformSystem[A, B, Cmat, Tocf];
+  {vals, V} = Eigensystem[A];
+  Vmat = Transpose[V];
+  {Amodal, Bmodal, Cmodal} = transformSystem[A, B, Cmat, Vmat];
+]], "Input"],
+Cell[BoxData[ToBoxes[
+  Column[{
+    "Physical/scaled A:", MatrixForm[A],
+    "Observable canonical A:", MatrixForm[Chop[Aocf]],
+    "Observable canonical C:", MatrixForm[Chop[Cocf]],
+    "OCF transform Frobenius condition proxy:", froCond[Tocf],
+    "Modal A:", MatrixForm[Chop[Amodal]],
+    "Modal eigenvector Frobenius condition proxy:", froCond[Vmat],
+    Which[
+      Min[froCond[Vmat], froCond[Tocf]] > 5000,
+        "Recommendation: both canonical transforms are poorly conditioned; keep physical/scaled coordinates or use an orthogonal Schur form.",
+      froCond[Vmat] < froCond[Tocf],
+        "Recommendation: modal coordinates are cleaner for this example.",
+      True,
+        "Recommendation: OCF is acceptable for observer algebra in this example."]
+  }]
+]], "Input"]
+}]

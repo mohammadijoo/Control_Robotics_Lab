@@ -1,0 +1,18 @@
+Notebook[{
+Cell["Chapter19_Lesson5.nb", "Title"],
+Cell["Physical Interpretation of Decomposed Subsystems in Kalman Decomposition", "Subtitle"],
+Cell[BoxData[ToBoxes[
+A = {{0, 1, 0, 0.2, 0}, {-2, -3, 0, 0, 0}, {0, 0.3, -4, 0.1, 0}, {0, 0, 0, -0.5, 0}, {0, 0, 0, 0, 0.2}};
+B = {{0}, {1}, {1}, {0}, {0}};
+Cmat = {{1, 0, 0, 1, 0}};
+n = Length[A];
+controllabilityMatrix = Transpose[Flatten[Table[MatrixPower[A, k].B, {k, 0, n - 1}], 1]];
+observabilityMatrix = Flatten[Table[Cmat.MatrixPower[A, k], {k, 0, n - 1}], 1];
+{MatrixRank[controllabilityMatrix], MatrixRank[observabilityMatrix]}
+]], "Input"],
+Cell[BoxData[ToBoxes[
+sys = StateSpaceModel[{A, B, Cmat, {{0}}}];
+TransferFunctionModel[sys]
+]], "Input"],
+Cell["The ranks identify reachable dimension 3 and observable dimension 3. The zero-initial transfer function is determined only by the controllable-observable block.", "Text"]
+}]

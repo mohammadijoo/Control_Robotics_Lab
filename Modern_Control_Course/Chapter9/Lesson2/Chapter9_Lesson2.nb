@@ -1,0 +1,65 @@
+(* Chapter9_Lesson2.nb *)
+(* Wolfram Mathematica code for eigenvalue-based stability criteria. *)
+
+ClearAll[classifyContinuous, classifyDiscrete, reportContinuous, reportDiscrete];
+
+classifyContinuous[A_] := Module[
+  {lambda = Eigenvalues[A], maxReal},
+  maxReal = Max[Re[lambda]];
+  Which[
+    maxReal < 0, "asymptotically stable",
+    maxReal > 0, "unstable",
+    True, "borderline: check semisimplicity of imaginary-axis eigenvalues"
+  ]
+];
+
+classifyDiscrete[A_] := Module[
+  {lambda = Eigenvalues[A], rho},
+  rho = Max[Abs[lambda]];
+  Which[
+    rho < 1, "asymptotically stable",
+    rho > 1, "unstable",
+    True, "borderline: check semisimplicity of unit-circle eigenvalues"
+  ]
+];
+
+reportContinuous[name_, A_] := Module[
+  {lambda = Eigenvalues[A], times = {0, 1, 2, 5, 10}},
+  Print["============================================================"];
+  Print[name];
+  Print["A = ", MatrixForm[A]];
+  Print["eigenvalues = ", lambda];
+  Print["classification = ", classifyContinuous[A]];
+  Print["Norm[MatrixExp[A t], 2] samples:"];
+  Table[Print["t = ", t, ": ", N[Norm[MatrixExp[A t], 2]]], {t, times}]
+];
+
+reportDiscrete[name_, A_] := Module[
+  {lambda = Eigenvalues[A], steps = {0, 1, 2, 5, 10}},
+  Print["============================================================"];
+  Print[name];
+  Print["A = ", MatrixForm[A]];
+  Print["eigenvalues = ", lambda];
+  Print["classification = ", classifyDiscrete[A]];
+  Print["Norm[MatrixPower[A, k], 2] samples:"];
+  Table[Print["k = ", k, ": ", N[Norm[MatrixPower[A, k], 2]]], {k, steps}]
+];
+
+A1 = {{-1, 0}, {0, -2}};
+A2 = {{0, -1}, {1, 0}};
+A3 = {{0, 1}, {0, 0}};
+Ad1 = {{0.8, 0}, {0, 0.5}};
+Ad2 = {{1.02, 0}, {0, 0.7}};
+
+reportContinuous["Continuous asymptotically stable example", A1];
+reportContinuous["Continuous oscillatory borderline example", A2];
+reportContinuous["Continuous defective zero-eigenvalue example", A3];
+reportDiscrete["Discrete asymptotically stable example", Ad1];
+reportDiscrete["Discrete unstable example", Ad2];
+
+(* Optional visualization of continuous-time eigenvalues in the complex plane. *)
+ListPlot[
+  ReIm /@ Eigenvalues[A2],
+  AxesLabel -> {"Re(lambda)", "Im(lambda)"},
+  PlotLabel -> "Eigenvalues of the rotation matrix"
+]

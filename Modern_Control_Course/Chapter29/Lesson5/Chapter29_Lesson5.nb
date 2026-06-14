@@ -1,0 +1,56 @@
+(* Chapter29_Lesson5.nb *)
+
+(* Slowly time-varying mass-spring-damper example for Wolfram Mathematica. *)
+(* This text is a Wolfram Language notebook-style source saved with .nb extension. *)
+
+ClearAll["Global`*"];
+
+epsilon = 0.03;
+
+m[t_] := 1.0 + 0.12 Sin[epsilon t];
+c[t_] := 0.22 + 0.04 Cos[epsilon t];
+k[t_] := 2.0 + 0.30 Sin[0.5 epsilon t];
+u[t_] := 0.2 Sin[0.7 t];
+
+A[t_] := {{0, 1}, {-k[t]/m[t], -c[t]/m[t]}};
+B[t_] := {0, 1/m[t]};
+
+solution = NDSolveValue[
+   {
+    x1'[t] == x2[t],
+    x2'[t] == -(k[t]/m[t]) x1[t] - (c[t]/m[t]) x2[t] + u[t]/m[t],
+    x1[0] == 1,
+    x2[0] == 0
+    },
+   {x1, x2},
+   {t, 0, 160},
+   MaxStepFraction -> 1/2000
+   ];
+
+x1fun = solution[[1]];
+x2fun = solution[[2]];
+
+alpha[t_] := -Max[Re[Eigenvalues[A[t]]]];
+
+finalState = {x1fun[160], x2fun[160]};
+minDecayMargin = NMinimize[{alpha[s], 0 <= s <= 160}, s];
+
+Print["Final state = ", finalState];
+Print["Minimum frozen-time decay margin = ", minDecayMargin];
+
+Plot[
+ Evaluate[{x1fun[t], x2fun[t]}],
+ {t, 0, 160},
+ PlotLegends -> {"x1 displacement", "x2 velocity"},
+ GridLines -> Automatic,
+ AxesLabel -> {"time", "state"},
+ PlotLabel -> "Slowly Time-Varying Mass-Spring-Damper System"
+ ]
+
+Plot[
+ alpha[t],
+ {t, 0, 160},
+ GridLines -> Automatic,
+ AxesLabel -> {"time", "alpha(t)"},
+ PlotLabel -> "Frozen-Time Decay Margin"
+ ]

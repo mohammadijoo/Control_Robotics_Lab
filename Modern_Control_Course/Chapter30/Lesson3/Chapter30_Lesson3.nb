@@ -1,0 +1,14 @@
+Notebook[{
+Cell["Chapter30 Lesson3: State-Space Analysis and Design", "Title"],
+Cell["This notebook computes controllability, observability, pole placement data, LQR equations, and a closed-loop simulation for a mass-spring-damper system.", "Text"],
+Cell[BoxData[RowBox[{RowBox[{"A", "=", RowBox[{"{{", RowBox[{RowBox[{"0", ",", "1"}], ",", RowBox[{RowBox[{"-", "2"}], ",", RowBox[{"-", "0.35"}]}]}], "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"B", "=", RowBox[{"{{", RowBox[{"0"}], "},{", RowBox[{"1"}], "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"Cmat", "=", RowBox[{"{{", RowBox[{"1", ",", "0"}], "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[RowBox[{"Eigenvalues", "[", "A", "]"}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"Ctrb", "=", RowBox[{"ArrayFlatten", "[", RowBox[{"{", RowBox[{"{", RowBox[{"B", ",", RowBox[{"A", ".", "B"}]}], "}"}], "}"}], "]"}]}], ";", RowBox[{"MatrixRank", "[", "Ctrb", "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"Obsv", "=", RowBox[{"Join", "[", RowBox[{"Cmat", ",", RowBox[{"Cmat", ".", "A"}]}], "]"}]}], ";", RowBox[{"MatrixRank", "[", "Obsv", "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"desiredPoly", "=", RowBox[{"Expand", "[", RowBox[{RowBox[{"(", RowBox[{"s", "+", "2", "-", RowBox[{"1.5", "I"}]}], ")"}], RowBox[{"(", RowBox[{"s", "+", "2", "+", RowBox[{"1.5", "I"}]}], ")"}]}], "]"}]}], ";", "desiredPoly"}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"K", "=", RowBox[{"{{", RowBox[{"0", ",", "1"}], "}}", ".", RowBox[{"Inverse", "[", "Ctrb", "]"}], ".", RowBox[{"(", RowBox[{RowBox[{"MatrixPower", "[", RowBox[{"A", ",", "2"}], "]"}], "+", RowBox[{"4", "A"}], "+", RowBox[{"6.25", RowBox[{"IdentityMatrix", "[", "2", "]"}]}]}], ")"}]}]}], ";", "K"}]], "Input"],
+Cell[BoxData[RowBox[{"Eigenvalues", "[", RowBox[{"A", "-", RowBox[{"B", ".", "K"}]}], "]"}]], "Input"],
+Cell[BoxData[RowBox[{"NDSolveValue", "[", RowBox[{RowBox[{"{", RowBox[{RowBox[{RowBox[{"x1", "'"}], "[", "t", "]"}], "==", RowBox[{RowBox[{"x2", "[", "t", "]"}]}], ",", RowBox[{RowBox[{RowBox[{"x2", "'"}], "[", "t", "]"}], "==", RowBox[{RowBox[{"-", RowBox[{"(", RowBox[{"2", "+", RowBox[{"K", "[[", RowBox[{"1", ",", "1"}], "]]"}]}], ")"}]}], RowBox[{"x1", "[", "t", "]"}], "-", RowBox[{RowBox[{"(", RowBox[{"0.35", "+", RowBox[{"K", "[[", RowBox[{"1", ",", "2"}], "]]"}]}], ")"}], RowBox[{"x2", "[", "t", "]"}]}]}], ",", RowBox[{RowBox[{"x1", "[", "0", "]"}], "==", "1"}], ",", RowBox[{RowBox[{"x2", "[", "0", "]"}], "==", "0"}]}], "}"}], ",", RowBox[{"{", RowBox[{"x1", ",", "x2"}], "}"}], ",", RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}]}], "]"}]], "Input"]
+}]

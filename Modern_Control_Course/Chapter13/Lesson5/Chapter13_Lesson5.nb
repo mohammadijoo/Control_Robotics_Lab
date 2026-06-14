@@ -1,0 +1,62 @@
+(* Chapter13_Lesson5.nb *)
+(* Wolfram Mathematica code for observability examples. *)
+
+ClearAll[ObservabilityMatrixCustom, ClassifySystem];
+
+ObservabilityMatrixCustom[A_, C_] := Module[
+  {n = Length[A]},
+  Join @@ Table[C . MatrixPower[A, k], {k, 0, n - 1}]
+];
+
+ClassifySystem[name_, A_, C_] := Module[
+  {O, r, n, eig},
+  O = ObservabilityMatrixCustom[A, C];
+  r = MatrixRank[O];
+  n = Length[A];
+  eig = Eigenvalues[A];
+
+  Print["\n==============================================================="];
+  Print[name];
+  Print["A = ", MatrixForm[A]];
+  Print["C = ", MatrixForm[C]];
+  Print["O = ", MatrixForm[O]];
+  Print["rank(O) = ", r, " out of n = ", n];
+  Print["eig(A) = ", eig];
+
+  If[r == n,
+    Print["Conclusion: observable."],
+    Print["Conclusion: unobservable. Inspect hidden modes for detectability."]
+  ];
+];
+
+A1 = {{0, 1}, {-2, -3}};
+C1 = {{1, 0}};
+ClassifySystem["Example 1: observable second-order system", A1, C1];
+
+A2 = {{-1, 0}, {0, 2}};
+C2 = {{1, 0}};
+ClassifySystem["Example 2: unobservable and not detectable", A2, C2];
+
+A3 = {{-1, 0}, {0, -4}};
+C3 = {{1, 0}};
+ClassifySystem["Example 3: unobservable but detectable", A3, C3];
+
+A4 = {{0, 1}, {-6, -5}};
+C4a = {{0, 1}};
+C4b = {{1, 0}};
+ClassifySystem["Example 4a: velocity sensor", A4, C4a];
+ClassifySystem["Example 4b: position sensor", A4, C4b];
+
+(* Output indistinguishability for Example 2 *)
+x0a = {1, 0};
+x0b = {1, 5};
+ya[t_] := First[C2 . MatrixExp[A2 t] . x0a];
+yb[t_] := First[C2 . MatrixExp[A2 t] . x0b];
+
+Plot[
+  {ya[t], yb[t]},
+  {t, 0, 3},
+  PlotLegends -> {"x0 = {1,0}", "x0 = {1,5}"},
+  AxesLabel -> {"time", "y(t)"},
+  PlotLabel -> "Unobservable Example: Different Initial States, Same Output"
+]

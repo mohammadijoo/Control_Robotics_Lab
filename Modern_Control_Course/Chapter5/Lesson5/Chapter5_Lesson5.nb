@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Unscaled matrices *)\nA = { {0, 1, 0},\n     {0, 0, 1},\n     {-1, -10, -1000} };\nB = { {0}, {0}, {1} };\nC = { {1, 0, 0} };\nD = { {0} };\n\nomega = 10;\nS = DiagonalMatrix[{1, omega, omega^2}];\nSinv = Inverse[S];\n\nAs = Sinv.A.S;\nBs = Sinv.B;\nCs = C.S;\nDs = D;\n\nAs // MatrixForm\nBs // MatrixForm\nCs // MatrixForm\n\n(* Define input u(t) = 1 and simulate both realizations *)\nu[t_] := 1;\n\nt0 = 0; tf = 0.02;\nx0 = {0, 0, 0};\nz0 = Sinv.x0;\n\n(* ODEs *)\nxSol = NDSolveValue[\n  {x'[t] == A.x[t] + Flatten[B]*u[t], x[t0] == x0},\n  x, {t, t0, tf}\n];\n\nzSol = NDSolveValue[\n  {z'[t] == As.z[t] + Flatten[Bs]*u[t], z[t0] == z0},\n  z, {t, t0, tf}\n];\n\ny1[t_] := C.xSol[t] + D*u[t];\ny2[t_] := C.(S.zSol[t]) + D*u[t];\n\n(* Compare outputs on a grid *)\ngrid = Table[t, {t, t0, tf, (tf - t0)/400}];\nmaxErr = Max[Abs[Table[y1[t] - y2[t], {t, grid}]]];\nmaxErr", "Input"]
+},
+WindowTitle -> "Chapter5/Lesson5.html"
+]

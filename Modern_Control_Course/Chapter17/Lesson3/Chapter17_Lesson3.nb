@@ -1,0 +1,18 @@
+Notebook[{
+Cell["Chapter17_Lesson3.nb", "Title"],
+Cell["Diagonal modal form for a continuous-time LTI system with distinct eigenvalues.", "Text"],
+Cell[BoxData[RowBox[{"A", "=", RowBox[{"{{", RowBox[{RowBox[{"0", ",", "1", ",", "0"}], ",", RowBox[{RowBox[{"-", "2"}], ",", RowBox[{"-", "3"}], ",", "0"}], ",", RowBox[{"0.5", ",", "0", ",", RowBox[{"-", "4"}]}]}], "}}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"B", "=", RowBox[{"{{", RowBox[{"0"}], "},", "{", RowBox[{"1"}], "},", "{", RowBox[{"0"}], "}}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Cmat", "=", RowBox[{"{{", RowBox[{"1", ",", "0", ",", "1"}], "}}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Dmat", "=", RowBox[{"{{", "0", "}}"}]}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"{", RowBox[{"eVals", ",", "eVecs"}], "}"}], "=", RowBox[{"Eigensystem", "[", "A", "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"V", "=", RowBox[{"Transpose", "[", "eVecs", "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Vinv", "=", RowBox[{"Inverse", "[", "V", "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Lambda", "=", RowBox[{"Simplify", "[", RowBox[{"Vinv", ".", "A", ".", "V"}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Bm", "=", RowBox[{"Simplify", "[", RowBox[{"Vinv", ".", "B"}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Cm", "=", RowBox[{"Simplify", "[", RowBox[{"Cmat", ".", "V"}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"x0", "=", RowBox[{"{", RowBox[{"1", ",", "0", ",", RowBox[{"-", "0.5"}]}], "}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"z0", "=", RowBox[{"Vinv", ".", "x0"}]}]], "Input"],
+Cell[BoxData[RowBox[{"y", "=", RowBox[{"Simplify", "[", RowBox[{"Cmat", ".", RowBox[{"V", ".", RowBox[{"MatrixExp", "[", RowBox[{"Lambda", " ", "t"}], "]"}], ".", "z0"}]}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Table", "[", RowBox[{RowBox[{"{", RowBox[{"tt", ",", RowBox[{"N", "[", RowBox[{"y", "/.", RowBox[{"t", "->", "tt"}]}], "]"}]}], "}"}], ",", RowBox[{"{", RowBox[{"tt", ",", "0", ",", "5"}], "}"}]}], "]"}]], "Input"]
+}]

@@ -1,0 +1,63 @@
+Notebook[{
+Cell["Chapter15_Lesson3.nb", "Title"],
+Cell["Finite-horizon observability Gramian and qualitative sensor placement.", "Text"],
+Cell[BoxData[
+ToBoxes[
+ClearAll["Global`*"];
+
+A = {{0.0, 1.0, 0.0},
+     {-2.0, -0.45, 0.8},
+     {0.0, -0.7, -1.25}};
+
+Tfinal = 6.0;
+n = Length[A];
+
+sensorMatrix[sensors_List, n_Integer] := Module[{C},
+  C = ConstantArray[0.0, {Length[sensors], n}];
+  Do[C[[r, sensors[[r]]]] = 1.0, {r, Length[sensors]}];
+  C
+];
+
+finiteHorizonWo[A_, C_, T_] := Module[{Q, t, W},
+  Q = Transpose[C].C;
+  W = NIntegrate[
+    Transpose[MatrixExp[A t]].Q.MatrixExp[A t],
+    {t, 0, T},
+    Method -> "GlobalAdaptive"
+  ];
+  (W + Transpose[W])/2
+];
+
+metrics[W_] := Module[{e, eps = 10^-8},
+  e = Eigenvalues[(W + Transpose[W])/2];
+  <|
+    "Trace" -> Tr[W],
+    "LogDetEps" -> Total[Log[Clip[e, {eps, Infinity}]]],
+    "LambdaMin" -> Min[e],
+    "LambdaMax" -> Max[e],
+    "Condition" -> If[Min[e] <= eps, Infinity, Max[e]/Min[e]]
+  |>
+];
+
+Print["Single-sensor scores"];
+Do[
+  C = sensorMatrix[{i}, n];
+  W = finiteHorizonWo[A, C, Tfinal];
+  Print["x", i, " -> ", metrics[W]],
+  {i, 1, n}
+];
+
+Print["Two-sensor scores"];
+sets = Subsets[Range[n], {2}];
+scores = Table[
+   C = sensorMatrix[s, n];
+   W = finiteHorizonWo[A, C, Tfinal];
+   {s, metrics[W]},
+   {s, sets}
+];
+
+SortBy[scores, -#2["LogDetEps"] &] // TableForm
+]], "Input"]
+},
+WindowTitle -> "Chapter15_Lesson3.nb"
+]

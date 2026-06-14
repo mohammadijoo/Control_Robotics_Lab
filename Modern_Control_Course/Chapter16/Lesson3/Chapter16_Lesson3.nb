@@ -1,0 +1,45 @@
+(* Chapter16_Lesson3.nb *)
+
+(* Properties of Controllable Canonical Form for analysis and design.
+   This Wolfram Language code can be evaluated in a Mathematica notebook. *)
+
+ClearAll["Global`*"];
+
+a = {2, 6, 11, 6};              (* [a0, a1, ..., a_{n-1}] *)
+b = {1, 2, 3, 0};               (* [b0, b1, ..., b_{n-1}] *)
+n = Length[a];
+
+A = ConstantArray[0, {n, n}];
+Do[A[[i, i + 1]] = 1, {i, 1, n - 1}];
+A[[n, All]] = -a;
+
+B = UnitVector[n, n];
+Cmat = {b};
+Dmat = {{0}};
+
+Wc = Transpose[
+   Table[MatrixPower[A, k].B, {k, 0, n - 1}]
+   ];
+
+desiredPoles = {-2, -3, -4, -5};
+pdes = CoefficientList[Expand[Times @@ (s - # & /@ desiredPoles)], s];
+alpha = Most[pdes];             (* [alpha0, ..., alpha_{n-1}] *)
+
+K = alpha - a;
+Acl = A - KroneckerProduct[B, K];
+
+Print["A = ", MatrixForm[A]];
+Print["B = ", MatrixForm[B]];
+Print["C = ", MatrixForm[Cmat]];
+Print["Wc = ", MatrixForm[Wc]];
+Print["Rank[Wc] = ", MatrixRank[Wc]];
+Print["Det[Wc] = ", Det[Wc]];
+Print["alpha = ", alpha];
+Print["K for u = -K x + r = ", K];
+Print["Eigenvalues[A - B K] = ", Eigenvalues[Acl]];
+
+(* Transfer function check:
+   G(s) = C (s I - A)^(-1) B + D
+*)
+G = FullSimplify[Cmat . Inverse[s IdentityMatrix[n] - A] . B + Dmat];
+Print["G(s) = ", G[[1, 1]]];

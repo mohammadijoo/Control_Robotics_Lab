@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Parameters *)\nm = 1; b = 0.4; k = 4;\n\nA = { {0, 1}, {-k/m, -b/m} };\nB = { {0}, {1/m} };\nC = { {1, 0} };\nD = { {0} };\n\nss = StateSpaceModel[{A, B, C, D}, SamplingPeriod -> None];\ntfFromSS = TransferFunctionModel[ss];\n\n(* Polynomial TF *)\ntfPoly = TransferFunctionModel[{ { {1} }, { {m, b, k} } }, s];\n\ntfFromSS\ntfPoly\n\n(* Compare frequency response at s = I w *)\nwList = {0.01, 0.1, 1, 10};\nTable[\n  Module[{w = wv, sVal = I*wv, Gss, Gtf},\n    Gss = (C . Inverse[sVal IdentityMatrix[2] - A] . B + D)[[1,1]];\n    Gtf = 1/(m sVal^2 + b sVal + k);\n    {w, Gss, Gtf, Abs[Gss - Gtf]}\n  ],\n  {wv, wList}\n]\n\n(* Step response comparison (IC=0) *)\nySS = OutputResponse[ss, UnitStep[t], {t, 0, 20}];\nyTF = OutputResponse[tfPoly, UnitStep[t], {t, 0, 20}];\n\n(* Demonstrate nonzero initial state in state-space *)\nx0 = {1, 0};\nyIC = OutputResponse[ss, UnitStep[t], {t, 0, 20}, InitialState -> x0];", "Input"]
+},
+WindowTitle -> "Chapter4/Lesson5.html"
+]

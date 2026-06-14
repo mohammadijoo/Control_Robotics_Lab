@@ -1,0 +1,40 @@
+Notebook[{
+  Cell["Chapter25_Lesson1.nb", "Title"],
+  Cell["Uncontrollable Modes and Unassignable Poles", "Subtitle"],
+  Cell["This notebook computes the Kalman controllability matrix, applies the PBH test, and demonstrates that an uncontrollable eigenvalue is invariant under state feedback.", "Text"],
+
+  Cell[BoxData[ToBoxes[
+    ClearAll[A, B, K, controllabilityMatrix, pbhRank, gains];
+    A = {{0, 0}, {0, 2}};
+    B = {{1}, {0}};
+  ]], "Input"],
+
+  Cell[BoxData[ToBoxes[
+    controllabilityMatrix[A_, B_] := Module[{n = Length[A]},
+      ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]
+    ];
+    Cmat = controllabilityMatrix[A, B];
+    {"C =", MatrixForm[Cmat], "rank(C) =", MatrixRank[Cmat]}
+  ]], "Input"],
+
+  Cell[BoxData[ToBoxes[
+    pbhRank[lambda_] := MatrixRank[ArrayFlatten[{{lambda IdentityMatrix[Length[A]] - A, B}}]];
+    Table[{lambda, pbhRank[lambda]}, {lambda, Eigenvalues[A]}]
+  ]], "Input"],
+
+  Cell[BoxData[ToBoxes[
+    gains = {{0, 0}, {3, 0}, {8, 100}, {-1, -50}};
+    Table[
+      K = {gain};
+      {"K =", gain, "closed-loop eigenvalues =", Eigenvalues[A - B.K]},
+      {gain, gains}
+    ]
+  ]], "Input"],
+
+  Cell["Symbolic proof for the example: for K = {k1,k2}, the characteristic polynomial of A - B K contains the fixed factor (s - 2).", "Text"],
+  Cell[BoxData[ToBoxes[
+    ClearAll[k1, k2, s];
+    K = {{k1, k2}};
+    CharacteristicPolynomial[A - B.K, s] // Factor
+  ]], "Input"]
+}]

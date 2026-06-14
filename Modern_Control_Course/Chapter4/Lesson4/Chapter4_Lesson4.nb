@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Physical parameters *)\nm = 1.0; b = 0.4; k = 4.0;\n\n(* State choice: x1 = q, x2 = qdot *)\nA = { {0, 1}, {-k/m, -b/m} };\nB = { {0}, {1/m} };\nC = { {1, 0} };\nD = { {0} };\n\nsys = StateSpaceModel[{A, B, C, D}];\n\n(* Step input u(t)=1, simulate from x(0)={0,0} *)\nu[t_] := 1;\n\nsol = OutputResponse[sys, u[t], {t, 0, 10}, \"InitialState\" -> {0, 0}];\n\n(* Sample final value *)\nPrint[\"y(10) = \", sol /. t -> 10];\n\n(* Also retrieve state response *)\nxresp = StateResponse[sys, u[t], {t, 0, 10}, \"InitialState\" -> {0, 0}];\nPrint[\"x(10) = \", xresp /. t -> 10];\n      ", "Input"]
+},
+WindowTitle -> "Chapter4/Lesson4.html"
+]

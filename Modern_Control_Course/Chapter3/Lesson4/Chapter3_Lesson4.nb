@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* LTI example *)\nA = { {0, 1}, {-2, -3} };\nt0 = 0;\nt  = 5/4;\n\nPhi[t_] := MatrixExp[A (t - t0)];\nx0 = {1, 0};\nx[t_] := Phi[t].x0;\n\nPhiVal = Phi[t];\nxVal = x[t];\n\nPrint[\"Phi(t) = \", PhiVal];\nPrint[\"x(t) = \", xVal];\n\n(* LTV example: Phi'(t)=A(t) Phi(t), Phi(t0)=I *)\nAfun[t_] := { {0, 1}, {-(2 + 0.1 t), -3} };\nPhiSym = Array[Subscript[\\[CapitalPhi], ##] &, {2, 2}];\n\neqs = Flatten@Table[\n   D[PhiSym[[i, j]], t] == Sum[Afun[t][[i, k]] PhiSym[[k, j]], {k, 1, 2}],\n   {i, 1, 2}, {j, 1, 2}\n];\n\nics = Flatten@Table[\n   PhiSym[[i, j]] /. t -> 0 == If[i == j, 1, 0],\n   {i, 1, 2}, {j, 1, 2}\n];\n\nsol = NDSolve[Join[eqs, ics], PhiSym, {t, 0, 2}][[1]];\n\nPhiNum[tt_] := Evaluate[PhiSym /. sol /. t -> tt];\nxNum[tt_] := PhiNum[tt].x0;\n\nPrint[\"Phi(2) approx = \", PhiNum[2]];\nPrint[\"x(2) approx = \", xNum[2]];", "Input"]
+},
+WindowTitle -> "Chapter3/Lesson4.html"
+]

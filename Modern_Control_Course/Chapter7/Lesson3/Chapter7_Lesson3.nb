@@ -1,0 +1,73 @@
+(* Chapter7_Lesson3.nb
+   Modern Control — Chapter 7 (Solutions of LTI State Equations), Lesson 3
+   Solutions for Constant, Step, and Polynomial Inputs
+
+   This is a plain-text Wolfram Language notebook expression. You can open it
+   in Mathematica; if your environment treats it as a script, evaluate cells
+   manually. *)
+
+Notebook[{
+  Cell["Chapter 7, Lesson 3 — Solutions for Constant, Step, and Polynomial Inputs", "Title"],
+  Cell["Setup", "Section"],
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "A = {{0, 1}, {-2, -3}}; ",
+      "B = {{0}, {1}}; ",
+      "x0 = {1, 0};"
+    }]
+  ], "Input"],
+
+  Cell["Constant input u(t)=u0", "Section"],
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "u0 = 2; ",
+      "xConst[t_] := MatrixExp[A t].x0 + ",
+      "Integrate[MatrixExp[A (t - \[Tau])].B u0, {\[Tau], 0, t}] // Simplify;"
+    }]
+  ], "Input"],
+
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "xConst[5] // N"
+    }]
+  ], "Input"],
+
+  Cell["Step input u(t)=u0 * UnitStep(t-ts)", "Section"],
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "ts = 3/2; ",
+      "uStep[t_] := u0*UnitStep[t - ts]; ",
+      "xStep[t_] := MatrixExp[A t].x0 + ",
+      "Integrate[MatrixExp[A (t - \[Tau])].B uStep[\[Tau]], {\[Tau], 0, t}] // PiecewiseExpand // Simplify;"
+    }]
+  ], "Input"],
+
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "xStep[2] // N"
+    }]
+  ], "Input"],
+
+  Cell["Polynomial input u(t)=u0 + u1 t (affine)", "Section"],
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "u1 = 1/2; ",
+      "uPoly[t_] := u0 + u1 t; ",
+      "xPoly[t_] := MatrixExp[A t].x0 + ",
+      "Integrate[MatrixExp[A (t - \[Tau])].B uPoly[\[Tau]], {\[Tau], 0, t}] // Simplify;"
+    }]
+  ], "Input"],
+
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "xPoly[5] // N"
+    }]
+  ], "Input"],
+
+  Cell["Verification by differentiating x(t)", "Section"],
+  Cell[BoxData@ToBoxes[
+    Row[{
+      "Simplify[D[xConst[t], t] - (A.xConst[t] + Flatten[B]*u0)]"
+    }]
+  ], "Input"]
+}]

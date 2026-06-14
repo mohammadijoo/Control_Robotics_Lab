@@ -1,0 +1,5 @@
+Notebook[{
+Cell["V = { {1, 2, 0, 1},\n     {0, 1, 1, 1},\n     {1, 3, 1, 2},\n     {0, 0, 1, 1} };\n\nR = RowReduce[V];\nR\n\n(* Identify pivot columns by scanning for leading 1s *)\npivotCols = Module[{m = Length[R], n = Length[R[[1]]]},\n  Module[{p = {}, leadPos},\n    Do[\n      leadPos = FirstPosition[R[[i]], 1, Missing[\"NotFound\"]];\n      If[leadPos =!= Missing[\"NotFound\"], AppendTo[p, leadPos[[1]]]],\n      {i, 1, m}\n    ];\n    DeleteDuplicates[p]\n  ]\n];\n\npivotCols\ndimSpan = Length[pivotCols]\nB = V[[All, pivotCols]]  (* basis columns as a matrix *)\n\n(* Coordinate solve: least squares (if needed) *)\nv = {3, 2, 5, 2};\nc = LeastSquares[B, v];\n{c, B.c, Norm[B.c - v]}\n      ", "Input"]
+},
+WindowTitle -> "Chapter2/Lesson1.html"
+]

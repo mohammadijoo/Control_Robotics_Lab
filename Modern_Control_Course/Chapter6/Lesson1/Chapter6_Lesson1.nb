@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Example matrices *)\nA = { {0, 1}, {-2, -3} };\nB = { {0}, {1} };\nC = { {1, 0} };\nD = { {0} };\n\n(* State-space model *)\nss = StateSpaceModel[{A, B, C, D}];\n\n(* Convert to transfer function model *)\ntf = TransferFunctionModel[ss, s]\n(* Alternatively: TransferFunctionModel[ss] may infer variables in some versions *)\n\n(* Evaluate at s = I*2 *)\nGj2 = tf /. s -> I*2 // Simplify\n\n(* Direct formula: G(s)=C.(sI-A)^(-1).B + D *)\nGdirect[s_] := C . Inverse[s IdentityMatrix[Length[A]] - A] . B + D\nSimplify[Gdirect[s]]\n      ", "Input"]
+},
+WindowTitle -> "Chapter6/Lesson1.html"
+]

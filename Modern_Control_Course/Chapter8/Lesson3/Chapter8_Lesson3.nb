@@ -1,0 +1,41 @@
+(* ::Package:: *)
+
+(* Chapter8_Lesson3.nb *)
+
+(* Computing Phi(t) = MatrixExp[A t] via eigen-decomposition in Wolfram Mathematica. *)
+
+ClearAll["Global`*"];
+
+A = {{-1.0, 2.0, 0.0},
+     { 0.0,-2.0, 0.0},
+     { 0.0, 0.0,-0.5}};
+
+t = 2.0;
+
+{vals, vecsRows} = Eigensystem[A];
+V = Transpose[vecsRows];
+
+If[MatrixRank[V] < Length[A],
+   Print["A is not diagonalizable: eigenvector matrix is rank deficient."],
+   Dmat = DiagonalMatrix[vals];
+   PhiEig = V . MatrixExp[Dmat t] . Inverse[V];
+   PhiExact = MatrixExp[A t];
+
+   Print["Eigenvalues = "];
+   Print[vals];
+
+   Print["Phi(t) via eigen-decomposition = "];
+   Print[MatrixForm[Chop[PhiEig]]];
+
+   Print["Phi(t) via MatrixExp[A t] = "];
+   Print[MatrixForm[Chop[PhiExact]]];
+
+   Print["Frobenius error = "];
+   Print[Norm[PhiEig - PhiExact, "Frobenius"]];
+
+   x0 = {1.0, -1.0, 2.0};
+   xt = PhiEig . x0;
+
+   Print["x(t) = Phi(t) x0 = "];
+   Print[Chop[xt]];
+];

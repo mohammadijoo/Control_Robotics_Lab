@@ -10,11 +10,12 @@ This repository is the **code companion** for a comprehensive, course-based tuto
 
 ## Repository status (today)
 
-✅ **Courses currently included (7):**
+✅ **Courses currently included (8):**
 
 - **Introduction to Robotics Course** — [`./Introduction_to_Robotics_Course`](./Introduction_to_Robotics_Course)
 - **Linear Control Course** — [`./Linear_Control_Course`](./Linear_Control_Course)
 - **System Dynamics Course** — [`./System_Dynamics_Course`](./System_Dynamics_Course)
+- **Modern Control Course** — [`./Modern_Control_Course`](./Modern_Control_Course)
 - **Robotics Kinematics and Dynamics Course** — [`./Robotics_Kinematics_and_Dynamics_Course`](./Robotics_Kinematics_and_Dynamics_Course)
 - **Robot Control Course** — [`./Robot_Control_Course`](./Robot_Control_Course)
 - **Advanced Robotics Course** — [`./Advanced_Robotics_Course`](./Advanced_Robotics_Course)
@@ -36,6 +37,9 @@ Each item below is a clickable link to the course playlist.
 
 # System Dynamics Course
 [![System Dynamics Course](https://i.ytimg.com/vi/kD9kvr1Ntjo/maxresdefault.jpg)](https://www.youtube.com/playlist?list=PLdUBuoJCa2BxLOM_tPEzBj3lsG_87mkRb)
+
+# Modern Control Course
+[![Modern Control Course](https://i.ytimg.com/vi/qDPHgFH0M7U/maxresdefault.jpg)](https://www.youtube.com/playlist?list=PLdUBuoJCa2ByCoSUI7vwi369U0JA5cZR5)
 
 # Robotics Kinematics and Dynamics Course
 [![Robotics Kinematics and Dynamics Course](https://i.ytimg.com/vi/miyV8Msk0qU/maxresdefault.jpg)](https://www.youtube.com/playlist?list=PLdUBuoJCa2ByUYXn64GUrAuZVK6CRNZO1)

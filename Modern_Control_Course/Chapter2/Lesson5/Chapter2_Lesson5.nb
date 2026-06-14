@@ -1,0 +1,5 @@
+Notebook[{
+Cell["A = { {2, 1, 0},\n     {0, 2, 0},\n     {0, 0, 3} };\n\n{P, J} = JordanDecomposition[A];\n\nPrint[\"J = \"];\nPrint[J];\n\nPrint[\"Check A == P.J.Inverse[P]: \"];\nPrint[A == Simplify[P.J.Inverse[P]]];\n\n(* Kernel dimensions for lambda = 2 *)\nlam = 2;\nM = A - lam IdentityMatrix[3];\nd1 = NullSpace[M];\nd2 = NullSpace[MatrixPower[M, 2]];\nPrint[\"nullity k=1: \", Length[d1]];\nPrint[\"nullity k=2: \", Length[d2]];", "Input"]
+},
+WindowTitle -> "Chapter2/Lesson5.html"
+]

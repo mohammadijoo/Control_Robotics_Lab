@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* T: R^3 -> R^2 *)\nA = { {1, 2, 0}, {0, -1, 3} };\nx = {1, -2, 1/2};\nTx = A.x;\n\nPrint[\"A = \", MatrixForm[A]];\nPrint[\"x = \", x];\nPrint[\"T(x) = A.x = \", Tx];\n\n(* Composition with B: R^2 -> R^2 *)\nB = { {0, 1}, {-1, 0} };\nBA = B.A;\nPrint[\"BA = \", MatrixForm[BA]];\nPrint[\"(S o T)(x) = BA.x = \", BA.x];\n      ", "Input"]
+},
+WindowTitle -> "Chapter2/Lesson2.html"
+]

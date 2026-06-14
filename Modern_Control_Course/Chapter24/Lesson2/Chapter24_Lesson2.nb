@@ -1,0 +1,35 @@
+(* Chapter24_Lesson2.nb *)
+(* Degrees of freedom and closed-loop eigenstructure for MIMO pole placement. *)
+(* This is Wolfram Language code saved with .nb extension for easy copy/import. *)
+
+ClearAll["Global`*"];
+
+A = {{0, 1, 0}, {0, 0, 1}, {-2, -3, -4}};
+B = {{0, 0}, {1, 0}, {0, 1}};
+
+desiredPoles = {-1, -2, -5};
+gammas = {0.2, -0.4, 0.8};
+
+eigenstructureColumn[lambda_, gamma_] := Module[{v, z},
+  v = {1, lambda, lambda^2 + gamma};
+  z = {gamma, -2 - 3 lambda + (-4 - lambda) (lambda^2 + gamma)};
+  {v, z}
+];
+
+cols = MapThread[eigenstructureColumn, {desiredPoles, gammas}];
+
+V = Transpose[cols[[All, 1]]];
+Z = Transpose[cols[[All, 2]]];
+
+K = Z . Inverse[V];
+Acl = A - B . K;
+residual = A . V - B . Z - V . DiagonalMatrix[desiredPoles];
+
+Print["A = ", MatrixForm[A]];
+Print["B = ", MatrixForm[B]];
+Print["V = ", MatrixForm[V]];
+Print["Z = K V = ", MatrixForm[Z]];
+Print["K = ", MatrixForm[N[K]]];
+Print["Eigenvalues of A - B K = ", Eigenvalues[N[Acl]]];
+Print["Condition number of V = ", N[ConditionNumber[V]]];
+Print["Max eigenstructure residual = ", Max[Abs[N[residual]]]];

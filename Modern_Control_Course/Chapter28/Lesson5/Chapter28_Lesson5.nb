@@ -1,0 +1,46 @@
+Notebook[{
+Cell["Chapter28_Lesson5.nb", "Title"],
+Cell["Continuous-time LQR preview for a double integrator.", "Text"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "=", RowBox[{"{{", RowBox[{
+      RowBox[{"0", ",", "1"}], ",", RowBox[{"0", ",", "0"}]}], "}}"}]}], ";",
+  RowBox[{"B", "=", RowBox[{"{{", "0", "}", ",", "{", "1", "}}"}]}], ";",
+  RowBox[{"Q", "=", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"10", ",", "1"}], "}"}], "]"}]}], ";",
+  RowBox[{"R", "=", RowBox[{"{{", "0.2", "}}"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"p", "=", RowBox[{"{{", RowBox[{
+      RowBox[{"p11", ",", "p12"}], ",", RowBox[{"p12", ",", "p22"}]}], "}}"}]}], ";",
+  RowBox[{"care", "=", RowBox[{
+      RowBox[{"Transpose", "[", "A", "]"}], ".", "p", "+", RowBox[{"p", ".", "A"}], "-",
+      RowBox[{"p", ".", "B", ".", RowBox[{"Inverse", "[", "R", "]"}], ".", RowBox[{"Transpose", "[", "B", "]"}], ".", "p"}], "+", "Q"}]}], ";",
+  RowBox[{"solutions", "=", RowBox[{"NSolve", "[", RowBox[{
+      RowBox[{"Thread", "[", RowBox[{
+          RowBox[{"Flatten", "[", "care", "]"}], "==", RowBox[{"ConstantArray", "[", RowBox[{"0", ",", "4"}], "]"}]}], "]"}],
+      ",", RowBox[{"{", RowBox[{"p11", ",", "p12", ",", "p22"}], "}"}], ",", "Reals"}], "]"}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"stableSolution", "=", RowBox[{"SelectFirst", "[", RowBox[{"solutions", ",",
+      RowBox[{RowBox[{"Max", "[", RowBox[{"Re", "[",
+          RowBox[{"Eigenvalues", "[", RowBox[{"A", "-", RowBox[{"B", ".", RowBox[{"Inverse", "[", "R", "]"}], ".", RowBox[{"Transpose", "[", "B", "]"}], ".", RowBox[{"(", RowBox[{"p", "/.", "#"}], ")"}]}]}], "]"}], "]"}], "]"}], "<", "0"}], "&"}]}], "]"}]}], ";",
+  RowBox[{"P", "=", RowBox[{"p", "/.", "stableSolution"}]}], ";",
+  RowBox[{"K", "=", RowBox[{RowBox[{"Inverse", "[", "R", "]"}], ".", RowBox[{"Transpose", "[", "B", "]"}], ".", "P"}]}], ";",
+  RowBox[{"Acl", "=", RowBox[{"A", "-", RowBox[{"B", ".", "K"}]}]}], ";"}]], "Input"],
+Cell[BoxData[
+ RowBox[{"{", RowBox[{
+  RowBox[{"MatrixForm", "[", "P", "]"}], ",",
+  RowBox[{"MatrixForm", "[", "K", "]"}], ",",
+  RowBox[{"Eigenvalues", "[", "Acl", "]"}]}], "}"}]], "Input"],
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"x0", "=", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], ";",
+  RowBox[{"x", "=", RowBox[{"NDSolveValue", "[", RowBox[{
+      RowBox[{"{", RowBox[{
+          RowBox[{RowBox[{"state", "'"}], "[", "t", "]"}], "==", RowBox[{"Acl", ".", RowBox[{"state", "[", "t", "]"}]}]}], ",",
+          RowBox[{RowBox[{"state", "[", "0", "]"}], "==", "x0"}]}], "}"}], ",", "state", ",", RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}]}], "]"}]}], ";",
+  RowBox[{"Plot", "[", RowBox[{
+      RowBox[{"Evaluate", "[", RowBox[{"x", "[", "t", "]"}], "]"}], ",",
+      RowBox[{"{", RowBox[{"t", ",", "0", ",", "8"}], "}"}], ",",
+      RowBox[{"PlotLegends", "->", RowBox[{"{", RowBox[{"\"position\"", ",", "\"velocity\""}], "}"}]}]}], "]"}]}]], "Input"]
+}]

@@ -1,0 +1,64 @@
+(* Chapter30_Lesson2.nb
+   Wolfram Mathematica code cells for coordinate scaling and conditioning.
+   Paste these cells into a notebook if a .nb front end is desired. *)
+
+ClearAll["Global`*"];
+
+A = {{0., 1., 0.},
+     {-2.0*^3, -5.0*^1, 8.0*^4},
+     {0., -2.0*^-2, -4.0*^3}};
+
+B = {{0.}, {0.}, {2.0*^3}};
+Cmat = {{1., 0., 0.}};
+Dmat = {{0.}};
+
+xNom = {1.0*^-3, 1.0*^-1, 1.0*^1};
+S = DiagonalMatrix[xNom];
+Sinv = Inverse[S];
+
+Az = Sinv.A.S;
+Bz = Sinv.B;
+Cz = Cmat.S;
+
+controllabilityMatrix[AA_, BB_] := Module[
+  {n = Length[AA]},
+  ArrayFlatten[{Table[MatrixPower[AA, k].BB, {k, 0, n - 1}]}]
+];
+
+observabilityMatrix[AA_, CC_] := Module[
+  {n = Length[AA]},
+  Join @@ Table[CC.MatrixPower[AA, k], {k, 0, n - 1}]
+];
+
+conditionNumber2[M_] := Max[SingularValueList[M]]/Min[SingularValueList[M]];
+
+Print["Eigenvalues of A: ", Eigenvalues[A]];
+Print["Eigenvalues of Az: ", Eigenvalues[Az]];
+
+Mc = controllabilityMatrix[A, B];
+Mcz = controllabilityMatrix[Az, Bz];
+Mo = observabilityMatrix[A, Cmat];
+Moz = observabilityMatrix[Az, Cz];
+
+Print["cond(A) = ", conditionNumber2[A]];
+Print["cond(Az) = ", conditionNumber2[Az]];
+Print["cond(Mc) = ", conditionNumber2[Mc]];
+Print["cond(Mc scaled) = ", conditionNumber2[Mcz]];
+Print["cond(Mo) = ", conditionNumber2[Mo]];
+Print["cond(Mo scaled) = ", conditionNumber2[Moz]];
+
+sys = StateSpaceModel[{A, B, Cmat, Dmat}];
+sysz = StateSpaceModel[{Az, Bz, Cz, Dmat}];
+
+Print["Transfer functions are equivalent:"];
+Print[TransferFunctionModel[sys]];
+Print[TransferFunctionModel[sysz]];
+
+(* Pole placement through scaled coordinates. *)
+desiredPoles = {-20, -35, -1200};
+Kz = StateFeedbackGains[StateSpaceModel[{Az, Bz, IdentityMatrix[3], 0}], desiredPoles];
+Kx = Kz.Sinv;
+
+Print["Kz = ", Kz];
+Print["Kx = ", Kx];
+Print["Closed-loop eigenvalues = ", Eigenvalues[A - B.Kx]];

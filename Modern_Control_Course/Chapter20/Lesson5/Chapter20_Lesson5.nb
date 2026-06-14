@@ -1,0 +1,67 @@
+Notebook[{
+Cell["Chapter20_Lesson5.nb", "Title"],
+Cell["Numerical issues in realization and model reduction", "Subtitle"],
+Cell[BoxData[
+"ClearAll[\"Global`*\"];
+
+A = {{-0.20, 0.05, 0.00, 0.00},
+     { 0.00,-1.00, 0.10, 0.00},
+     { 0.00, 0.00,-8.00, 0.20},
+     { 0.00, 0.00, 0.00,-20.0}};
+
+B = {{1.0}, {0.4}, {0.05}, {0.01}};
+Cmat = {{1.0, 0.3, 0.02, 0.005}};
+Dmat = {{0.0}};
+
+ctrb[A_, B_] := Module[{n = Length[A]},
+  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]
+];
+
+obsv[A_, C_] := Module[{n = Length[A]},
+  Join @@ Table[C.MatrixPower[A, k], {k, 0, n - 1}]
+];
+
+numericalRank[M_] := Module[{s, tol},
+  s = SingularValueList[N[M]];
+  tol = Max[Dimensions[M]]*$MachineEpsilon*First[s];
+  Count[s, x_ /; x > tol]
+];
+
+Rc = ctrb[A, B];
+Ro = obsv[A, Cmat];
+
+Print[\"Controllability singular values = \", SingularValueList[N[Rc]]];
+Print[\"Observability singular values = \", SingularValueList[N[Ro]]];
+
+Print[\"Numerical controllability rank = \", numericalRank[Rc]];
+Print[\"Numerical observability rank = \", numericalRank[Ro]];
+
+Print[\"Condition number of controllability matrix = \", ConditionNumber[N[Rc]]];
+Print[\"Condition number of observability matrix = \", ConditionNumber[N[Ro]]];
+
+varsWc = Array[wc, {4, 4}];
+varsWo = Array[wo, {4, 4}];
+
+eqWc = Thread[Flatten[A.varsWc + varsWc.Transpose[A] + B.Transpose[B]] == 0];
+eqWo = Thread[Flatten[Transpose[A].varsWo + varsWo.A + Transpose[Cmat].Cmat] == 0];
+
+solWc = Solve[eqWc, Flatten[varsWc]][[1]];
+solWo = Solve[eqWo, Flatten[varsWo]][[1]];
+
+Wc = N[varsWc /. solWc];
+Wo = N[varsWo /. solWo];
+
+Print[\"Eigenvalues of Wc = \", Eigenvalues[Wc]];
+Print[\"Eigenvalues of Wo = \", Eigenvalues[Wo]];
+
+hsv = Sqrt[Eigenvalues[Wc.Wo]];
+Print[\"Hankel singular values (unsorted) = \", hsv];
+
+sortedHsv = Reverse[Sort[Abs[hsv]]];
+Print[\"Hankel singular values (sorted) = \", sortedHsv];
+
+r = 2;
+Print[\"Balanced truncation theoretical error bound for r=2 = \",
+      2 Total[sortedHsv[[r + 1 ;;]]]];"
+], "Input"]
+}]

@@ -1,0 +1,33 @@
+Notebook[{
+Cell["Chapter15_Lesson1.nb", "Title"],
+Cell["Observability Gramian for a continuous-time LTI system", "Text"],
+Cell[BoxData[
+"ClearAll[A, Cmat, T, Q, t, WoT, WoInf, Omat, x0, energy];\n\
+A = {{0, 1}, {-2, -3}};\n\
+Cmat = {{1, 0}};\n\
+T = 4;\n\
+Q = Transpose[Cmat].Cmat;\n\
+\n\
+WoT = Integrate[Transpose[MatrixExp[A t]].Q.MatrixExp[A t], {t, 0, T}] // FullSimplify;\n\
+WoTNumeric = N[WoT];\n\
+Print[\"Finite-horizon observability Gramian Wo(T):\"];\n\
+Print[MatrixForm[WoTNumeric]];\n\
+Print[\"Eigenvalues of Wo(T):\"];\n\
+Print[N[Eigenvalues[WoT]]];\n\
+\n\
+Omat = Join[Cmat, Cmat.A];\n\
+Print[\"Observability matrix:\"];\n\
+Print[MatrixForm[Omat]];\n\
+Print[\"rank(O) = \", MatrixRank[Omat]];\n\
+\n\
+WoInf = LyapunovSolve[Transpose[A], Q];\n\
+Print[\"Infinite-horizon observability Gramian:\"];\n\
+Print[MatrixForm[N[WoInf]]];\n\
+Print[\"Residual A^T W + W A + C^T C:\"];\n\
+Print[MatrixForm[N[Transpose[A].WoInf + WoInf.A + Q]]];\n\
+\n\
+x0 = {1, -1/2};\n\
+energy = x0.WoT.x0;\n\
+Print[\"Output energy over [0,T] = \", N[energy]];"
+], "Input"]
+}]

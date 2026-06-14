@@ -1,0 +1,18 @@
+Notebook[{
+Cell["Chapter14_Lesson4.nb", "Title"],
+Cell["Observability in canonical (observable) forms", "Subtitle"],
+Cell[BoxData[RowBox[{"den", "=", RowBox[{"{", RowBox[{"6", ",", "11", ",", "6"}], "}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"num", "=", RowBox[{"{", RowBox[{"4", ",", "3", ",", "2"}], "}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"n", "=", RowBox[{"Length", "[", "den", "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Ao", "=", RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"{", RowBox[{"n", ",", "n"}], "}"}]}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"Ao", "[[", RowBox[{"All", ",", "1"}], "]]"}], "=", RowBox[{"-", RowBox[{"Reverse", "[", "den", "]"}]}]}]], "Input"],
+Cell[BoxData[RowBox[{"Do", "[", RowBox[{RowBox[{RowBox[{"Ao", "[[", RowBox[{"i", ",", RowBox[{"i", "+", "1"}]}], "]]"}], "=", "1"}], ",", RowBox[{"{", RowBox[{"i", ",", "1", ",", RowBox[{"n", "-", "1"}]}], "}"}]}], "]"}]], "Input"],
+Cell[BoxData[RowBox[{"Bo", "=", RowBox[{"Transpose", "[", RowBox[{"{", RowBox[{"Reverse", "[", "num", "]"}], "}"}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Co", "=", RowBox[{"{", RowBox[{"Join", "[", RowBox[{RowBox[{"{", "1", "}"}], ",", RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"n", "-", "1"}]}], "]"}]}], "]"}], "}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"Omat", "=", RowBox[{"Table", "[", RowBox[{RowBox[{"First", "[", RowBox[{"Co", ".", RowBox[{"MatrixPower", "[", RowBox[{"Ao", ",", "k"}], "]"}]}], "]"}], ",", RowBox[{"{", RowBox[{"k", ",", "0", ",", RowBox[{"n", "-", "1"}]}], "}"}]}], "]"}]}]], "Input"],
+Cell[BoxData[RowBox[{"MatrixForm", "/@", RowBox[{"{", RowBox[{"Ao", ",", "Bo", ",", "Co", ",", "Omat"}], "}"}]}]], "Input"],
+Cell[BoxData[RowBox[{RowBox[{"{", RowBox[{RowBox[{"MatrixRank", "[", "Omat", "]"}], ",", RowBox[{"Det", "[", "Omat", "]"}], ",", RowBox[{"Eigenvalues", "[", "Ao", "]"}]}], "}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"x0True", "=", RowBox[{"{", RowBox[{"1", ",", RowBox[{"-", "2"}], ",", "0.5"}], "}"}]}]], "Input"],
+Cell[BoxData[RowBox[{"eta", "=", RowBox[{"Omat", ".", "x0True"}]}]], "Input"],
+Cell[BoxData[RowBox[{"x0Hat", "=", RowBox[{"LinearSolve", "[", RowBox[{"Omat", ",", "eta"}], "]"}]}]], "Input"]
+}]

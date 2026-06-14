@@ -1,0 +1,6 @@
+Notebook[{
+Cell["Chapter12_Lesson1.nb", "Title"],
+Cell["Definition and Computation of the Controllability Gramian", "Section"],
+Cell[BoxData[
+"ClearAll[\"Global`*\"];\n\nA = {{0, 1}, {-2, -3}};\nB = {{0}, {1}};\nTfinal = 2.0;\n\ncontrollabilityMatrix[A_, B_] := Module[{n = Length[A]},\n  ArrayFlatten[{Table[MatrixPower[A, k].B, {k, 0, n - 1}]}]\n];\n\nfiniteHorizonGramian[A_, B_, T_] := Module[{n = Length[A], tau},\n  NIntegrate[\n    MatrixExp[A tau].B.Transpose[B].Transpose[MatrixExp[A tau]],\n    {tau, 0, T},\n    WorkingPrecision -> 30\n  ]\n];\n\nCmat = controllabilityMatrix[A, B];\nMatrixRank[Cmat]\n\nWcT = finiteHorizonGramian[A, B, Tfinal] // N;\nWcT // MatrixForm\nEigenvalues[WcT] // N\nMatrixRank[WcT]\n\nn = Length[A];\nWvars = Array[w, {n, n}];\neqns = Flatten[A.Wvars + Wvars.Transpose[A] + B.Transpose[B] == ConstantArray[0, {n, n}]];\nsol = Solve[eqns, Flatten[Wvars]][[1]];\nWinf = Wvars /. sol;\nWinf // MatrixForm\nEigenvalues[Winf] // N\n\nA2 = {{0, 0}, {0, -1}};\nB2 = {{1}, {0}};\nCmat2 = controllabilityMatrix[A2, B2];\nWcT2 = finiteHorizonGramian[A2, B2, Tfinal] // N;\n\nMatrixRank[Cmat2]\nWcT2 // MatrixForm\nEigenvalues[WcT2] // N\nMatrixRank[WcT2]"], "Input"]
+}]

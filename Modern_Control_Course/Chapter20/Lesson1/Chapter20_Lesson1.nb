@@ -1,0 +1,52 @@
+(* Chapter20_Lesson1.nb *)
+(* Minimal realization tests for continuous-time LTI systems in Wolfram Language. *)
+(* The transfer matrix is G(s) = C . Inverse[s I - A] . B + D. *)
+(* A realization is minimal iff (A,B) is reachable and (C,A) is observable. *)
+
+ClearAll[reachabilityMatrix, observabilityMatrix, minimalQ, transferValue, report];
+
+reachabilityMatrix[A_, B_] := Module[{n = Length[A], Ak = IdentityMatrix[Length[A]]},
+  ArrayFlatten[{Table[(Ak = If[k == 1, IdentityMatrix[n], A . Ak]; If[k == 1, B, Ak . B]), {k, 1, n}]}]
+];
+
+observabilityMatrix[A_, C_] := Module[{n = Length[A], Ak = IdentityMatrix[Length[A]], blocks},
+  blocks = Table[
+    If[k == 1, C, Ak = Ak . A; C . Ak],
+    {k, 1, n}
+  ];
+  Join @@ blocks
+];
+
+minimalQ[A_, B_, C_] := Module[{n = Length[A], R, O},
+  R = reachabilityMatrix[A, B];
+  O = observabilityMatrix[A, C];
+  MatrixRank[R] == n && MatrixRank[O] == n
+];
+
+transferValue[A_, B_, C_, D_, s_] := C . Inverse[s IdentityMatrix[Length[A]] - A] . B + D;
+
+report[name_, A_, B_, C_] := Module[{R, O, n},
+  n = Length[A];
+  R = reachabilityMatrix[A, B];
+  O = observabilityMatrix[A, C];
+  Print["\n", name];
+  Print["rank(R_n) = ", MatrixRank[R], " of n = ", n];
+  Print["rank(O_n) = ", MatrixRank[O], " of n = ", n];
+  Print["minimal?  = ", minimalQ[A, B, C]];
+];
+
+A_nonmin = {{-1, 0}, {0, -2}};
+B_nonmin = {{1}, {1}};
+C_nonmin = {{0, 1}};
+D_nonmin = {{0}};
+
+A_min = {{-2}};
+B_min = {{1}};
+C_min = {{1}};
+D_min = {{0}};
+
+report["Two-state nonminimal realization", A_nonmin, B_nonmin, C_nonmin];
+report["One-state minimal realization", A_min, B_min, C_min];
+
+FullSimplify[transferValue[A_nonmin, B_nonmin, C_nonmin, D_nonmin, s]]
+FullSimplify[transferValue[A_min, B_min, C_min, D_min, s]]

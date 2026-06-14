@@ -1,0 +1,46 @@
+(* Chapter12_Lesson2.nb *)
+(* Minimum-energy steering for a double-integrator system. *)
+
+Clear["Global`*"];
+
+A = {{0, 1}, {0, 0}};
+B = {{0}, {1}};
+Tfinal = 2;
+x0 = {0, 0};
+xf = {1, 0};
+
+Wc = Integrate[
+   MatrixExp[A s].B.Transpose[B].Transpose[MatrixExp[A s]],
+   {s, 0, Tfinal}
+];
+
+z = xf - MatrixExp[A Tfinal].x0;
+lambda = LinearSolve[Wc, z];
+
+uStar[t_] := First[Transpose[B].MatrixExp[Transpose[A] (Tfinal - t)].lambda];
+
+Emin = z.lambda;
+
+xSol = NDSolveValue[
+   {
+    x1'[t] == x2[t],
+    x2'[t] == uStar[t],
+    x1[0] == x0[[1]],
+    x2[0] == x0[[2]]
+   },
+   {x1, x2},
+   {t, 0, Tfinal}
+];
+
+terminalState = {xSol[[1]][Tfinal], xSol[[2]][Tfinal]};
+terminalError = Norm[terminalState - xf];
+
+Print["Wc(T) = ", MatrixForm[Wc]];
+Print["lambda = ", lambda];
+Print["minimum energy = ", Emin];
+Print["terminal state = ", terminalState];
+Print["terminal error norm = ", terminalError];
+
+Plot[uStar[t], {t, 0, Tfinal},
+ AxesLabel -> {"t", "u*(t)"},
+ PlotLabel -> "Minimum-energy input"]

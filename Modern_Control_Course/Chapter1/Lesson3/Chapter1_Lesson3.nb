@@ -1,0 +1,5 @@
+Notebook[{
+Cell["(* Physical parameters *)\nm = 1.0;\nc = 0.4;\nk = 4.0;\n\n(* State variables: x1[t] = y[t], x2[t] = y'[t] *)\nx1 = x1[t];\nx2 = x2[t];\n\n(* Differential equations for zero-input internal dynamics *)\neqs = {\n  x1' == x2,\n  x2' == -(k/m) x1 - (c/m) x2\n};\n\n(* Initial conditions *)\nics = {\n  x1 /. t -> 0 == 1.0,\n  x2 /. t -> 0 == 0.0\n};\n\nsol = NDSolve[\n  Join[eqs, ics],\n  {x1, x2},\n  {t, 0, 10}\n];\n\n(* Extract y(t) = x1(t) *)\ny[t_] := Evaluate[x1 /. sol[[1]]];\n\n(* Plot y(t) *)\n(* Plot[y[t], {t, 0, 10}, AxesLabel -> {\"t\", \"y(t)\"}] *)\n      ", "Input"]
+},
+WindowTitle -> "Chapter1/Lesson3.html"
+]

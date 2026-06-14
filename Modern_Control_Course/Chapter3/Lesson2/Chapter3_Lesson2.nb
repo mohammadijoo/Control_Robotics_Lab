@@ -1,0 +1,6 @@
+Notebook[{
+Cell["(* ===== Code block 1 extracted from Chapter3/Lesson2.html ===== *)\n(* Define A(t), b(t), and the vector ODE x'(t) = A(t) x(t) + b(t) *)\nA[t_] := { {0, 1}, {-2 - 0.2 Sin[t], -0.4} };\nb[t_] := {0, 0.5 Cos[t]};\n\neqns = {\n  x1'[t] == (A[t].{x1[t], x2[t]})[[1]] + b[t][[1]],\n  x2'[t] == (A[t].{x1[t], x2[t]})[[2]] + b[t][[2]],\n  x1[0] == 1, x2[0] == 0\n};\n\nsol = NDSolve[eqns, {x1, x2}, {t, 0, 10}, AccuracyGoal -> 12, PrecisionGoal -> 12];\n{x1[10], x2[10]} /. sol[[1]]\n      ", "Input"],
+Cell["(* ===== Code block 2 extracted from Chapter3/Lesson2.html ===== *)\n(* From-scratch RK4 for vector ODE *)\nf[t_, x_] := A[t].x + b[t];\n\nrk4Step[t_, x_, h_] := Module[{k1, k2, k3, k4},\n  k1 = f[t, x];\n  k2 = f[t + h/2, x + (h/2) k1];\n  k3 = f[t + h/2, x + (h/2) k2];\n  k4 = f[t + h,   x + h k3];\n  x + (h/6) (k1 + 2 k2 + 2 k3 + k4)\n];\n\nh = 0.01; t0 = 0; tf = 10;\nN = Round[(tf - t0)/h];\nx = {1.0, 0.0}; t = t0;\n\nDo[\n  x = rk4Step[t, x, h];\n  t = t + h;\n, {k, 1, N}];\n\nx\n      ", "Input"]
+},
+WindowTitle -> "Chapter3/Lesson2.html"
+]
