@@ -1864,3 +1864,193 @@ body:not(.crl-home) .featured-posts .heading {
     padding-right: 6px !important;
   }
 }
+
+/* =========================================================
+   CaaT Academy lesson-page fixes
+   Actual HTML selectors:
+   - display formulas: h4.mathJax
+   - MathJax version: v2 / TeX-MML-AM_CHTML
+   - Similar Tutorials: #sidebar .featured-posts .owl-carousel
+   Append to END of assets/css/styles.css
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   1) MathJax v2 formulas inside <h4 class="mathJax">
+   Make long display equations horizontally scrollable.
+   --------------------------------------------------------- */
+
+body:not(.crl-home) h4.mathJax {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-inline: contain !important;
+
+  white-space: nowrap !important;
+  text-align: left !important;
+
+  margin: 1rem 0 !important;
+  padding: 0.35rem 0 0.65rem 0 !important;
+}
+
+/* MathJax v2 display wrapper */
+body:not(.crl-home) h4.mathJax .MathJax_Display {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: max-content !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+/* MathJax v2 CommonHTML output */
+body:not(.crl-home) h4.mathJax .MathJax,
+body:not(.crl-home) h4.mathJax .MathJax_CHTML,
+body:not(.crl-home) h4.mathJax .mjx-chtml {
+  display: inline-block !important;
+  max-width: none !important;
+  min-width: max-content !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+}
+
+/* Do not let MathJax's internal generated boxes shrink */
+body:not(.crl-home) h4.mathJax .MathJax_CHTML > *,
+body:not(.crl-home) h4.mathJax .mjx-chtml > * {
+  max-width: none !important;
+}
+
+/* Keep inline MathJax inside paragraphs from creating page-level overflow */
+body:not(.crl-home) .simple-post p .MathJax,
+body:not(.crl-home) .simple-post li .MathJax,
+body:not(.crl-home) .simple-post strong .MathJax,
+body:not(.crl-home) .simple-post p .MathJax_CHTML,
+body:not(.crl-home) .simple-post li .MathJax_CHTML,
+body:not(.crl-home) .simple-post strong .MathJax_CHTML {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  vertical-align: middle !important;
+}
+
+/* Visible scrollbar for long formulas */
+body:not(.crl-home) h4.mathJax::-webkit-scrollbar {
+  height: 8px;
+}
+
+body:not(.crl-home) h4.mathJax::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+}
+
+body:not(.crl-home) h4.mathJax::-webkit-scrollbar-thumb {
+  background: rgba(14, 116, 144, 0.5);
+  border-radius: 999px;
+}
+
+
+/* ---------------------------------------------------------
+   2) Similar Tutorials full sidebar-width fix
+   Actual structure:
+   #sidebar > .inner > .featured-posts > .owl-carousel
+   --------------------------------------------------------- */
+
+@media screen and (max-width: 1280px) {
+  body:not(.crl-home) #sidebar > .inner .featured-posts {
+    width: calc(100% + 60px) !important;
+    max-width: calc(100% + 60px) !important;
+
+    margin-left: -30px !important;
+    margin-right: -30px !important;
+
+    padding: 30px 0 36px 0 !important;
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+  }
+
+  body:not(.crl-home) #sidebar > .inner .featured-posts .heading {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+    box-sizing: border-box !important;
+  }
+
+  body:not(.crl-home) #sidebar > .inner .featured-posts .owl-carousel,
+  body:not(.crl-home) #sidebar > .inner .featured-posts .owl-stage-outer {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body:not(.crl-home) #sidebar > .inner .featured-posts .owl-stage-outer {
+    border-radius: 0 !important;
+  }
+
+  body:not(.crl-home) #sidebar > .inner .featured-posts .featured-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body:not(.crl-home) #sidebar > .inner .featured-posts .featured-item img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+
+  body:not(.crl-home) #sidebar > .inner .featured-posts .featured-item p {
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+    box-sizing: border-box !important;
+  }
+
+  body:not(.crl-home) #sidebar > .inner .featured-posts .owl-carousel .owl-dots {
+    right: 30px !important;
+  }
+
+  body:not(.crl-home) #sidebar > .inner .featured-posts .owl-carousel .owl-nav {
+    left: 0 !important;
+    right: 0 !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  body:not(.crl-home) #sidebar,
+  body:not(.crl-home) #sidebar > .inner {
+    width: min(380px, 100vw) !important;
+  }
+
+  body:not(.crl-home) #sidebar.inactive {
+    margin-left: calc(-1 * min(380px, 100vw)) !important;
+  }
+
+  body:not(.crl-home) #sidebar .toggle {
+    left: min(380px, 100vw) !important;
+  }
+
+  body:not(.crl-home) #sidebar > .inner .featured-posts {
+    width: calc(100% + 60px) !important;
+    max-width: calc(100% + 60px) !important;
+  }
+}
