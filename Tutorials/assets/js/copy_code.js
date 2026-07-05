@@ -1,27 +1,67 @@
-document.querySelectorAll('pre code').forEach(codeBlock => {
-  const pre = codeBlock.parentElement;
+(function () {
+  function setCopyState(button) {
+    button.classList.remove("is-copied", "is-failed");
+    button.setAttribute("aria-label", "Copy code");
+    button.innerHTML = '<i class="fa fa-copy" aria-hidden="true"></i>';
+  }
 
-  // Skip if already added
-  if (pre.querySelector('.copy-btn')) return;
+  function setOkState(button) {
+    button.classList.remove("is-failed");
+    button.classList.add("is-copied");
+    button.setAttribute("aria-label", "Copied");
+    button.textContent = "OK";
+    window.setTimeout(function () {
+      setCopyState(button);
+    }, 1700);
+  }
 
-  // Create and style the button
-  const button = document.createElement('button');
-  button.className = 'copy-btn';
-  button.type = 'button';
-  button.innerText = '📋 Copy';
+  function setFailedState(button) {
+    button.classList.remove("is-copied");
+    button.classList.add("is-failed");
+    button.setAttribute("aria-label", "Copy failed");
+    button.textContent = "!";
+    window.setTimeout(function () {
+      setCopyState(button);
+    }, 1700);
+  }
 
-  // Handle click to copy
-  button.addEventListener('click', () => {
-    const code = codeBlock.innerText;
-    navigator.clipboard.writeText(code).then(() => {
-      button.innerText = '✅ Copied';
-      setTimeout(() => button.innerText = '📋 Copy', 1500);
-    }).catch(() => {
-      button.innerText = '❌ Failed';
-      setTimeout(() => button.innerText = '📋 Copy', 1500);
+  document.querySelectorAll("pre code").forEach(function (codeBlock) {
+    var pre = codeBlock.parentElement;
+    if (!pre || pre.querySelector(".copy-btn")) return;
+
+    var button = document.createElement("button");
+    button.className = "copy-btn";
+    button.type = "button";
+    setCopyState(button);
+
+    button.addEventListener("click", function () {
+      var code = codeBlock.innerText;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(function () {
+          setOkState(button);
+        }).catch(function () {
+          setFailedState(button);
+        });
+        return;
+      }
+
+      try {
+        var textArea = document.createElement("textarea");
+        textArea.value = code;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        setOkState(button);
+      } catch (error) {
+        setFailedState(button);
+      }
     });
-  });
 
-  // Inject into <pre> so it’s above code but inside the dark box
-  pre.appendChild(button);
-});
+    pre.appendChild(button);
+  });
+})();

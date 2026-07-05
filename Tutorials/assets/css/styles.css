@@ -1,324 +1,1866 @@
-#menu ul li h3 {
-  /* Your styles here */
-  color: #00bfff !important;
-  font-size: 1.5rem !important;
-  font-weight: bold;
-  text-transform: none;
-}
-#menu ul li h4 {
-  /* Your styles here */
-  color: #b2ffff !important;
-  font-size: 1.3rem !important;
-  font-weight: bold;
-  text-transform: none;
-}
-#menu ul li h6 {
-  /* Your styles here */
-  color: #f0f8ff !important;
-  font-size: 1rem !important;
-  font-weight: bold;
-  text-transform: none;
-}
-#menu ul li ul a {
-  text-transform: none;
-  font-size: 0.8rem;
-}
-code,
-pre {
-  border-radius: 5px !important;
+/*
+  CaaT Academy / Control & Robotics Lab visual refresh
+  Placement: append this block to the END of Tutorials/assets/css/styles.css
+  Scope: homepage classes use .crl-*; course-page rules override existing selectors without renaming classes or ids.
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+:root {
+  --crl-bg: #070b16;
+  --crl-bg-soft: #0d1424;
+  --crl-bg-card: rgba(255, 255, 255, 0.075);
+  --crl-bg-card-strong: rgba(255, 255, 255, 0.11);
+  --crl-text: #f8fafc;
+  --crl-text-muted: #aab7cf;
+  --crl-ink: #101828;
+  --crl-body: #344054;
+  --crl-border: rgba(255, 255, 255, 0.14);
+  --crl-border-light: rgba(16, 24, 40, 0.11);
+  --crl-primary: #58d5ff;
+  --crl-primary-2: #7c5cff;
+  --crl-accent: #2fffd1;
+  --crl-warning: #ffd166;
+  --crl-dark-button-1: #050816;
+  --crl-dark-button-2: #10213f;
+  --crl-dark-button-3: #0f4c5c;
+  --crl-radius-xl: 34px;
+  --crl-radius-lg: 24px;
+  --crl-radius-md: 16px;
+  --crl-shadow-soft: 0 24px 70px rgba(2, 8, 23, 0.2);
+  --crl-shadow-dark: 0 30px 90px rgba(0, 0, 0, 0.35);
+  --crl-font-main: "Inter", "Roboto Slab", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --crl-font-display: "Space Grotesk", "Inter", "Roboto Slab", system-ui, sans-serif;
 }
 
-.new__badge {
-  border-radius: 4px;
-  background-color: #afeeee;
-  padding: 0px 3px 2px;
-  margin: 0px 2px;
-}
-
-.simple-post h1 {
-  font-size: 1.9rem;
-  padding: 0.8rem 0;
-}
-
-.simple-post h2 {
-  font-size: 1.7rem;
-}
-
-.simple-post h3 {
-  font-size: 1.5rem;
-}
-
-.simple-post h4 {
-  font-size: 1.3rem;
-}
-
-.diagram-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.mermaid {
-  background: #ffffff;
-  padding: 1rem;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 1000px; /* Adjust as needed */
+body.crl-home *,
+body.crl-home *::before,
+body.crl-home *::after,
+body:not(.crl-home) *,
+body:not(.crl-home) *::before,
+body:not(.crl-home) *::after {
   box-sizing: border-box;
-  display: flex;
-  justify-content: center;
 }
 
-.border-rectangle-button {
-  margin-bottom: 5px !important;
+/* =========================================================
+   Homepage
+   ========================================================= */
+
+html:has(body.crl-home),
+body.crl-home {
+  min-height: 100%;
+  height: auto;
+  margin: 0;
+  overflow-x: visible;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  font-family: var(--crl-font-main);
+  color: var(--crl-text);
+  background:
+    radial-gradient(circle at 15% 5%, rgba(88, 213, 255, 0.28), transparent 28rem),
+    radial-gradient(circle at 82% 10%, rgba(124, 92, 255, 0.22), transparent 30rem),
+    linear-gradient(135deg, #060914 0%, #08111f 44%, #0b0f1f 100%);
 }
 
-pre {
+body.crl-home::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent 78%);
+  z-index: 0;
+}
+
+body.crl-home a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.crl-site-header,
+body.crl-home main,
+.crl-site-footer {
   position: relative;
-  overflow: auto;
+  z-index: 1;
 }
 
-/* Ensure code block can host absolute content */
-pre code {
+.crl-site-header {
+  width: min(1180px, calc(100% - 32px));
+  margin: 22px auto 0;
+  min-height: 76px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  border: 1px solid var(--crl-border);
+  border-radius: 999px;
+  background: rgba(7, 11, 22, 0.66);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--crl-shadow-dark);
+}
+
+.crl-brand {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--crl-font-display);
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.crl-brand img {
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px;
+  object-fit: contain;
+  flex: 0 0 48px;
   display: block;
-  position: relative;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px;
 }
 
-/* Copy button style */
-.copy-btn {
-  position: absolute;
-  top: 0.5em;
-  right: 0.5em;
-  background-color: #2d333b;
-  color: #adbac7;
-  border: 1px solid #444c56;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  padding: 4px 10px;
-  cursor: pointer;
-  z-index: 10;
-  opacity: 0.8;
-  pointer-events: auto;
-  transition: background-color 0.2s, opacity 0.2s;
-}
-
-.copy-btn:hover {
-  opacity: 1;
-  background-color: #444c56;
-}
-
-.border-rectangle-button-cyan {
-  margin-bottom: 30px;
-}
-.border-rectangle-button-cyan a {
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  display: inline-block;
-  padding: 8px;
-  width: 100%;
-  text-align: center;
-  letter-spacing: 0.5px;
-  color: #b2ffff;
-  border: 0px;
-  transition: all 0.5s;
-  background-color: rgba(83, 91, 160, 0);
-}
-.border-rectangle-button-cyan a:hover {
-  color: black;
-  background-color: #b2ffff;
-  border: 0px;
-}
-
-#footer {
+.crl-top-nav {
   display: flex;
-  justify-content: center; /* centers horizontally */
-  align-items: center; /* centers vertically */
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
-.copyright {
-  /* margin-top: -10px !important; */
-  padding-bottom: 20px !important;
-  font-size: 12px !important;
-  line-height: 1.45 !important;
+.crl-top-nav a {
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: var(--crl-text-muted);
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.crl-top-nav a:hover {
+  color: var(--crl-text);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.crl-hero {
+  width: min(1180px, calc(100% - 32px));
+  margin: 72px auto 54px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 32px;
+  align-items: stretch;
+}
+
+.crl-hero__content {
+  min-width: 0;
+  padding: clamp(36px, 6vw, 78px);
+  border: 1px solid var(--crl-border);
+  border-radius: var(--crl-radius-xl);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.055)),
+    radial-gradient(circle at 88% 18%, rgba(47, 255, 209, 0.16), transparent 20rem);
+  box-shadow: var(--crl-shadow-dark);
+}
+
+.crl-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
   max-width: 100%;
-  overflow-wrap: break-word;
-  white-space: normal;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  line-height: 1.55;
+  color: var(--crl-accent) !important;
+  text-transform: uppercase;
 }
 
-.down-content p {
-  text-align: justify !important;
-  font-size: 1rem !important;
-  color: #212529 !important;
+.crl-eyebrow::before {
+  content: "";
+  width: 34px;
+  min-width: 34px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--crl-accent), var(--crl-primary));
 }
 
-q {
+.crl-hero h1 {
+  max-width: 880px;
+  margin: 0;
+  font-family: var(--crl-font-display);
+  font-size: clamp(3.1rem, 8vw, 6.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.075em;
+  color: var(--crl-text);
+}
+
+.crl-hero__lead {
+  max-width: 850px;
+  margin: 28px 0 0;
+  font-size: clamp(1.05rem, 1.7vw, 1.28rem);
+  line-height: 1.78;
+  color: var(--crl-text-muted) !important;
+}
+
+.crl-hero__actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 34px;
+}
+
+.crl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.crl-btn:hover {
+  transform: translateY(-2px);
+}
+
+.crl-btn--primary {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--crl-dark-button-1), var(--crl-dark-button-2) 48%, var(--crl-dark-button-3));
+  box-shadow: 0 16px 44px rgba(15, 76, 92, 0.34);
+}
+
+.crl-btn--primary:hover {
+  background: linear-gradient(135deg, #00040d, #0a1933 48%, #0b3b49);
+}
+
+.crl-btn--ghost {
+  color: var(--crl-text) !important;
+  border: 1px solid var(--crl-border);
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.crl-hero-panel {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.crl-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 150px;
+  padding: 28px;
+  border: 1px solid var(--crl-border);
+  border-radius: var(--crl-radius-lg);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--crl-shadow-dark);
+}
+
+.crl-stat strong {
+  font-family: var(--crl-font-display);
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: var(--crl-text);
+}
+
+.crl-stat span {
+  margin-top: 10px;
+  font-weight: 800;
+  color: var(--crl-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.76rem;
+}
+
+.crl-section {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto 52px;
+  padding: clamp(28px, 4vw, 48px);
+  border: 1px solid var(--crl-border);
+  border-radius: var(--crl-radius-xl);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: var(--crl-shadow-dark);
+}
+
+.crl-section--intro p {
+  max-width: 980px;
+  margin: 0;
+  color: var(--crl-text-muted) !important;
+  font-size: 1.08rem;
+  line-height: 1.85;
+}
+
+.crl-section-heading {
+  margin-bottom: 26px;
+}
+
+.crl-section-heading--split {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.crl-section h2 {
+  margin: 0;
+  font-family: var(--crl-font-display);
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  letter-spacing: -0.055em;
+  color: var(--crl-text);
+}
+
+.crl-section-note {
+  max-width: 440px;
+  margin: 0;
+  color: var(--crl-text-muted) !important;
+  line-height: 1.7;
+}
+
+.crl-course-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.crl-course-card {
+  min-height: 360px;
+  min-width: 0;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid var(--crl-border);
+  border-radius: var(--crl-radius-lg);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.045)),
+    radial-gradient(circle at 16% 4%, rgba(88, 213, 255, 0.16), transparent 14rem);
+  transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.crl-course-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(88, 213, 255, 0.52);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.crl-course-card--robotics { background-image: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.045)), radial-gradient(circle at 14% 5%, rgba(47, 255, 209, 0.16), transparent 14rem); }
+.crl-course-card--control { background-image: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.045)), radial-gradient(circle at 14% 5%, rgba(124, 92, 255, 0.18), transparent 14rem); }
+.crl-course-card--dynamics { background-image: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.045)), radial-gradient(circle at 14% 5%, rgba(255, 209, 102, 0.18), transparent 14rem); }
+.crl-course-card--mobile { background-image: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.045)), radial-gradient(circle at 14% 5%, rgba(88, 213, 255, 0.18), transparent 14rem); }
+.crl-course-card--advanced { background-image: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.045)), radial-gradient(circle at 14% 5%, rgba(255, 92, 168, 0.17), transparent 14rem); }
+
+.crl-course-card__icon {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  color: #04111f;
+  background: linear-gradient(135deg, var(--crl-accent), var(--crl-primary));
+  box-shadow: 0 12px 28px rgba(88, 213, 255, 0.2);
+  font-size: 1.25rem;
+}
+
+.crl-course-card__meta {
+  margin: 28px 0 10px;
+  color: var(--crl-accent) !important;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.crl-course-card h3 {
+  margin: 0;
+  font-family: var(--crl-font-display);
+  font-size: 1.42rem;
+  line-height: 1.14;
+  letter-spacing: -0.04em;
+  color: var(--crl-text);
+}
+
+.crl-course-card p {
+  color: var(--crl-text-muted) !important;
+  line-height: 1.68;
+}
+
+.crl-course-card__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--crl-border);
+  color: var(--crl-text) !important;
+  font-weight: 900;
+}
+
+.crl-course-card__link span {
+  transition: transform 0.2s ease;
+}
+
+.crl-course-card__link:hover span {
+  transform: translateX(4px);
+}
+
+.crl-learning-roadmap {
+  --roadmap-line: linear-gradient(180deg, rgba(47, 255, 209, 0.9), rgba(88, 213, 255, 0.65), rgba(255, 209, 102, 0.7));
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 34px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: roadmap;
+}
+
+.crl-learning-roadmap::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  bottom: 28px;
+  left: 50%;
+  width: 3px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--roadmap-line);
+  box-shadow: 0 0 30px rgba(88, 213, 255, 0.28);
+}
+
+.crl-learning-roadmap li {
+  position: relative;
+  min-width: 0;
+}
+
+.crl-learning-roadmap li::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  width: 34px;
+  height: 2px;
+  background: rgba(88, 213, 255, 0.38);
+}
+
+.crl-learning-roadmap li:nth-child(odd)::before {
+  right: -34px;
+}
+
+.crl-learning-roadmap li:nth-child(even)::before {
+  left: -34px;
+}
+
+.crl-learning-roadmap li::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #08111f;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--crl-accent), var(--crl-primary));
+  box-shadow: 0 0 0 5px rgba(88, 213, 255, 0.16), 0 0 26px rgba(88, 213, 255, 0.35);
+  z-index: 2;
+}
+
+.crl-learning-roadmap li:nth-child(odd)::after {
+  right: -43px;
+}
+
+.crl-learning-roadmap li:nth-child(even)::after {
+  left: -43px;
+}
+
+.crl-roadmap-card {
+  min-height: 154px;
+  display: block;
+  padding: 22px;
+  border: 1px solid var(--crl-border);
+  border-radius: 24px;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.045)),
+    rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.crl-roadmap-card--available:hover {
+  transform: translateY(-4px);
+  border-color: rgba(47, 255, 209, 0.6);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.crl-roadmap-card--planned {
+  opacity: 0.72;
+}
+
+.crl-roadmap-card__number {
+  display: inline-flex;
+  margin-right: 10px;
+  font-family: var(--crl-font-display);
+  color: var(--crl-accent);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.crl-roadmap-card__stage {
+  color: var(--crl-text-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.crl-roadmap-card h3 {
+  margin: 14px 0 10px;
+  font-family: var(--crl-font-display);
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  line-height: 1.14;
+  letter-spacing: -0.045em;
+  color: var(--crl-text);
+}
+
+.crl-roadmap-card p {
+  margin: 0;
+  color: var(--crl-text-muted) !important;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.crl-roadmap-card--available p {
+  color: var(--crl-accent) !important;
+}
+
+.crl-site-footer {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto 42px;
+  color: var(--crl-text-muted);
+  text-align: center;
+}
+
+.crl-site-footer p {
+  color: var(--crl-text-muted) !important;
+}
+
+/* =========================================================
+   Course page refresh: overrides only, no selector renaming
+   ========================================================= */
+
+body:not(.crl-home) {
+  font-family: var(--crl-font-main) !important;
+  background: #f5f7fb;
+}
+
+body:not(.crl-home) #wrapper {
+  background:
+    radial-gradient(circle at top left, rgba(88, 213, 255, 0.12), transparent 28rem),
+    linear-gradient(180deg, #f7faff 0%, #eef3f9 100%);
+}
+
+body:not(.crl-home) #main {
+  min-width: 0;
+}
+
+body:not(.crl-home) #main > .inner {
+  --crl-inner-pad: clamp(24px, 4.6vw, 82px);
+  padding: var(--crl-inner-pad);
+}
+
+body:not(.crl-home) #header {
+  min-height: 100px;
+  margin: calc(var(--crl-inner-pad) * -1) calc(var(--crl-inner-pad) * -1) 56px calc(var(--crl-inner-pad) * -1);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(135deg, rgba(8, 13, 27, 0.98), rgba(18, 28, 52, 0.98)),
+    radial-gradient(circle at 95% 15%, rgba(88, 213, 255, 0.24), transparent 20rem);
+  box-shadow: 0 22px 55px rgba(2, 8, 23, 0.22);
+}
+
+body:not(.crl-home) #header .logo {
+  min-height: 100px;
+  height: 100px;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 14px;
+  width: 100%;
+  padding: 0 var(--crl-inner-pad);
+}
+
+body:not(.crl-home) #header .logo img {
+  width: 52px !important;
+  height: 52px !important;
+  max-width: 52px !important;
+  min-width: 52px !important;
+  display: block !important;
+  object-fit: contain !important;
+  margin-top: 0 !important;
+  flex: 0 0 52px !important;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px;
+}
+
+body:not(.crl-home) #header .logo a {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 100px;
+  margin-right: 0 !important;
+  font-family: var(--crl-font-display) !important;
+  font-size: clamp(1.65rem, 3vw, 2.15rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1 !important;
+  color: #ffffff !important;
+  white-space: nowrap;
+}
+
+body:not(.crl-home) #sidebar .toggle {
+  height: 100px !important;
+  line-height: 100px !important;
+  top: 0 !important;
+}
+
+body:not(.crl-home) #sidebar .toggle::before {
+  height: 100px !important;
+  line-height: 100px !important;
+  top: 0 !important;
+  margin-top: 0 !important;
+}
+
+body:not(.crl-home) .page-heading {
+  margin-bottom: 26px;
+  padding: clamp(28px, 4vw, 48px);
+  border: 1px solid var(--crl-border-light);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 90% 15%, rgba(88, 213, 255, 0.16), transparent 18rem),
+    linear-gradient(135deg, #ffffff 0%, #f6f9ff 100%);
+  box-shadow: var(--crl-shadow-soft);
+}
+
+body:not(.crl-home) .page-heading h1 {
+  margin-bottom: 18px !important;
+  font-family: var(--crl-font-display) !important;
+  font-size: clamp(2.05rem, 4vw, 4.3rem) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.065em !important;
+  color: #0b1220 !important;
+}
+
+body:not(.crl-home) .page-heading h3 {
+  margin-bottom: 20px;
+  font-family: var(--crl-font-display) !important;
+  font-size: clamp(1.2rem, 2vw, 1.75rem);
+  color: #264b6d;
+}
+
+body:not(.crl-home) .page-heading p {
+  max-width: 1100px;
+  margin: 0 auto;
+  color: #475467 !important;
+  font-size: 1.05rem !important;
+  line-height: 1.8 !important;
+}
+
+body:not(.crl-home) .simple-post {
+  margin-top: 18px !important;
+  padding: clamp(22px, 3vw, 36px);
+  border: 1px solid var(--crl-border-light);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 50px rgba(16, 24, 40, 0.08);
+}
+
+body:not(.crl-home) .simple-post + .simple-post {
+  margin-top: 24px !important;
+}
+
+body:not(.crl-home) .simple-post .container-fluid,
+body:not(.crl-home) .page-heading .container-fluid,
+body:not(.crl-home) .contact-form .container-fluid,
+body:not(.crl-home) .section-heading .container-fluid {
+  max-width: 100%;
+}
+
+body:not(.crl-home) .simple-post h1,
+body:not(.crl-home) .simple-post h2,
+body:not(.crl-home) .simple-post h3,
+body:not(.crl-home) .simple-post h4 {
+  font-family: var(--crl-font-display) !important;
+  letter-spacing: -0.035em;
+  color: #101828;
+}
+
+body:not(.crl-home) .simple-post h2 {
+  position: relative;
+  padding-left: 18px;
+  line-height: 1.2;
+}
+
+body:not(.crl-home) .simple-post h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.18em;
+  bottom: 0.18em;
+  width: 5px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #58d5ff, #0f4c5c);
+}
+
+body:not(.crl-home) .down-content p,
+body:not(.crl-home) .simple-post p,
+body:not(.crl-home) .right-content p,
+body:not(.crl-home) .left-content p {
+  color: #344054 !important;
+  font-size: 1.01rem !important;
+  line-height: 1.82 !important;
+}
+
+body:not(.crl-home) .simple-post ul,
+body:not(.crl-home) .simple-post ol {
+  color: #344054;
+  line-height: 1.78;
+}
+
+body:not(.crl-home) .simple-post li {
+  margin-bottom: 0.45rem;
+}
+
+body:not(.crl-home) strong {
+  color: #101828;
+}
+
+body:not(.crl-home) #main a:not(.crl-btn):not(.copy-btn):not(.crl-course-card__link):not(.crl-roadmap-card) {
+  color: #075985 !important;
+  font-weight: 800;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(14, 116, 144, 0.28);
+}
+
+body:not(.crl-home) #main a:not(.crl-btn):not(.copy-btn):not(.crl-course-card__link):not(.crl-roadmap-card):hover {
+  color: #0f172a !important;
+  border-bottom-color: rgba(15, 23, 42, 0.5);
+}
+
+body:not(.crl-home) pre {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px !important;
+  box-shadow: 0 18px 45px rgba(2, 8, 23, 0.16);
+}
+
+body:not(.crl-home) code {
+  border-radius: 8px !important;
+  overflow-wrap: anywhere;
+}
+
+body:not(.crl-home) .copy-btn {
+  border-radius: 0 !important;
+  font-family: var(--crl-font-main);
   font-weight: 800;
 }
-q::before,
-q::after {
-  font-size: 4rem; /* Larger quotes */
-  vertical-align: middle;
+
+body:not(.crl-home) .diagram-wrapper,
+body:not(.crl-home) .mermaid {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
-.diagram-section {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center; /* centers horizontally */
-  align-items: center; /* centers vertically */
-  text-align: center;
+body:not(.crl-home) .diagram-wrapper {
+  border-radius: 18px;
 }
 
-svg {
-  /* border: 1px solid #ccc; */
-  background: white;
-  display: flex;
-  justify-content: center; /* centers horizontally */
-  align-items: center; /* centers vertically */
+body:not(.crl-home) .diagram-wrapper svg,
+body:not(.crl-home) .mermaid svg {
+  max-width: 100%;
+  height: auto;
 }
 
-.logout__btn,
-._pdf {
-  cursor: pointer;
+body:not(.crl-home) .mermaid {
+  border: 1px solid var(--crl-border-light);
+  border-radius: 18px;
+  box-shadow: 0 16px 44px rgba(16, 24, 40, 0.08);
 }
 
-.right-content p,
-.left-content p {
-  text-align: justify !important;
-  font-size: 0.9rem !important;
-  color: #212529 !important;
+body:not(.crl-home) mjx-container,
+body:not(.crl-home) .MathJax,
+body:not(.crl-home) .MathJax_Display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-.mathJax {
-  font-size: 1rem !important;
-  word-wrap: break-word !important; /* Allow breaks */
-  overflow-wrap: break-word !important;
-}
-
-#vecmDiagram {
+body:not(.crl-home) table {
   width: 100%;
-  max-height: 75vh;
-  border: 1px solid #ccc;
-  background: #fff;
-  color: black;
-  margin: 15px auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-#vecmDiagram svg text {
-  font-weight: 500 !important; /* 400 = normal, 600 = semi-bold, 700 = bold */
-  font-size: 1rem !important;
-  dominant-baseline: middle !important;
+body:not(.crl-home) .default-table,
+body:not(.crl-home) .alternate-table {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
-#vecmDiagram svg g.joint-link text {
-  font-size: 1rem !important;
-  font-style: italic;
+body:not(.crl-home) table th {
+  background: #111827;
+  color: #ffffff !important;
+  font-family: var(--crl-font-display);
 }
 
-
-/* Highlight current lesson */
-#menu ul li a.active-lesson {
-  color: #fff !important;
-  background-color: #49796B;
-  border-radius: 4px;
-  padding: 7px;
+body:not(.crl-home) table td {
+  color: #344054;
 }
 
-/* Ensure opened dropdown stays visible */
-#menu .opener.active-chapter + ul {
-  display: block !important;
+body:not(.crl-home) .primary-button a,
+body:not(.crl-home) button,
+body:not(.crl-home) .border-rectangle-button a,
+body:not(.crl-home) .filled-rectangle-button a,
+body:not(.crl-home) .filled-radius-button a,
+body:not(.crl-home) .border-radius-button a,
+body:not(.crl-home) .filled-rounded-button a,
+body:not(.crl-home) .border-rounded-button a,
+body:not(.crl-home) .filled-icon-button a,
+body:not(.crl-home) .border-icon-button a {
+  border-radius: 0 !important;
+  border: 0 !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--crl-dark-button-1), var(--crl-dark-button-2) 48%, var(--crl-dark-button-3)) !important;
+  font-family: var(--crl-font-main);
+  font-weight: 900 !important;
+  letter-spacing: 0.04em;
+  box-shadow: 0 14px 34px rgba(15, 76, 92, 0.24);
 }
 
-/* Similar Tutorials carousel fixes
-   - Hide Owl theme's inner round dot spans so only the project's square dots appear.
-   - Place previous/next arrows over the tutorial image. */
-.featured-posts .owl-carousel {
+body:not(.crl-home) .primary-button a:hover,
+body:not(.crl-home) button:hover,
+body:not(.crl-home) .border-rectangle-button a:hover,
+body:not(.crl-home) .filled-rectangle-button a:hover,
+body:not(.crl-home) .filled-radius-button a:hover,
+body:not(.crl-home) .border-radius-button a:hover,
+body:not(.crl-home) .filled-rounded-button a:hover,
+body:not(.crl-home) .border-rounded-button a:hover,
+body:not(.crl-home) .filled-icon-button a:hover,
+body:not(.crl-home) .border-icon-button a:hover {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #00040d, #0a1933 48%, #0b3b49) !important;
+  transform: translateY(-1px);
+}
+
+body:not(.crl-home) .border-rectangle-button h1,
+body:not(.crl-home) .filled-rectangle-button h1,
+body:not(.crl-home) .border-radius-button h1,
+body:not(.crl-home) .filled-radius-button h1 {
+  font-family: var(--crl-font-display) !important;
+  color: #0b1220 !important;
+  letter-spacing: -0.05em;
+}
+
+/* Sidebar typography and visual upgrade */
+body:not(.crl-home) #sidebar {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(88, 213, 255, 0.2), transparent 18rem),
+    linear-gradient(180deg, #070b16 0%, #0c1323 52%, #111827 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body:not(.crl-home) #sidebar > .inner {
+  scrollbar-color: rgba(88, 213, 255, 0.65) rgba(255, 255, 255, 0.08);
+}
+
+body:not(.crl-home) #sidebar > .inner > #search {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body:not(.crl-home) #menu ul {
+  font-family: var(--crl-font-display) !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+}
+
+body:not(.crl-home) #menu ul li h3 {
+  color: #58d5ff !important;
+  font-family: var(--crl-font-display) !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+}
+
+body:not(.crl-home) #menu ul li h4 {
+  color: #2fffd1 !important;
+  font-family: var(--crl-font-display) !important;
+  font-size: 1.08rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.035em !important;
+}
+
+body:not(.crl-home) #menu ul li h6 {
+  color: #e5e7eb !important;
+  font-family: var(--crl-font-display) !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.015em !important;
+}
+
+body:not(.crl-home) #menu ul a,
+body:not(.crl-home) #menu ul span {
+  border-radius: 0 !important;
+  color: #d9e6f7 !important;
+  font-family: var(--crl-font-display) !important;
+  font-size: 0.86rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.35;
+  transition: color 0.2s ease, background 0.2s ease, padding-left 0.2s ease;
+}
+
+body:not(.crl-home) #menu ul a:hover,
+body:not(.crl-home) #menu ul span:hover {
+  color: #ffffff !important;
+  background: rgba(88, 213, 255, 0.1);
+  padding-left: 10px;
+}
+
+body:not(.crl-home) #menu ul a.opener:before,
+body:not(.crl-home) #menu ul span.opener:before {
+  color: #58d5ff !important;
+}
+
+body:not(.crl-home) #menu ul li a.active-lesson {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #051225 0%, #0f4c5c 48%, #0e7490 100%) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 12px 28px rgba(8, 47, 73, 0.34);
+}
+
+body:not(.crl-home) #menu > ul > li {
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body:not(.crl-home) .featured-posts {
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.055) !important;
+}
+
+body:not(.crl-home) #footer .copyright,
+body:not(.crl-home) #footer .copyright p {
+  color: rgba(255, 255, 255, 0.74) !important;
+}
+
+@media (max-width: 1180px) {
+  .crl-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .crl-hero-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .crl-course-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 845px) {
+  body:not(.crl-home) #main > .inner {
+    --crl-inner-pad: 15px;
+  }
+
+  body:not(.crl-home) #header {
+    min-height: 100px;
+    margin: calc(var(--crl-inner-pad) * -1) calc(var(--crl-inner-pad) * -1) 38px calc(var(--crl-inner-pad) * -1) !important;
+  }
+
+  body:not(.crl-home) #header .logo {
+    justify-content: flex-end !important;
+    padding: 0 24px 0 110px;
+  }
+
+  body:not(.crl-home) #header .logo img {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    flex-basis: 44px !important;
+  }
+
+  body:not(.crl-home) #header .logo a {
+    height: 100px;
+    font-size: clamp(1.2rem, 5vw, 1.65rem) !important;
+  }
+
+  body:not(.crl-home) #sidebar .toggle {
+    height: 100px !important;
+    line-height: 100px !important;
+    top: 0 !important;
+    width: 7.25em;
+  }
+
+  body:not(.crl-home) #sidebar .toggle::before {
+    height: 100px !important;
+    line-height: 100px !important;
+    margin-top: 0 !important;
+    margin-left: -0.0855em;
+    z-index: 2;
+  }
+
+  body:not(.crl-home) #sidebar .toggle::after {
+    top: 20px !important;
+    height: 60px !important;
+    border-radius: 0 !important;
+    background: linear-gradient(135deg, var(--crl-dark-button-1), var(--crl-dark-button-2) 52%, var(--crl-dark-button-3)) !important;
+  }
+
+  body:not(.crl-home) .page-heading h1 {
+    margin-top: 0 !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .crl-site-header {
+    align-items: center;
+    border-radius: 28px;
+    flex-direction: column;
+  }
+
+  .crl-brand {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .crl-top-nav {
+    justify-content: center;
+  }
+
+  .crl-hero {
+    margin-top: 36px;
+  }
+
+  .crl-hero-panel,
+  .crl-course-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crl-section-heading--split {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .crl-course-card {
+    min-height: auto;
+  }
+
+  .crl-learning-roadmap {
+    grid-template-columns: 1fr;
+    padding-left: 30px;
+    gap: 18px;
+  }
+
+  .crl-learning-roadmap::before {
+    left: 9px;
+  }
+
+  .crl-learning-roadmap li::before {
+    left: -21px !important;
+    right: auto !important;
+    width: 21px;
+  }
+
+  .crl-learning-roadmap li::after {
+    left: -30px !important;
+    right: auto !important;
+  }
+
+  body:not(.crl-home) .page-heading {
+    border-radius: 22px;
+  }
+
+  body:not(.crl-home) .simple-post {
+    border-radius: 20px;
+  }
+}
+
+/* =========================================================
+   Requested refinement patch: copy icons, light gradients,
+   logical roadmap support, and light course grid background
+   ========================================================= */
+
+/* Course pages: light grid background in the full reading area, not hidden overflow. */
+body:not(.crl-home) #wrapper,
+body:not(.crl-home) #main {
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 8% 6%, rgba(88, 213, 255, 0.16), transparent 28rem),
+    radial-gradient(circle at 92% 14%, rgba(124, 92, 255, 0.11), transparent 26rem),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8ff 54%, #eef4fb 100%) !important;
+  background-size: 42px 42px, 42px 42px, auto, auto, auto !important;
+  background-position: 0 0, 0 0, center, center, center !important;
+}
+
+/* Header brand hover: keep it bright and readable. */
+body:not(.crl-home) #header .logo a:hover,
+body.crl-home .crl-brand:hover span {
+  color: #e0f7ff !important;
+  text-shadow: 0 0 18px rgba(88, 213, 255, 0.42);
+}
+
+/* Code copy control: show only an icon, ChatGPT-style, at the top-right. */
+body:not(.crl-home) .code-block-wrapper,
+body:not(.crl-home) .code-container,
+body:not(.crl-home) .highlight,
+body:not(.crl-home) .code-copy-wrapper,
+body:not(.crl-home) pre {
   position: relative;
 }
 
-.featured-posts .owl-carousel .owl-dots {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  position: absolute;
-  top: -55px;
-  right: 0;
+body:not(.crl-home) .copy-btn {
+  position: absolute !important;
+  top: 0.72rem !important;
+  right: 0.82rem !important;
+  z-index: 5 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(226, 232, 240, 0.28) !important;
+  border-radius: 12px !important;
+  color: #e5edf7 !important;
+  background: rgba(15, 23, 42, 0.78) !important;
+  box-shadow: 0 12px 30px rgba(2, 8, 23, 0.3) !important;
+  backdrop-filter: blur(10px);
+  font-size: 0 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-indent: 0 !important;
+  text-transform: none !important;
 }
 
-.featured-posts .owl-carousel button.owl-dot {
+body:not(.crl-home) .copy-btn::before {
+  content: "\f0c5";
   display: block;
-  width: 10px;
-  height: 10px;
+  font-family: "FontAwesome";
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 1;
+}
+
+body:not(.crl-home) .copy-btn.copied::before,
+body:not(.crl-home) .copy-btn.is-copied::before,
+body:not(.crl-home) .copy-btn[data-copied="true"]::before,
+body:not(.crl-home) .copy-btn[data-state="copied"]::before {
+  content: "\f00c";
+}
+
+body:not(.crl-home) .copy-btn:hover {
+  color: #ffffff !important;
+  background: rgba(30, 41, 59, 0.94) !important;
+  transform: translateY(-1px);
+}
+
+/* Active lesson: padded, rounded, light gradient highlight. */
+body:not(.crl-home) #menu ul li a.active-lesson {
+  display: block !important;
+  margin: 4px 0 !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  color: #0f172a !important;
+  background: linear-gradient(135deg, #f0fdff 0%, #dff7ff 42%, #eef2ff 100%) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(125, 211, 252, 0.74),
+    0 10px 24px rgba(14, 116, 144, 0.16) !important;
+}
+
+body:not(.crl-home) #menu ul li a.active-lesson:hover {
+  color: #020617 !important;
+  padding-left: 14px !important;
+  background: linear-gradient(135deg, #e0faff 0%, #bfecff 48%, #e0e7ff 100%) !important;
+}
+
+/* Bottom previous/next navigation buttons: rounded, light gradient background. */
+body:not(.crl-home) .border-rectangle-button a,
+body:not(.crl-home) .filled-rectangle-button a {
+  border: 1px solid rgba(125, 211, 252, 0.72) !important;
+  border-radius: 10px !important;
+  color: #0f172a !important;
+  background: linear-gradient(135deg, #f8fdff 0%, #dff7ff 48%, #eef2ff 100%) !important;
+  box-shadow: 0 12px 28px rgba(14, 116, 144, 0.14) !important;
+}
+
+body:not(.crl-home) .border-rectangle-button a:hover,
+body:not(.crl-home) .filled-rectangle-button a:hover {
+  color: #020617 !important;
+  background: linear-gradient(135deg, #e0faff 0%, #bfecff 48%, #e0e7ff 100%) !important;
+  box-shadow: 0 16px 34px rgba(14, 116, 144, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   Append-only patch: sidebar carousel, footer layout, and
+   translucent grid cards. This block intentionally does not
+   replace or remove any earlier rule from this file.
+   ========================================================= */
+
+/* 1) Similar Tutorials slider: keep navigation arrows inside the image box. */
+body:not(.crl-home) .featured-posts .owl-carousel {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+body:not(.crl-home) .featured-posts .owl-carousel .owl-stage-outer {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+}
+
+body:not(.crl-home) .featured-posts .featured-item {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.055) !important;
+}
+
+body:not(.crl-home) .featured-posts .featured-item img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 18px !important;
+}
+
+body:not(.crl-home) .featured-posts .owl-carousel .owl-nav {
+  position: absolute !important;
+  top: 50% !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+}
+
+body:not(.crl-home) .featured-posts .owl-carousel .owl-nav button.owl-prev,
+body:not(.crl-home) .featured-posts .owl-carousel .owl-nav button.owl-next {
+  position: relative !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
   margin: 0 !important;
   padding: 0 !important;
-  border-radius: 0 !important;
-  background-color: #2d2e39 !important;
-  border: 0 !important;
-  outline: none !important;
-}
-
-.featured-posts .owl-carousel button.owl-dot span {
-  display: none !important;
-}
-
-.featured-posts .owl-carousel button.owl-dot.active,
-.featured-posts .owl-carousel button.owl-dot:hover {
-  background-color: #535ba0 !important;
-}
-
-.featured-posts .owl-carousel .owl-nav {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
-  pointer-events: none;
-  z-index: 5;
-}
-
-.featured-posts .owl-carousel .owl-nav button.owl-prev,
-.featured-posts .owl-carousel .owl-nav button.owl-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(226, 232, 240, 0.34) !important;
   border-radius: 50% !important;
-  background-color: rgba(30, 31, 37, 0.75) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.28), transparent 42%),
+    rgba(3, 7, 18, 0.78) !important;
+  box-shadow: 0 14px 34px rgba(2, 8, 23, 0.42) !important;
+  backdrop-filter: blur(10px) !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  line-height: 1 !important;
+  text-indent: 0 !important;
+  overflow: visible !important;
+}
+
+body:not(.crl-home) .featured-posts .owl-carousel .owl-nav button.owl-prev:hover,
+body:not(.crl-home) .featured-posts .owl-carousel .owl-nav button.owl-next:hover {
+  color: #07111f !important;
+  background: linear-gradient(135deg, #e0faff 0%, #bfecff 48%, #e0e7ff 100%) !important;
+  box-shadow: 0 16px 38px rgba(88, 213, 255, 0.28) !important;
+}
+
+body:not(.crl-home) .featured-posts .owl-carousel .owl-nav button.owl-prev span,
+body:not(.crl-home) .featured-posts .owl-carousel .owl-nav button.owl-next span {
+  display: block !important;
+  font-size: 30px !important;
+  line-height: 34px !important;
+  font-weight: 700 !important;
+  transform: translateY(-2px) !important;
+}
+
+/* 2) Similar Tutorials slider dots: remove duplicate square backgrounds and keep clean spaced dots. */
+body:not(.crl-home) .featured-posts .owl-carousel .owl-dots {
+  position: absolute !important;
+  top: -54px !important;
+  right: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 9px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 4 !important;
+}
+
+body:not(.crl-home) .featured-posts .owl-carousel button.owl-dot,
+body:not(.crl-home) .featured-posts .owl-carousel button.owl-dot.active {
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   outline: none !important;
-  pointer-events: auto;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
+  line-height: 1 !important;
+  transform: none !important;
 }
 
-.featured-posts .owl-carousel .owl-nav button.owl-prev {
-  left: 8px;
+body:not(.crl-home) .featured-posts .owl-carousel button.owl-dot span {
+  display: block !important;
+  width: 9px !important;
+  height: 9px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(226, 232, 240, 0.38) !important;
+  box-shadow: 0 0 0 1px rgba(226, 232, 240, 0.1) !important;
+  transition: width 0.2s ease, background 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-.featured-posts .owl-carousel .owl-nav button.owl-next {
-  right: 8px;
+body:not(.crl-home) .featured-posts .owl-carousel button.owl-dot.active span {
+  width: 24px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #2fffd1, #58d5ff) !important;
+  box-shadow: 0 0 18px rgba(88, 213, 255, 0.38) !important;
 }
 
-.featured-posts .owl-carousel .owl-nav button.owl-prev:hover,
-.featured-posts .owl-carousel .owl-nav button.owl-next:hover {
-  background-color: rgba(83, 91, 160, 0.9) !important;
+/* 3) Sidebar footer: image at left, copyright centered at right, license line below. */
+body:not(.crl-home) #footer {
+  display: grid !important;
+  grid-template-columns: 108px minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  column-gap: 16px !important;
+  row-gap: 10px !important;
+  align-items: center !important;
+  margin-top: 28px !important;
+  padding-top: 22px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
 }
 
-.featured-posts .owl-carousel .similar-carousel-arrow {
-  display: block;
-  font-size: 20px;
-  line-height: 1;
-  font-weight: 700;
+body:not(.crl-home) #footer > a {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  display: block !important;
+  justify-self: start !important;
+  align-self: center !important;
+  margin-top: 10px !important;
+  border: 0 !important;
 }
 
-.featured-posts .owl-carousel .featured-item img {
-  display: block;
+body:not(.crl-home) #footer > a div {
+  display: block !important;
+  margin: 0 !important;
 }
 
+body:not(.crl-home) #footer img {
+  width: 96px !important;
+  height: 96px !important;
+  max-width: 96px !important;
+  min-width: 96px !important;
+  display: block !important;
+  object-fit: cover !important;
+  margin: 0 !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(226, 232, 240, 0.2) !important;
+  box-shadow: 0 18px 40px rgba(2, 8, 23, 0.34) !important;
+}
+
+body:not(.crl-home) #footer .copyright {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  align-self: center !important;
+  justify-self: stretch !important;
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+body:not(.crl-home) #footer .copyright::before {
+  content: "© Abolfazl Mohammadijoo — Control & Robotics Tutorials.";
+  display: block !important;
+  color: rgba(248, 250, 252, 0.9) !important;
+  font-family: var(--crl-font-display) !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  line-height: 1.45 !important;
+  letter-spacing: -0.015em !important;
+  text-align: center !important;
+}
+
+body:not(.crl-home) #footer::after {
+  content: "Licensed for non-commercial educational use only. Commercial use requires permission.";
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  color: rgba(203, 213, 225, 0.78) !important;
+  font-family: var(--crl-font-main) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+/* 4) Course cards: keep the light page grid visible through translucent card surfaces. */
+body:not(.crl-home) .page-heading,
+body:not(.crl-home) .simple-post,
+body:not(.crl-home) .contact-form,
+body:not(.crl-home) .tables,
+body:not(.crl-home) .section-heading {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.66)),
+    linear-gradient(rgba(15, 23, 42, 0.038) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.038) 1px, transparent 1px),
+    radial-gradient(circle at 94% 10%, rgba(88, 213, 255, 0.14), transparent 18rem) !important;
+  background-size: auto, 32px 32px, 32px 32px, auto !important;
+  background-position: center, 0 0, 0 0, center !important;
+  backdrop-filter: blur(7px) !important;
+}
+
+body:not(.crl-home) .simple-post:hover,
+body:not(.crl-home) .page-heading:hover {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.6)),
+    linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 94% 10%, rgba(88, 213, 255, 0.18), transparent 18rem) !important;
+  background-size: auto, 32px 32px, 32px 32px, auto !important;
+}
+
+/* Small sidebar widths: keep footer readable without horizontal overflow. */
+@media (max-width: 460px) {
+  body:not(.crl-home) #footer {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto !important;
+    justify-items: center !important;
+  }
+
+  body:not(.crl-home) #footer > a,
+  body:not(.crl-home) #footer .copyright,
+  body:not(.crl-home) #footer::after {
+    grid-column: 1 !important;
+  }
+
+  body:not(.crl-home) #footer > a {
+    grid-row: 1 !important;
+  }
+
+  body:not(.crl-home) #footer .copyright {
+    grid-row: 2 !important;
+  }
+
+  body:not(.crl-home) #footer::after {
+    grid-row: 3 !important;
+    white-space: normal !important;
+  }
+}
+
+
+/* =========================================================
+   Micro patch: sidebar footer image radius and wrapping license
+   ========================================================= */
+
+/* 1) Bottom sidebar author image: sharp-but-soft 4px corner radius. */
+body:not(.crl-home) #footer img {
+  border-radius: 4px !important;
+}
+
+/* 2) License line below the image: wrap when needed, never hide text, with 30px bottom space. */
+body:not(.crl-home) #footer::after {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  max-width: 100% !important;
+  margin: 0 0 30px 0 !important;
+  padding: 0 6px !important;
+}
+
+@media (max-width: 460px) {
+  body:not(.crl-home) #footer::after {
+    margin-bottom: 30px !important;
+  }
+}
+
+
+/* =========================================================
+   Final append-only patch: mobile hamburger background,
+   larger sidebar author image, and bright header hover
+   ========================================================= */
+
+/* 1) Remove hamburger background on small laptops, tablets, and mobiles.
+   main.css and earlier patches may create backgrounds on ::before/::after,
+   so both pseudo-elements are neutralized here without changing the icon itself. */
+@media (max-width: 1680px) {
+  body:not(.crl-home) #sidebar .toggle,
+  body:not(.crl-home) #sidebar .toggle:hover,
+  body:not(.crl-home) #sidebar .toggle:focus {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  body:not(.crl-home) #sidebar .toggle::before {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  body:not(.crl-home) #sidebar .toggle::after {
+    content: none !important;
+    display: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+}
+
+/* 2) Increase the author image in the sidebar footer by about 1.5x,
+   while keeping the 4px radius from the previous accepted patch. */
+body:not(.crl-home) #footer {
+  grid-template-columns: 156px minmax(0, 1fr) !important;
+  column-gap: 18px !important;
+}
+
+body:not(.crl-home) #footer img {
+  width: 144px !important;
+  height: 144px !important;
+  max-width: 144px !important;
+  min-width: 144px !important;
+  border-radius: 4px !important;
+}
+
+/* Keep the larger image centered when the footer stacks on very narrow screens. */
+@media (max-width: 460px) {
+  body:not(.crl-home) #footer {
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+  }
+
+  body:not(.crl-home) #footer img {
+    width: 144px !important;
+    height: 144px !important;
+    max-width: 144px !important;
+    min-width: 144px !important;
+  }
+}
+
+/* 3) Header brand hover/focus: force a readable light color over the dark header.
+   The broader #main link-hover rule is intentionally overridden here. */
+body:not(.crl-home) #main #header .logo a,
+body:not(.crl-home) #main #header .logo a:visited,
+body:not(.crl-home) #main #header .logo a:hover,
+body:not(.crl-home) #main #header .logo a:focus,
+body:not(.crl-home) #main #header .logo a:active {
+  color: #e8fbff !important;
+  border-bottom: 0 !important;
+  text-decoration: none !important;
+  background: transparent !important;
+}
+
+body:not(.crl-home) #main #header .logo a:hover,
+body:not(.crl-home) #main #header .logo a:focus {
+  color: #ffffff !important;
+  text-shadow:
+    0 0 16px rgba(88, 213, 255, 0.5),
+    0 0 28px rgba(47, 255, 209, 0.22) !important;
+}
+
+
+
+/* =========================================================
+   Safe mobile/tablet readability + overflow patch
+   Append-only. Keeps Mermaid/internal diagram font sizes unchanged.
+   ========================================================= */
+
+/* 1) Mermaid diagrams: center the diagram block and the generated SVG.
+   No font-size rules are applied here. */
+body:not(.crl-home) .mermaid {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+body:not(.crl-home) .mermaid svg {
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 2) Remove the background box behind the Similar Tutorials section. */
+body:not(.crl-home) .featured-posts {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+/* Keep the carousel/image cards styled, but do not paint the whole section. */
+body:not(.crl-home) .featured-posts .heading {
+  background: transparent !important;
+}
+
+/* 3) Mobile/tablet x-overflow prevention.
+   This fixes likely overflow sources instead of scaling Mermaid text. */
+@media (max-width: 1024px) {
+  html,
+  body,
+  body:not(.crl-home),
+  body:not(.crl-home) #wrapper,
+  body:not(.crl-home) #main,
+  body:not(.crl-home) #main > .inner {
+    max-width: 100% !important;
+    overflow-x: clip !important;
+  }
+
+  @supports not (overflow-x: clip) {
+    html,
+    body,
+    body:not(.crl-home),
+    body:not(.crl-home) #wrapper,
+    body:not(.crl-home) #main,
+    body:not(.crl-home) #main > .inner {
+      overflow-x: hidden !important;
+    }
+  }
+
+  body:not(.crl-home) #main > .inner {
+    width: 100% !important;
+    padding-left: max(16px, env(safe-area-inset-left)) !important;
+    padding-right: max(16px, env(safe-area-inset-right)) !important;
+  }
+
+  body:not(.crl-home) .container,
+  body:not(.crl-home) .container-fluid {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  body:not(.crl-home) .row {
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  body:not(.crl-home) [class*="col-"] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  body:not(.crl-home) .page-heading,
+  body:not(.crl-home) .simple-post,
+  body:not(.crl-home) .contact-form,
+  body:not(.crl-home) .section-heading,
+  body:not(.crl-home) .featured-posts,
+  body:not(.crl-home) .default-table,
+  body:not(.crl-home) .alternate-table,
+  body:not(.crl-home) pre,
+  body:not(.crl-home) table,
+  body:not(.crl-home) mjx-container,
+  body:not(.crl-home) .MathJax,
+  body:not(.crl-home) .MathJax_Display,
+  body:not(.crl-home) .diagram-wrapper,
+  body:not(.crl-home) .mermaid {
+    max-width: 100% !important;
+  }
+
+  body:not(.crl-home) pre,
+  body:not(.crl-home) code,
+  body:not(.crl-home) table,
+  body:not(.crl-home) mjx-container,
+  body:not(.crl-home) .MathJax,
+  body:not(.crl-home) .MathJax_Display,
+  body:not(.crl-home) .diagram-wrapper,
+  body:not(.crl-home) .mermaid {
+    overflow-x: auto !important;
+  }
+
+  body:not(.crl-home) img,
+  body:not(.crl-home) video,
+  body:not(.crl-home) canvas,
+  body:not(.crl-home) iframe {
+    max-width: 100% !important;
+  }
+
+  body:not(.crl-home) #header {
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  body:not(.crl-home) #header .logo {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body:not(.crl-home) #header .logo a {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+  }
+}
+
+/* 4) Increase readable text sizes on tablet/mobile only.
+   These selectors target normal lesson/sidebar text only.
+   They intentionally avoid .mermaid, svg, code, pre, MathJax, and tables. */
+@media (max-width: 1024px) {
+  body:not(.crl-home) .down-content p,
+  body:not(.crl-home) .simple-post p,
+  body:not(.crl-home) .right-content p,
+  body:not(.crl-home) .left-content p,
+  body:not(.crl-home) .page-heading p,
+  body:not(.crl-home) .simple-post li,
+  body:not(.crl-home) .down-content li,
+  body:not(.crl-home) .right-content li,
+  body:not(.crl-home) .left-content li {
+    font-size: 1.08rem !important;
+    line-height: 1.86 !important;
+  }
+
+  body:not(.crl-home) #menu ul a,
+  body:not(.crl-home) #menu ul span {
+    font-size: 0.98rem !important;
+    line-height: 1.48 !important;
+  }
+
+  body:not(.crl-home) #menu ul li h3 {
+    font-size: 1.5rem !important;
+    line-height: 1.22 !important;
+  }
+
+  body:not(.crl-home) #menu ul li h4 {
+    font-size: 1.18rem !important;
+    line-height: 1.28 !important;
+  }
+
+  body:not(.crl-home) #menu ul li h6 {
+    font-size: 1.05rem !important;
+    line-height: 1.38 !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body:not(.crl-home) .down-content p,
+  body:not(.crl-home) .simple-post p,
+  body:not(.crl-home) .right-content p,
+  body:not(.crl-home) .left-content p,
+  body:not(.crl-home) .page-heading p,
+  body:not(.crl-home) .simple-post li,
+  body:not(.crl-home) .down-content li,
+  body:not(.crl-home) .right-content li,
+  body:not(.crl-home) .left-content li {
+    font-size: 1.12rem !important;
+    line-height: 1.9 !important;
+  }
+
+  body:not(.crl-home) #menu ul a,
+  body:not(.crl-home) #menu ul span {
+    font-size: 1.04rem !important;
+    line-height: 1.55 !important;
+  }
+
+  body:not(.crl-home) #menu ul li h3 {
+    font-size: 1.6rem !important;
+  }
+
+  body:not(.crl-home) #menu ul li h4 {
+    font-size: 1.26rem !important;
+  }
+
+  body:not(.crl-home) #menu ul li h6 {
+    font-size: 1.12rem !important;
+  }
+
+  body:not(.crl-home) .page-heading h1 {
+    font-size: clamp(2.15rem, 9vw, 3rem) !important;
+    line-height: 1.04 !important;
+  }
+
+  body:not(.crl-home) .simple-post h2 {
+    font-size: clamp(1.65rem, 7vw, 2.25rem) !important;
+    line-height: 1.14 !important;
+  }
+
+  body:not(.crl-home) .simple-post h3 {
+    font-size: clamp(1.38rem, 5.6vw, 1.85rem) !important;
+    line-height: 1.18 !important;
+  }
+}
+
+/* 5) Extra small screens: neutralize decorative pseudo-elements that can leak horizontally. */
+@media (max-width: 480px) {
+  body:not(.crl-home) .simple-post h2 {
+    padding-left: 14px !important;
+  }
+
+  body:not(.crl-home) .simple-post h2::before {
+    width: 4px !important;
+  }
+
+  body:not(.crl-home) .featured-posts .owl-carousel .owl-dots {
+    right: 4px !important;
+  }
+
+  body:not(.crl-home) .featured-posts .owl-carousel .owl-nav {
+    left: 0 !important;
+    right: 0 !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+}
