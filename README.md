@@ -7,7 +7,7 @@ This repository contains standalone HTML lecture pages together with companion s
 <p align="center">
   <a href="https://mohammadijoo.github.io/CaaT_Academy/" target="_blank" rel="noopener noreferrer">
     <img
-      src="https://github.com/mohammadijoo/mohammadijoo.github.io/blob/main/assets/Abolfazl_Mohammadijoo_Portfolio.jpg"
+      src="https://github.com/mohammadijoo/Control_Robotics_Lab/blob/main/Tutorials/assets/images/CaaT_Academy_Banner.jpg"
       alt="CaaT Academy"
       width="100%"
     />
