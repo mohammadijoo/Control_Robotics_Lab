@@ -4,6 +4,16 @@ A course-based educational repository for **Control Engineering** and **Robotics
 
 This repository contains standalone HTML lecture pages together with companion source-code examples, simulations, and computational demonstrations. The goal is to provide structured learning material that can be read as static course content and studied alongside executable examples in multiple programming environments.
 
+<p align="center">
+  <a href="https://mohammadijoo.github.io/CaaT_Academy/" target="_blank" rel="noopener noreferrer">
+    <img
+      src="https://github.com/mohammadijoo/mohammadijoo.github.io/blob/main/assets/Abolfazl_Mohammadijoo_Portfolio.jpg"
+      alt="CaaT Academy"
+      width="100%"
+    />
+  </a>
+</p>
+
 ---
 
 ## Repository Contents
