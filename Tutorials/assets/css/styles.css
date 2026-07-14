@@ -2054,3 +2054,200 @@ body:not(.crl-home) h4.mathJax::-webkit-scrollbar-thumb {
     max-width: calc(100% + 60px) !important;
   }
 }
+
+/* =========================================================
+   Code block copy and collapse/expand controls
+   ========================================================= */
+
+/*
+ * Move the existing copy button to the left so that the
+ * collapse/expand button can appear on its right.
+ */
+body:not(.crl-home) .copy-btn {
+  right: calc(0.82rem + 44px + 0.5rem) !important;
+}
+
+/*
+ * Collapse/expand button.
+ * It uses the same dimensions and visual style as the copy button.
+ */
+body:not(.crl-home) .code-toggle-btn {
+  position: absolute !important;
+  top: 0.72rem !important;
+  right: 0.82rem !important;
+  z-index: 6 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+
+  border: 1px solid rgba(226, 232, 240, 0.28) !important;
+  border-radius: 12px !important;
+
+  color: #e5edf7 !important;
+  background: rgba(15, 23, 42, 0.78) !important;
+
+  box-shadow: 0 12px 30px rgba(2, 8, 23, 0.3) !important;
+  backdrop-filter: blur(10px);
+
+  font-size: 0 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-indent: 0 !important;
+  text-transform: none !important;
+
+  cursor: pointer !important;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/*
+ * Default state: code is open, so show the minus icon.
+ * Font Awesome 4 minus icon: f068
+ */
+body:not(.crl-home) .code-toggle-btn::before {
+  content: "\f068";
+  display: block;
+
+  font-family: "FontAwesome";
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 1;
+}
+
+/*
+ * Collapsed state: show the plus icon.
+ * Font Awesome 4 plus icon: f067
+ */
+body:not(.crl-home) .code-toggle-btn.is-collapsed::before {
+  content: "\f067";
+}
+
+/* Hover style matching the copy button. */
+body:not(.crl-home) .code-toggle-btn:hover {
+  color: #ffffff !important;
+  background: rgba(30, 41, 59, 0.94) !important;
+  transform: translateY(-1px);
+}
+
+/* Keyboard accessibility. */
+body:not(.crl-home) .copy-btn:focus-visible,
+body:not(.crl-home) .code-toggle-btn:focus-visible {
+  outline: 3px solid rgba(88, 213, 255, 0.75) !important;
+  outline-offset: 3px !important;
+}
+
+/*
+ * Collapsed code-block state.
+ *
+ * The <pre> element remains visible as a short control bar,
+ * while its <code> child is hidden.
+ */
+body:not(.crl-home) pre.is-code-collapsed {
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+}
+
+/* Hide only the code content, not the control buttons. */
+body:not(.crl-home) pre.is-code-collapsed > code {
+  display: none !important;
+}
+
+/*
+ * Mobile layout: use slightly smaller controls and spacing.
+ */
+@media (max-width: 600px) {
+  body:not(.crl-home) .copy-btn {
+    right: calc(0.55rem + 40px + 0.4rem) !important;
+  }
+
+  body:not(.crl-home) .code-toggle-btn {
+    top: 0.55rem !important;
+    right: 0.55rem !important;
+
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+  }
+
+  body:not(.crl-home) pre.is-code-collapsed {
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+  }
+}
+
+/* =========================================================
+   Corrections for collapsed code blocks and mobile controls
+   ========================================================= */
+
+/* Keep the same dark background when code is collapsed. */
+body:not(.crl-home) pre.is-code-collapsed {
+  background: #0d1117 !important;
+  background-color: #0d1117 !important;
+}
+
+/* Ensure both mobile controls have identical dimensions. */
+@media (max-width: 600px) {
+  body:not(.crl-home) .copy-btn,
+  body:not(.crl-home) .code-toggle-btn {
+    top: 0.55rem !important;
+
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border-radius: 10px !important;
+  }
+
+  body:not(.crl-home) .copy-btn {
+    right: calc(0.55rem + 40px + 0.4rem) !important;
+  }
+
+  body:not(.crl-home) .code-toggle-btn {
+    right: 0.55rem !important;
+  }
+
+  body:not(.crl-home) .copy-btn::before,
+  body:not(.crl-home) .code-toggle-btn::before {
+    font-size: 17px !important;
+    line-height: 1 !important;
+  }
+
+  body:not(.crl-home) pre.is-code-collapsed {
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+  }
+}
